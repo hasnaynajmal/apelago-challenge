@@ -9,6 +9,11 @@ export const FAST_MODEL = modelId(process.env.RADAR_FAST_MODEL, "claude-haiku-5-
 const main = () => anthropic(MAIN_MODEL);
 const fast = () => anthropic(FAST_MODEL);
 
+// Thinking effort (cost lever): low | medium | high | xhigh | max. Default low; raise for the live demo.
+type Effort = "low" | "medium" | "high" | "xhigh" | "max";
+const EFFORT = (process.env.RADAR_EFFORT ?? "low") as Effort;
+const effort = (level: Effort = EFFORT) => ({ providerOptions: { anthropic: { effort: level } } });
+
 const EVIDENCE_RULES = `Rules:
 - Use only the evidence provided. Never invent customers, numbers or investors.
 - If evidence is thin, choose the lower level and lower confidence, and list the gaps.
@@ -22,7 +27,8 @@ Find: what they do, technology, location, founding year, team, customers/pilots,
 current fundraising, impact claims and any measured impact. Prefer the company website, reputable press, EU/Business Finland
 pages and LinkedIn/Crunchbase snippets. Write dense factual notes with a source URL for every fact. Note when a fact is old.`,
   model: main,
-  tools: { web_search: anthropic.tools.webSearch_20260209({ maxUses: 5 }) },
+  defaultOptions: effort(),
+  tools: { web_search: anthropic.tools.webSearch_20260209({ maxUses: 3 }) },
 });
 
 export const scoutStructurer = new Agent({
@@ -31,6 +37,7 @@ export const scoutStructurer = new Agent({
   instructions: `Convert research notes about a startup into a structured profile. ${EVIDENCE_RULES}
 Sectors: choose from the allowed list, most relevant first. Stage: infer from funding history and traction.`,
   model: main,
+  defaultOptions: effort(),
 });
 
 export const trlAssessor = new Agent({
@@ -42,6 +49,7 @@ Ocean heuristics: tank/harbour test ≈ 5, single at-sea or single-site pilot �
 certified/class-approved product sold ≈ 8, multiple commercial deployments ≈ 9. Software: MVP 5–6, production users 7–8.
 ${EVIDENCE_RULES}`,
   model: main,
+  defaultOptions: effort(),
 });
 
 export const brlAssessor = new Agent({
@@ -53,6 +61,7 @@ Heuristics: market sizing only ≈ 3; projections ≈ 4; pilots/LOIs/pricing hyp
 recurring revenue with named commercial customers ≈ 7; growth metrics across markets ≈ 8; profitable and scaling ≈ 9.
 ${EVIDENCE_RULES}`,
   model: main,
+  defaultOptions: effort(),
 });
 
 export const impactAssessor = new Agent({
@@ -67,6 +76,7 @@ Map the startup to impact areas and the most relevant KPIs, estimate impact wher
 and flag impact-washing risks (no mechanism, ignored D2 emissions, unproven substitution).
 ${EVIDENCE_RULES}`,
   model: main,
+  defaultOptions: effort(),
 });
 
 export const investmentAnalyst = new Agent({
@@ -77,6 +87,7 @@ ${Object.entries(IRL_DIMENSION_RUBRIC).map(([k, v]) => `- ${k}: ${v}`).join("\n"
 Be calibrated: 3 is a solid early-stage startup. Reserve 5 for clear outliers.
 ${EVIDENCE_RULES}`,
   model: main,
+  defaultOptions: effort(),
 });
 
 export const matchNarrator = new Agent({
@@ -86,6 +97,7 @@ export const matchNarrator = new Agent({
 to a specific startup right now. Use the provided reasons and blockers. Be specific (name the programme, sector, stage,
 ticket, pilot type). No hype, no generic phrases.`,
   model: fast,
+  defaultOptions: effort("low"),
 });
 
 export const strategist = new Agent({
@@ -97,6 +109,7 @@ Prioritise by: hard deadlines, actions that unlock the most opportunities, warm-
 Mix startup-owned and operator-owned actions (the operator is the fund/accelerator team making introductions).
 Today's date is provided; respect deadlines.`,
   model: main,
+  defaultOptions: effort(),
 });
 
 export const radarAgents = {
