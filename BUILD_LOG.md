@@ -97,3 +97,18 @@ Commits ae849ea → b1e34f1.
 - **Not yet verified**: Realtime streaming end-to-end (needs one live paid run), visual QA in a browser.
 - **Next:** Phase 4 — CopilotKit copilot (Mastra radar agent with tools over the data; generative UI cards), polish
   (Aceternity/React Bits accents, loading states), production build check, demo script.
+
+## Phase 3b — UI redesign: light & minimal (2026-10-17) ✅
+User feedback: the dark "glassy" UI was rejected (too stylised, fonts too small). Commit c5c974e.
+- **Design rules now:** white background, Geist Sans (next/font/google), 15px base (`html { font-size: 15px }`), headings
+  semibold with tight tracking (48–64px h1, 30px section h2), body text ≥ 14px (never 9–11px), neutral zinc greys,
+  A'Pelago navy `#002444` = primary, gold only for highlights (`gold-ink #a87c12` for text on white, `gold-soft` backgrounds).
+  Cards: `.card-surface` (white, 1px border, rounded-2xl, faint shadow) + `.card-hover`. Reference sites: Ramp, Mercury, Attio, Cal.com, Resend.
+- **React Bits** (vendored source in `src/components/reactbits/`, not via CLI because the registry pins motion@12):
+  BlurText (patched to render a `span`), RotatingText, CountUp, DotGrid, ShinyText, SpotlightCard (unused yet).
+- **Logo:** `public/brand/apelago-logo-navy.svg` (white fills → navy) for light backgrounds.
+- **Hydration rule:** round every computed SVG / React Flow coordinate (float differences between server and client caused
+  mismatches). Radar uses `q()`; constellation uses `Math.round`.
+- **Visual QA loop:** headless Chrome screenshots →
+  `chrome --headless=new --window-size=1440,2400 --virtual-time-budget=8000 --screenshot=out.png http://localhost:3000/...`
+- Recharts radar: `isAnimationActive={false}` (animation didn't render reliably).
