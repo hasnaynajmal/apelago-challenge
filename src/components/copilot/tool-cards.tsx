@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, CalendarClock, Landmark, Loader2, Route, Sparkles } from "lucide-react";
 import { Flag } from "@/components/country";
+import { VentureAvatar } from "@/components/v2/primitives";
 import { cn } from "@/lib/utils";
 
 const LEVELS = [
@@ -13,11 +14,11 @@ const LEVELS = [
   { k: "irl", label: "Invest", color: "#a87c12" },
 ] as const;
 
-const GROUP_STYLE: Record<string, string> = {
-  "Investment-ready": "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  Accelerate: "bg-navy-soft text-navy ring-blue-200",
-  "Refer onwards": "bg-amber-50 text-amber-700 ring-amber-200",
-  Monitor: "bg-zinc-100 text-zinc-600 ring-zinc-200",
+const GROUP_STYLE: Record<string, { cls: string; dot: string }> = {
+  "Investment-ready": { cls: "bg-emerald-50 text-emerald-700 ring-emerald-200", dot: "#059669" },
+  Accelerate: { cls: "bg-navy-soft text-navy ring-blue-200", dot: "#002444" },
+  "Refer onwards": { cls: "bg-amber-50 text-amber-700 ring-amber-200", dot: "#d97706" },
+  Monitor: { cls: "bg-zinc-100 text-zinc-600 ring-zinc-200", dot: "#a1a1aa" },
 };
 
 type Levels = Partial<Record<"trl" | "brl" | "oirl" | "irl", number | null>>;
@@ -39,19 +40,27 @@ const href = (id: string, lens?: string) => `/dashboard/startups/${id}${lens ? `
 
 function Shell({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) {
   return (
-    <div className="my-2 overflow-hidden rounded-xl border bg-white">
-      <div className="flex items-center gap-2 border-b bg-zinc-50/80 px-3 py-2 text-xs font-medium text-muted-foreground">
-        <Icon className="size-3.5 text-navy" />
-        {title}
+    <div className="my-2.5 overflow-hidden rounded-2xl border bg-white shadow-[0_1px_2px_rgb(16_24_40/0.04)]">
+      <div className="flex items-center gap-2.5 px-3.5 pb-1.5 pt-3">
+        <span className="flex size-7 items-center justify-center rounded-lg bg-navy-soft text-navy"><Icon className="size-3.5" /></span>
+        <span className="text-[13px] font-semibold text-foreground">{title}</span>
       </div>
       {children}
     </div>
   );
 }
 
-export function GroupBadge({ group }: { group: string | null }) {
+const SHORT_GROUP: Record<string, string> = { "Investment-ready": "Ready", Accelerate: "Accelerate", "Refer onwards": "Refer", Monitor: "Monitor" };
+
+export function GroupBadge({ group, short }: { group: string | null; short?: boolean }) {
   if (!group) return null;
-  return <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset", GROUP_STYLE[group])}>{group}</span>;
+  const g = GROUP_STYLE[group];
+  return (
+    <span className={cn("inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-px text-[11px] font-medium ring-1 ring-inset", g?.cls)}>
+      <span className="size-1.5 rounded-full" style={{ background: g?.dot }} />
+      {short ? SHORT_GROUP[group] ?? group : group}
+    </span>
+  );
 }
 
 function MiniLevels({ levels }: { levels: Levels }) {
@@ -78,9 +87,9 @@ function MiniLevels({ levels }: { levels: Levels }) {
 /** Running state shown while a tool executes. */
 export function ToolPending({ label }: { label: string }) {
   return (
-    <div className="my-2 flex items-center gap-2 rounded-xl border border-dashed bg-white px-3 py-2.5 text-xs text-muted-foreground">
-      <Loader2 className="size-3.5 animate-spin text-navy" />
-      {label}
+    <div className="my-2.5 flex items-center gap-2.5 rounded-2xl border border-dashed bg-white/70 px-3.5 py-3 text-[13px]">
+      <span className="flex size-7 items-center justify-center rounded-lg bg-navy-soft"><Loader2 className="size-3.5 animate-spin text-navy" /></span>
+      <span className="shimmer-text font-medium">{label}</span>
     </div>
   );
 }
@@ -89,18 +98,19 @@ export function VentureListCard({ title, ventures, lens, total }: { title: strin
   if (!ventures.length) return <Shell icon={Sparkles} title={title}><div className="px-3 py-3 text-sm text-muted-foreground">No ventures match.</div></Shell>;
   return (
     <Shell icon={Sparkles} title={total != null && total > ventures.length ? `${title} · top ${ventures.length} of ${total}` : title}>
-      <ul className="divide-y">
+      <ul className="divide-y border-t">
         {ventures.map((v) => (
           <li key={v.id}>
-            <Link href={href(v.id, lens)} className="group flex items-center gap-3 px-3 py-2.5 transition-colors hover:bg-zinc-50">
+            <Link href={href(v.id, lens)} className="group flex items-center gap-3 px-3.5 py-2.5 transition-colors hover:bg-zinc-50">
+              <VentureAvatar name={v.name} size="sm" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
+                  <span className="truncate text-[13px] font-semibold group-hover:text-navy">{v.name}</span>
                   <Flag code={v.country} className="h-3" />
-                  <span className="truncate text-sm font-medium group-hover:text-navy">{v.name}</span>
                 </div>
                 <div className="mt-0.5 flex items-center gap-2 text-[11px] text-muted-foreground">
-                  {v.sector && <span className="truncate">{v.sector}</span>}
                   <GroupBadge group={v.group} />
+                  {v.sector && <span className="truncate">{v.sector}</span>}
                 </div>
               </div>
               {v.score != null && (
@@ -142,14 +152,19 @@ export function VentureSnapshotCard({ v }: { v: VentureSnapshot }) {
   const levels = Object.fromEntries(Object.entries(v.levels).map(([k, x]) => [k, x?.level ?? null])) as Levels;
   return (
     <Shell icon={Sparkles} title="Venture snapshot">
-      <div className="space-y-3 px-3 py-3">
+      <div className="space-y-3 px-3.5 pb-3.5 pt-1.5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="flex items-center gap-1.5">
-              <Flag code={v.country} className="h-3" />
-              <span className="truncate font-semibold">{v.name}</span>
+            <div className="flex items-center gap-2.5">
+              <VentureAvatar name={v.name} size="sm" />
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="truncate text-[14px] font-semibold">{v.name}</span>
+                  <Flag code={v.country} className="h-3" />
+                </div>
+                <div className="text-[11px] text-muted-foreground">{v.sectors.slice(0, 2).join(" · ")}</div>
+              </div>
             </div>
-            <div className="text-[11px] text-muted-foreground">{v.sectors.slice(0, 2).join(" · ")}</div>
           </div>
           {v.score != null && (
             <div className="text-right">
@@ -189,7 +204,7 @@ export function CompareCard({ ventures, lens }: { ventures: VentureRow[]; lens?:
     { label: "Score", get: (v) => v.score ?? "–", best: (v) => v.score ?? -1 },
     { label: "Thesis fit", get: (v) => (v.thesisFit != null ? `${v.thesisFit}%` : "–"), best: (v) => v.thesisFit ?? -1 },
     ...LEVELS.map((l) => ({ label: l.label, get: (v: VentureRow) => v.levels[l.k] ?? "–", best: (v: VentureRow) => v.levels[l.k] ?? -1 })),
-    { label: "Group", get: (v) => <GroupBadge group={v.group} /> },
+    { label: "Group", get: (v) => <GroupBadge group={v.group} short /> },
     { label: "Top investor", get: (v) => <span className="line-clamp-2">{v.topInvestor ?? "–"}</span> },
   ];
   return (
@@ -243,9 +258,9 @@ export function DeadlinesCard({ deadlines, lens }: { deadlines: DeadlineItem[]; 
   return (
     <Shell icon={CalendarClock} title="Funding deadlines">
       {!deadlines.length && <div className="px-3 py-3 text-sm text-muted-foreground">No deadlines in this window.</div>}
-      <ul className="divide-y">
+      <ul className="divide-y border-t">
         {deadlines.map((d) => (
-          <li key={d.name + d.date} className="flex gap-3 px-3 py-2.5">
+          <li key={d.name + d.date} className="flex gap-3 px-3.5 py-2.5">
             <div className={cn("w-11 shrink-0 rounded-lg py-1 text-center", d.daysLeft <= 30 ? "bg-amber-50 text-amber-700" : "bg-muted text-zinc-700")}>
               <div className="text-sm font-semibold leading-none tabular">{d.daysLeft}</div>
               <div className="text-[9px] uppercase">days</div>
@@ -286,9 +301,9 @@ export function InvestorsCard({ investors }: { investors: InvestorItem[] }) {
   if (!investors.length) return null; // the agent explains why in text
   return (
     <Shell icon={Landmark} title="Investors">
-      <ul className="divide-y">
+      <ul className="divide-y border-t">
         {investors.map((i) => (
-          <li key={i.name} className="px-3 py-2.5">
+          <li key={i.name} className="px-3.5 py-2.5">
             <div className="flex items-center justify-between gap-2">
               <div className="flex min-w-0 items-center gap-1.5">
                 <Flag code={i.hq} className="h-3" />
@@ -327,7 +342,7 @@ export function OverviewCard({ o }: { o: OverviewResult }) {
   const max = Math.max(1, ...Object.values(o.groups));
   return (
     <Shell icon={Sparkles} title={`Portfolio · ${o.ventures} ventures`}>
-      <div className="space-y-3 px-3 py-3">
+      <div className="space-y-3 px-3.5 pb-3.5 pt-1.5">
         <div className="space-y-1.5">
           {Object.entries(o.groups).map(([g, n]) => (
             <div key={g} className="flex items-center gap-2 text-xs">
@@ -354,7 +369,7 @@ function VentureListInline({ ventures, lens }: { ventures: VentureRow[]; lens?: 
     <ul className="divide-y border-t">
       {ventures.map((v, i) => (
         <li key={v.id}>
-          <Link href={href(v.id, lens)} className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-zinc-50">
+          <Link href={href(v.id, lens)} className="flex items-center gap-2 px-3.5 py-2 text-sm hover:bg-zinc-50">
             <span className={cn("flex size-4 items-center justify-center rounded-full text-[10px] font-semibold", i === 0 ? "bg-gold text-navy" : "bg-muted text-zinc-600")}>{i + 1}</span>
             <span className="flex-1 truncate font-medium">{v.name}</span>
             <span className="font-semibold tabular">{v.score}</span>
@@ -386,9 +401,9 @@ export function ConnectionsCard({ connections, total, lens }: { connections: Con
   if (!connections.length) return null;
   return (
     <Shell icon={Route} title={total > connections.length ? `Connections · top ${connections.length} of ${total}` : "Connections"}>
-      <ul className="divide-y">
+      <ul className="divide-y border-t">
         {connections.map((c, i) => (
-          <li key={i} className="space-y-1.5 px-3 py-2.5">
+          <li key={i} className="space-y-1.5 px-3.5 py-2.5">
             <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
               <span className="font-medium text-gold-ink">{KIND_LABEL[c.kind] ?? c.kind}</span>
               <Link href={href(c.ventureId, lens)} className="truncate hover:text-navy hover:underline">{c.ventureName}</Link>
@@ -433,7 +448,7 @@ export function PlatformCard({ g }: { g: PlatformGuide }) {
   const LABEL: Record<string, string> = { irl: "Investment readiness", thesis_fit: "Thesis fit", impact: "Ocean impact", momentum: "Momentum", team: "Team" };
   return (
     <Shell icon={Sparkles} title="How Atlas works">
-      <div className="space-y-3 px-3 py-3">
+      <div className="space-y-3 px-3.5 pb-3.5 pt-1.5">
         <div className="grid grid-cols-5 gap-1 text-center">
           {Object.entries(g.data).map(([k, v]) => (
             <div key={k} className="rounded-lg bg-muted/70 py-1.5">

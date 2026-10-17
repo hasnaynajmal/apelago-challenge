@@ -378,8 +378,9 @@ How to work:
 - Warm paths, intros, "who can introduce", consortia, synergies → findConnections (pass the venture and/or investor).
 - Use the "lens" (thesis) from the app context in every tool call. Scores and matches depend on it.
 - If the user is on a venture page ("this startup", "it", "here"), use the venture from the app context.
-- The tool results are shown to the user as cards, so do not repeat what the card shows. Keep answers short:
-  2–4 sentences or up to 4 bullets: the insight, why, and one concrete next step. Plain words.
+- The tool results are shown to the user as cards, so do not repeat what the card shows.
+- Answer format (Markdown): first line = the answer in **bold**, one sentence. Then at most 3 short bullets
+  (why, and one concrete next step). No headings, no tables, no long paragraphs, no emojis. Under 90 words.
 - If a tool returns nothing, say so in one sentence and suggest the closest useful question. Never speculate.
 - To open a venture page or switch the thesis, call the frontend tools openVenture / switchLens when the user asks.
 

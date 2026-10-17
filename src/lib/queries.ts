@@ -1,4 +1,6 @@
-// Read models for the UI (server-side). Uncached: results change whenever the pipeline runs.
+// Read models for the UI (server-side). Cached for about a minute (`use cache`, tag "radar"); a finished
+// assessment clears the tag (see pipeline/run.ts), so new scores show on the next request.
+import { cacheLife, cacheTag } from "next/cache";
 import { quadrantOf, type Quadrant } from "./quadrant";
 import { supabaseAdmin } from "./supabase/admin";
 import { INVESTOR_FRAMING, type LensId } from "./lens";
@@ -27,6 +29,9 @@ export interface RadarItem {
 }
 
 export async function getRadar(lens: string): Promise<RadarItem[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("radar");
   const db = supabaseAdmin();
   const [startups, scores, assessments, matches] = await Promise.all([
     db.from("startups").select("id,name,one_liner,country,sectors,stage,apelago_alumnus"),
@@ -107,6 +112,9 @@ export interface Dossier {
 }
 
 export async function getDossier(id: string, lens: string): Promise<Dossier | null> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("radar");
   const db = supabaseAdmin();
   const { data: startup } = await db.from("startups").select("*").eq("id", id).maybeSingle();
   if (!startup) return null;
@@ -155,6 +163,9 @@ export interface PipelineRow extends RadarItem {
 }
 
 export async function getPipeline(lens: string): Promise<PipelineRow[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("radar");
   const db = supabaseAdmin();
   const [base, matches, actions, investors, funding, partners] = await Promise.all([
     getRadar(lens),
@@ -199,6 +210,9 @@ export interface DeadlineRow {
 
 /** Upcoming funding deadlines across the whole portfolio, with the ventures that match each call. */
 export async function getDeadlines(lens: string, horizonDays = 120): Promise<DeadlineRow[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("radar");
   const db = supabaseAdmin();
   const today = new Date();
   const until = new Date(today.getTime() + horizonDays * 86_400_000).toISOString().slice(0, 10);
@@ -234,6 +248,9 @@ export interface InvestorDemand {
 
 /** Investors that appear most often among ventures' top-3 investor matches — the relationships worth activating first. */
 export async function getInvestorDemand(lens: string, limit = 5): Promise<InvestorDemand[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("radar");
   const db = supabaseAdmin();
   const [{ data: m }, { data: inv }, { data: s }] = await Promise.all([
     db.from("matches").select("startup_id,target_id").eq("thesis_id", lens).eq("target_type", "investor").lte("rank", 3),
@@ -267,6 +284,9 @@ export interface WarmPathView {
 
 /** Strongest warm-intro paths across the portfolio (excluding paths into the lens owner itself). */
 export async function getWarmPaths(lens: string, limit = 3): Promise<WarmPathView[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("radar");
   const db = supabaseAdmin();
   const [{ data: c }, { data: s }] = await Promise.all([
     db.from("connections").select("startup_id,payload,score").eq("kind", "warm_path").order("score", { ascending: false }).limit(40),

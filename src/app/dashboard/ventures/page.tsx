@@ -1,13 +1,14 @@
 import { Suspense } from "react";
 import { PipelineTable } from "@/components/pipeline/pipeline-table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PageHeader } from "@/components/v2/page-header";
 import { INVESTOR_FRAMING, LENSES, resolveLens } from "@/lib/lens";
 import { getPipeline } from "@/lib/queries";
 import type { Quadrant } from "@/lib/quadrant";
 
 export default function VenturesPage({ searchParams }: PageProps<"/dashboard/ventures">) {
   return (
-    <Suspense fallback={<Skeleton className="mx-auto h-[700px] max-w-7xl rounded-2xl" />}>
+    <Suspense fallback={<Skeleton className="mx-auto h-[700px] max-w-[1320px] rounded-2xl" />}>
       <Content searchParams={searchParams} />
     </Suspense>
   );
@@ -19,14 +20,11 @@ async function Content({ searchParams }: { searchParams: PageProps<"/dashboard/v
   const group = ["invest", "accelerate", "refer", "monitor"].includes(String(sp.group)) ? (String(sp.group) as Quadrant) : "all";
   const rows = await getPipeline(lens);
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Ventures</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          All {rows.length} ventures ranked for the <span className="font-medium text-foreground">{LENSES.find((l) => l.id === lens)!.label}</span> thesis.
-          Filter by group or search, then open a venture for its full assessment.
-        </p>
-      </div>
+    <div className="mx-auto max-w-[1320px] space-y-6">
+      <PageHeader
+        title="Ventures"
+        sub={<>All {rows.length} ventures ranked for <span className="font-medium text-foreground">{LENSES.find((l) => l.id === lens)!.label}</span>. Filter, search, then open one.</>}
+      />
       <PipelineTable key={group} rows={rows} lens={lens} investorColumn={INVESTOR_FRAMING[lens].column} initialFilter={group} />
     </div>
   );

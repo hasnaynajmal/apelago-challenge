@@ -30,7 +30,7 @@ export function ActionPlan({ actions }: { actions: ActionView[] }) {
                       {a.owner === "operator" ? "Operator" : "Startup"}
                     </span>
                   </div>
-                  {a.detail && <p className="mt-2 text-sm leading-relaxed text-zinc-600">{a.detail}</p>}
+                  {a.detail && <p title={a.detail} className="mt-2 line-clamp-4 text-[13px] leading-relaxed text-zinc-600">{a.detail}</p>}
                   {(a.deadline_date || a.unlocks.length > 0) && (
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {a.deadline_date && (

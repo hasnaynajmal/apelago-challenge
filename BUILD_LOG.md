@@ -411,3 +411,61 @@ venture page 656 px wide, Ventures table cut off. Fixes:
   Dashboard content padding is smaller on phones (px-4 py-6).
 - README.md written for judges + developers (live links, the 5 questions → where answered, highlights, pipeline diagram, score weights, stack, structure, local setup, env vars, cost, data, limits). .env.example comments updated (Second Opinion, Haiku default).
 - Pushed to GitHub (hasnaynajmal/apelago-challenge): `dev` and `main` both at 11f6ad1 (main fast-forwarded). History checked first: only .env.example tracked, no keys. Vercel Git integration now auto-deploys: push to `main` → production, `dev` → preview.
+
+## Phase 6 — UI v2 redesign (branch `ui-v2`, 2026-10-18) ✅
+User: one last full UI push on a separate branch (not main/dev), inspired by five reference dashboards (Talab Edu,
+restaurant, "Rp" projects, Nike AI-visibility): fit lots of content but stay clean, clear, never stuffed.
+Plan (design system first, then pages):
+- Tokens: cool grey app background, white rounded panels (≈18px radius, hairline border, faint shadow), one idea per
+  panel, generous padding; navy primary, gold accent only, soft pastel tints for categories.
+- Shell: white sidebar with grouped nav + a thesis switcher card at the top (dropdown); page header inside the
+  content ("Welcome back" + date, right side: venture search, Ask Atlas); slim mobile top bar.
+- Overview: KPI cards (tinted icon tiles, big numbers), pipeline donut + score distribution chart, top-picks
+  leaderboard, clean ventures table preview, deadlines as schedule cards, this week's moves.
+- Ventures: spacious table (initial avatars, group pills, readiness dashes, score) with segmented filter + search.
+- Venture page: header card with score gauge; segmented pill tabs (Overview · Readiness · Opportunities · Action
+  plan · Connections · Deep dive) so one section shows at a time.
+- Deadlines (timeline/schedule cards), Investors (leaderboard), Assess + live run, Guide restyled to the system.
+- Keep every feature working: lens transition, Ask Atlas, mobile, auto-open after a run.
+Done (all on `ui-v2`; main/dev untouched):
+- Tokens (globals.css): `--color-app` #f3f5f8 canvas, cooler greys (#101828 text, #667085 muted, #e7eaef borders),
+  `.card-surface` 18px radius, `.icon-tile`. New `components/v2/primitives.tsx` (Panel, PanelLink, StatCard, TINTS,
+  VentureAvatar initials tile, GroupPill, LevelDashes, ScoreGauge SVG, BarRow) and `components/v2/charts.tsx`
+  (PipelineDonut, ScoreHistogram; Recharts, client-only).
+- Shell: sidebar rewritten (logo, **thesis switcher card** with popover, navy "Assess a startup", Workspace + Help
+  groups incl. Ask Atlas, Deep Panel note, Back to site). Desktop topbar removed; `PageHeader` (title/sub + venture
+  search ⌘K palette, deadlines bell with 30-day count, Ask Atlas) on every page; slim topbar only on phones. Lens
+  progress bar now fixed at the window top.
+- Overview: 4 KPI cards → Pipeline donut · Score distribution · Portfolio readiness (avg levels + computed biggest
+  gap + review count) → Top ventures table + schedule-style deadlines (with biggest grant / eligible ventures) →
+  This week's moves + investors leaderboard.
+- Ventures: segmented group filter + search, spacious table (avatar, group pill, readiness dashes + review flag,
+  score bar, investor fit, next step); phone list kept.
+- Venture page: header card (avatar, meta line, FitText summary, score gauge panel with thesis fit / programme and
+  re-run), segmented pill tabs Overview · Readiness · Opportunities · Action plan · Connections · Deep dive;
+  Overview tab = investment view quote, 4 glance cards, "Why this score" bars, readiness tiles. Opportunity cards:
+  "86% fit" + bar, pill sub-tabs, rationale 3 lines; action-plan details 4 lines (full text on hover).
+- Deadlines: KPI cards + month-grouped timeline with tinted urgency cards. Investors: top-3 podium + leaderboard
+  table. Assess: "What happens when you press Run" 6-step panel. Run page + Guide use the new header/canvas.
+- Fixes found while testing: CommandDialog needs a `<Command>` root inside (crashed on open); popover width used v3
+  arbitrary syntax (`w-[--x]` → `w-(--x)`). Phone pass: every page 390/390; Overview/Investors tables drop
+  secondary columns on small screens. Production build passes.
+- Fixes after review: segmented TabsList kept the base `group-data-horizontal/tabs:h-8` (32px) while triggers are 36px → active pill poked out of the track; override with `group-data-horizontal/tabs:h-auto` (main tabs + opportunity sub-tabs). Bell is now a popover (calls closing in 60 days, days left, amount, View all) instead of a plain link; venture page got the search/bell/Ask Atlas row (`PageActions`).
+- Bell → real notifications feed (`components/v2/notifications.tsx`): deadlines ≤60 days, ventures flagged by the Second Opinion (grouped per venture, levels named), assessments finished/failed in the last 7 days; All/Deadlines/Activity tabs; red dots for new; badge = urgent deadlines + activity since last opened (per-browser localStorage). Items link to the venture (or deadlines page for calls).
+- Copilot + component polish: chat cards restyled to v2 (white rounded cards, icon-tile header, initial avatars,
+  dotted group pills, short labels in compare); chat CSS: navy user bubbles, 14px assistant prose with tidy
+  bullets/bold/links; model "Thought for N seconds" rows hidden (`messageView={{ reasoningMessage: "hidden" }}`);
+  answer format: bold one-line answer + ≤3 bullets, <90 words. Readiness tab rebuilt: 2-column cards with icon tile,
+  question, big level, confidence pill, Second Opinion distribution, reasoning, next steps + missing evidence all
+  visible (no toggle).
+- Ask Atlas feel: `chat-parts.tsx` — ThinkingSlot shows a shimmering "Thinking…" while the model reasons (gone once the answer starts); tool progress lines shimmer too (`.shimmer-text`). Drawer closes on click outside (dim backdrop) and on Esc.
+- Streaming blur was the auto-scroll, not the stream: CopilotKit's default `pin-to-bottom` re-scrolls on every token. Switched to `autoScroll="pin-to-send"` (scroll once to the sent question, answer streams below without the view moving); removed the typewriter renderer (user liked native streaming).
+- Speed (user: deployed pages slow; Assess page showed grey blocks before the form):
+  - Supabase is in eu-west-1 but Vercel functions ran in the default iad1 → every query crossed the Atlantic.
+    `vercel.json` now pins functions to `dub1` (Dublin).
+  - Read models in `lib/queries.ts` are cached (`"use cache"`, `cacheLife("minutes")`, `cacheTag("radar")`);
+    `runPipeline` calls `revalidateTag("radar", { expire: 0 })` when a run finishes so new scores show on the
+    next request (logs a warning if called outside a request, e.g. CLI batches).
+  - Assess form no longer waits for searchParams (reads the lens from the URL at submit), so it is part of the
+    static shell; Recent assessments has a list-shaped skeleton.
+- Ask Atlas scrolling reverted to CopilotKit's default (user preferred following the answer down).

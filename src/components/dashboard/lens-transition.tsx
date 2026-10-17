@@ -60,7 +60,7 @@ export function LensContent({ children, className }: { children: React.ReactNode
 export function LensProgressBar() {
   const { pending } = useLensTransition();
   return (
-    <div className={cn("pointer-events-none absolute inset-x-0 -bottom-px h-0.5 overflow-hidden transition-opacity", pending ? "opacity-100" : "opacity-0")}>
+    <div className={cn("pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 overflow-hidden transition-opacity", pending ? "opacity-100" : "opacity-0")}>
       <div className="lens-progress h-full w-1/3 rounded-full bg-navy" />
     </div>
   );
