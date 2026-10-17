@@ -206,3 +206,15 @@ User: the 2×2 pipeline graph was not understandable; wanted something clear tha
   Side column keeps Upcoming deadlines + Co-investors to activate.
 - Data reveals that must not depend on JS (score rings, mini bars) use CSS keyframes (`.ring-fill`, `.bar-grow` in
   globals.css) with the final value inline — framer-motion `initial` values showed empty in slow loads.
+
+## Phase 3h — Venture page restructure (2026-10-17) ✅
+User: too much empty space, too much description; asked whether people would read it all (answer: no — operators
+skim for a verdict in ~10–20 s; details are reference material for due diligence).
+`src/app/dashboard/startups/[id]/page.tsx` now:
+1. **Compact header card** — name + group badge + chips; description clamped to 2 lines (`components/expandable-text.tsx`,
+   "Read more"); score ring (`ScoreRing` exported from overview/top-picks) + compact breakdown bars + Re-run.
+2. **At a glance** row — Verdict (group / A'Pelago programme), Next move, Best co-investor / investor intro, Next
+   deadline (or best rolling funding).
+3. **Readiness** — 4 cards (rationale clamped to 2 lines, numbers rendered directly; CountUp removed because it showed 0 before JS).
+4. **Tabs** (shadcn Tabs, `variant="line"`): Opportunities · Action plan · Connections (map + panel) · Deep dive
+   (IRL radar, Ocean impact, evidence, team, sources).

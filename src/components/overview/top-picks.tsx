@@ -17,7 +17,7 @@ const LEVELS = [
   { k: "irl", label: "Invest", color: "#a87c12" },
 ] as const;
 
-function ScoreRing({ value, rank }: { value: number; rank: number }) {
+export function ScoreRing({ value, rank }: { value: number; rank: number }) {
   const r = 26;
   const c = 2 * Math.PI * r;
   return (

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { ChevronDown, TriangleAlert } from "lucide-react";
 import { motion } from "motion/react";
-import CountUp from "@/components/reactbits/CountUp";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { FRAMEWORKS, type Framework } from "@/lib/taxonomy";
 import type { Assessment } from "@/lib/types";
@@ -48,7 +47,7 @@ export function ReadinessCard({ framework, a }: { framework: Framework; a?: Asse
 
       <div className="mt-4 flex items-baseline gap-2">
         <span className={cn("text-3xl font-semibold tracking-tight tabular", tone.text)}>
-          <CountUp to={a.level} duration={0.8} />
+          {a.level}
         </span>
         <span className="text-base text-muted-foreground">/ {meta.max}</span>
       </div>
@@ -88,7 +87,7 @@ export function ReadinessCard({ framework, a }: { framework: Framework; a?: Asse
         </div>
       </div>
 
-      <p className={cn("mt-5 text-sm leading-relaxed text-zinc-600", !open && "line-clamp-3")}>{a.rationale}</p>
+      <p className={cn("mt-4 text-sm leading-relaxed text-zinc-600", !open && "line-clamp-2")}>{a.rationale}</p>
 
       {open && (
         <div className="mt-4 space-y-4">
