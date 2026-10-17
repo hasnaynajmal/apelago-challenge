@@ -385,3 +385,7 @@ agents"). Old pipeline events in the DB still say "Committee" (historic rows, no
   glossary; sticky "On this page" contents. Static page; links keep the current thesis via `LensLink` (client,
   Suspense fallback to a plain link). Ask Atlas knows about the Guide. Fixed old unescaped-apostrophe lint errors in
   the sidebar tooltip.
+- Ask Atlas page awareness: `PAGES` map in radar-copilot.tsx tells the agent what each page shows (`currentPage`
+  context). Instructions: "this page" questions are answered from that context in text; tools only for live data;
+  on the Guide and for conceptual questions no tools (cards would repeat the guide). Guide page has its own chips
+  (Summarise this guide · Where do I start? · Explain the score · What is a warm intro path?).
