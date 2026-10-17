@@ -45,7 +45,7 @@ export function IntakeForm({ lens }: { lens: string }) {
   };
 
   return (
-    <form onSubmit={submit} className="card-surface p-8 shadow-xl shadow-zinc-200/50">
+    <form onSubmit={submit} className="card-surface p-7 shadow-xl shadow-zinc-200/50">
       <div className="space-y-5">
         <label className="block space-y-2">
           <span className="block text-sm font-medium leading-5">Startup name</span>
@@ -75,7 +75,7 @@ export function IntakeForm({ lens }: { lens: string }) {
         </label>
       </div>
 
-      <Button type="submit" size="lg" disabled={busy || name.trim().length < 2} className="mt-7 h-12 w-full rounded-full text-[15px]">
+      <Button type="submit" size="lg" disabled={busy || name.trim().length < 2} className="mt-6 h-12 w-full rounded-full text-[15px]">
         {busy ? <Loader2 className="animate-spin" /> : null} Run the assessment <ArrowRight />
       </Button>
 
