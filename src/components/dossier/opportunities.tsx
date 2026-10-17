@@ -59,7 +59,7 @@ function MatchCard({ m, i, roleTags }: { m: MatchView; i: number; roleTags?: boo
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-base font-semibold">{name}</span>
+            <span className="text-sm font-semibold">{name}</span>
             {roleTags && m.targetType === "investor" ? (
               <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", m.status === "ready" ? "bg-emerald-50 text-emerald-700" : "bg-sky-50 text-sky-700")}>
                 {m.status === "ready" ? "Co-invest now" : "Next round"}
@@ -82,7 +82,7 @@ function MatchCard({ m, i, roleTags }: { m: MatchView; i: number; roleTags?: boo
           </div>
         </div>
         <div className="w-24 shrink-0 text-right">
-          <div className="text-2xl font-semibold tracking-tight tabular">{Math.round(m.fit * 100)}<span className="text-sm font-normal text-muted-foreground">%</span></div>
+          <div className="text-xl font-semibold tracking-tight tabular">{Math.round(m.fit * 100)}<span className="text-sm font-normal text-muted-foreground">%</span></div>
           <div className="text-xs text-muted-foreground">fit</div>
           {m.calibratedFit != null && (
             <Tooltip>
@@ -96,7 +96,7 @@ function MatchCard({ m, i, roleTags }: { m: MatchView; i: number; roleTags?: boo
           )}
         </div>
       </div>
-      {m.rationale && <p className="mt-4 text-[15px] leading-relaxed text-zinc-700">{m.rationale}</p>}
+      {m.rationale && <p className="mt-4 text-sm leading-relaxed text-zinc-700">{m.rationale}</p>}
       <div className="mt-4 flex flex-wrap gap-2">
         {m.reasons.slice(0, 5).map((r) => (
           <span key={r} className="flex items-center gap-1.5 rounded-lg border bg-white px-2.5 py-1 text-sm text-zinc-700">
@@ -124,14 +124,14 @@ export function Opportunities({ matches, investorLabel = "Investors", investorSu
     <Tabs defaultValue="investor" className="w-full">
       <TabsList className="mb-4 h-11 rounded-full p-1">
         {(Object.keys(groups) as (keyof typeof groups)[]).map((k) => (
-          <TabsTrigger key={k} value={k} className="rounded-full px-4 text-[15px]">
+          <TabsTrigger key={k} value={k} className="rounded-full px-4 text-sm">
             {labels[k]} <span className="ml-1.5 text-muted-foreground tabular">{groups[k].length}</span>
           </TabsTrigger>
         ))}
       </TabsList>
       {(Object.keys(groups) as (keyof typeof groups)[]).map((k) => (
         <TabsContent key={k} value={k} className="space-y-3">
-          {k === "investor" && investorSub && <p className="text-[15px] text-muted-foreground">{investorSub}</p>}
+          {k === "investor" && investorSub && <p className="text-sm text-muted-foreground">{investorSub}</p>}
           {groups[k].slice(0, 8).map((m, i) => <MatchCard key={m.targetId} m={m} i={i} roleTags={roleTags} />)}
           {groups[k].length === 0 && <p className="text-muted-foreground">No matches.</p>}
         </TabsContent>

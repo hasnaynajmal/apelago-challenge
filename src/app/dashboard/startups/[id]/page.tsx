@@ -40,7 +40,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
   const breakdown = score?.breakdown as Record<string, number | string | undefined> | undefined;
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-12">
       {/* Header */}
       <section>
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -52,10 +52,10 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
         <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
           <div>
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-5xl font-semibold tracking-[-0.035em]">{s.name}</h1>
+              <h1 className="text-4xl font-semibold tracking-[-0.035em]">{s.name}</h1>
               {s.apelago_alumnus && <span className="rounded-full bg-navy-soft px-3 py-1 text-sm font-medium text-navy">A'Pelago alumni</span>}
             </div>
-            <p className="mt-4 max-w-3xl text-lg leading-relaxed text-zinc-600">{s.profile?.summary ?? s.one_liner}</p>
+            <p className="mt-4 max-w-3xl text-base leading-relaxed text-zinc-600">{s.profile?.summary ?? s.one_liner}</p>
             <div className="mt-5 flex flex-wrap items-center gap-2 text-sm">
               {(s.city || s.country) && <Chip><CountryLabel code={s.country} city={s.city} /></Chip>}
               {s.founded && <Chip>Founded {s.founded}</Chip>}
@@ -70,7 +70,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
           </div>
 
           {score ? (
-            <div className="card-surface p-6">
+            <div className="card-surface p-5">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="text-sm text-muted-foreground">Promise for {lensInfo.label}</div>
@@ -78,7 +78,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
                 </div>
                 <RunAssessmentButton startupId={s.id} lens={lens} rerun />
               </div>
-              {score.headline && <p className="mt-3 text-[15px] leading-relaxed text-zinc-700">{score.headline}</p>}
+              {score.headline && <p className="mt-3 text-sm leading-relaxed text-zinc-700">{score.headline}</p>}
               {breakdown && (
                 <div className="mt-5 space-y-2.5">
                   {(["irl", "thesis_fit", "impact", "momentum", "team"] as const).map((k) => {
@@ -101,9 +101,9 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
               )}
             </div>
           ) : (
-            <div className="card-surface p-6">
-              <div className="text-base font-semibold">Not assessed yet</div>
-              <p className="mt-2 text-[15px] text-muted-foreground">
+            <div className="card-surface p-5">
+              <div className="text-sm font-semibold">Not assessed yet</div>
+              <p className="mt-2 text-sm text-muted-foreground">
                 The committee researches the venture, scores four readiness frameworks, matches it across the ecosystem and writes an action plan. About a minute.
               </p>
               <div className="mt-5"><RunAssessmentButton startupId={s.id} lens={lens} /></div>
@@ -124,8 +124,8 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
           </Section>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <div className="card-surface p-6">
-              <h3 className="text-lg font-semibold">Investment readiness</h3>
+            <div className="card-surface p-5">
+              <h3 className="text-sm font-semibold">Investment readiness</h3>
               <p className="text-sm text-muted-foreground">Ten dimensions, scored 1–5</p>
               {irl?.dimensions && <IrlRadar dimensions={irl.dimensions} />}
               <div className="grid gap-6 sm:grid-cols-2">
@@ -133,12 +133,12 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
                 <List title="Risks" items={irl?.risks} tone="text-red-600" mark="−" />
               </div>
               {irl?.deal_notes && (
-                <p className="mt-5 rounded-xl bg-muted p-4 text-[15px] text-zinc-700"><span className="font-semibold text-foreground">Check first: </span>{irl.deal_notes}</p>
+                <p className="mt-5 rounded-xl bg-muted p-4 text-sm text-zinc-700"><span className="font-semibold text-foreground">Check first: </span>{irl.deal_notes}</p>
               )}
             </div>
 
-            <div className="card-surface p-6">
-              <h3 className="text-lg font-semibold">Ocean impact</h3>
+            <div className="card-surface p-5">
+              <h3 className="text-sm font-semibold">Ocean impact</h3>
               <p className="text-sm text-muted-foreground">Mapped to the Ocean Impact Navigator</p>
               <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {(Object.keys(IMPACT_AREAS) as ImpactArea[]).map((k) => {
@@ -157,7 +157,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
               </div>
               <div className="mt-5 space-y-2.5">
                 {impact?.kpis?.slice(0, 5).map((k) => (
-                  <div key={k.code + k.name} className="flex items-start gap-3 text-[15px]">
+                  <div key={k.code + k.name} className="flex items-start gap-3 text-sm">
                     <span className="rounded-md bg-emerald-50 px-2 py-0.5 font-mono text-sm text-emerald-700">{k.code}</span>
                     <span className="text-zinc-700">{k.name}{k.estimate && <span className="text-muted-foreground"> — {k.estimate}</span>}</span>
                   </div>
@@ -191,7 +191,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
           {s.profile && (
             <Section title="Evidence" sub="Everything above is grounded in these findings.">
               <div className="grid gap-6 lg:grid-cols-3">
-                <ul className="card-surface space-y-3 p-6 text-[15px] lg:col-span-2">
+                <ul className="card-surface space-y-3 p-6 text-sm lg:col-span-2">
                   {s.profile.evidence.slice(0, 12).map((e, i) => (
                     <li key={i} className="flex gap-3">
                       <span className="mt-2 size-1.5 shrink-0 rounded-full bg-navy" />
@@ -206,15 +206,15 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
                 </ul>
                 <div className="space-y-4">
                   {!!s.profile.team?.length && (
-                    <div className="card-surface p-6">
-                      <div className="text-base font-semibold">Team</div>
-                      <ul className="mt-3 space-y-2 text-[15px]">
+                    <div className="card-surface p-5">
+                      <div className="text-sm font-semibold">Team</div>
+                      <ul className="mt-3 space-y-2 text-sm">
                         {s.profile.team.slice(0, 5).map((t) => <li key={t.name}>{t.name} <span className="text-muted-foreground">· {t.role}</span></li>)}
                       </ul>
                     </div>
                   )}
-                  <div className="card-surface p-6">
-                    <div className="text-base font-semibold">Sources <span className="font-normal text-muted-foreground">{s.profile.sources.length}</span></div>
+                  <div className="card-surface p-5">
+                    <div className="text-sm font-semibold">Sources <span className="font-normal text-muted-foreground">{s.profile.sources.length}</span></div>
                     <ul className="mt-3 space-y-1.5 text-sm">
                       {s.profile.sources.slice(0, 8).map((u) => (
                         <li key={u} className="truncate"><a href={u} target="_blank" rel="noreferrer" className="text-navy hover:underline">{u.replace(/^https?:\/\/(www\.)?/, "")}</a></li>
@@ -239,7 +239,7 @@ function List({ title, items, tone, mark }: { title: string; items?: string[]; t
   return (
     <div>
       <div className="text-sm font-semibold">{title}</div>
-      <ul className="mt-2 space-y-1.5 text-[15px] text-zinc-700">
+      <ul className="mt-2 space-y-1.5 text-sm text-zinc-700">
         {items?.slice(0, 4).map((x) => <li key={x} className="flex gap-2"><span className={tone}>{mark}</span>{x}</li>)}
       </ul>
     </div>
@@ -250,8 +250,8 @@ function Section({ title, sub, children }: { title: string; sub?: string; childr
   return (
     <section className="space-y-6">
       <div>
-        <h2 className="text-3xl font-semibold">{title}</h2>
-        {sub && <p className="mt-1.5 text-muted-foreground">{sub}</p>}
+        <h2 className="text-xl font-semibold">{title}</h2>
+        {sub && <p className="mt-1 text-sm text-muted-foreground">{sub}</p>}
       </div>
       {children}
     </section>

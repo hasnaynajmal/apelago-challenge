@@ -78,7 +78,7 @@ export function PipelineTable({ rows, lens, investorColumn = "Best investor matc
                 <td className="px-4 py-4 text-sm text-muted-foreground tabular">{rows.indexOf(r) + 1}</td>
                 <td className="px-4 py-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-[15px] font-semibold">{r.name}</span>
+                    <span className="text-sm font-semibold">{r.name}</span>
                     {r.alumnus && <span title="A'Pelago accelerator alumni" className="whitespace-nowrap rounded-full bg-navy-soft px-2 py-0.5 text-xs font-medium text-navy">Alumni</span>}
                   </div>
                   <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-sm text-muted-foreground">
@@ -95,7 +95,7 @@ export function PipelineTable({ rows, lens, investorColumn = "Best investor matc
                   <div className="grid grid-cols-4 gap-3">
                     {LEVELS.map((l) => (
                       <div key={l.k} className="text-center">
-                        <div className={cn("text-base font-semibold tabular", l.cls)}>{r.levels[l.k] ?? "–"}</div>
+                        <div className={cn("text-sm font-semibold tabular", l.cls)}>{r.levels[l.k] ?? "–"}</div>
                         <div className="text-xs text-muted-foreground">{l.label}</div>
                       </div>
                     ))}
@@ -105,12 +105,12 @@ export function PipelineTable({ rows, lens, investorColumn = "Best investor matc
                   )}
                 </td>
                 <td className="px-4 py-4 text-right">
-                  <span className="text-xl font-semibold tabular">{r.promise != null ? Math.round(r.promise) : "–"}</span>
+                  <span className="text-lg font-semibold tabular">{r.promise != null ? Math.round(r.promise) : "–"}</span>
                 </td>
                 <td className="px-4 py-4">
                   {r.topInvestor ? (
                     <>
-                      <div className="text-[15px] font-medium">{r.topInvestor.name.replace(/\s*\(.*\)$/, "")}</div>
+                      <div className="text-sm font-medium">{r.topInvestor.name.replace(/\s*\(.*\)$/, "")}</div>
                       <div className="text-sm text-muted-foreground">{Math.round(r.topInvestor.fit * 100)}% fit</div>
                     </>
                   ) : (
@@ -120,7 +120,7 @@ export function PipelineTable({ rows, lens, investorColumn = "Best investor matc
                 <td className="max-w-80 px-4 py-4">
                   {r.nextStep ? (
                     <>
-                      <div className="text-[15px] leading-snug">{r.nextStep.title}</div>
+                      <div className="text-sm leading-snug">{r.nextStep.title}</div>
                       <div className="text-sm text-muted-foreground">{r.nextStep.owner === "operator" ? "Your team" : "Startup"}</div>
                     </>
                   ) : (

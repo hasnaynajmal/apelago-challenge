@@ -22,7 +22,7 @@ export function DeadlinesPanel({ deadlines, lens, title = "Upcoming deadlines", 
   return (
     <div className="card-surface">
       <div className="border-b px-5 py-4">
-        <h3 className="text-base font-semibold">{title}</h3>
+        <h3 className="text-sm font-semibold">{title}</h3>
         <p className="text-sm text-muted-foreground">{sub}</p>
       </div>
       <ul className="divide-y">
@@ -32,11 +32,11 @@ export function DeadlinesPanel({ deadlines, lens, title = "Upcoming deadlines", 
           return (
             <li key={d.id} className="flex items-start gap-4 px-5 py-4">
               <div className={cn("flex size-12 shrink-0 flex-col items-center justify-center rounded-lg border", urgent && "border-amber-300 bg-amber-50")}>
-                <span className="text-lg font-semibold leading-none tabular">{date.getUTCDate()}</span>
+                <span className="text-base font-semibold leading-none tabular">{date.getUTCDate()}</span>
                 <span className="mt-0.5 text-[11px] font-medium uppercase text-muted-foreground">{date.toLocaleString("en-GB", { month: "short", timeZone: "UTC" })}</span>
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-[15px] font-semibold leading-snug">{d.name}</div>
+                <div className="text-sm font-semibold leading-snug">{d.name}</div>
                 <div className={cn("mt-0.5 text-sm", urgent ? "text-amber-700" : "text-muted-foreground")}>
                   {d.days} days left{d.amount ? ` · up to ${eur(d.amount)}` : ""} · {d.eligible.length} ventures fit
                 </div>
@@ -55,7 +55,7 @@ export function InvestorDemandPanel({ investors, lens, title = "Investors to act
   return (
     <div className="card-surface">
       <div className="border-b px-5 py-4">
-        <h3 className="text-base font-semibold">{title}</h3>
+        <h3 className="text-sm font-semibold">{title}</h3>
         <p className="text-sm text-muted-foreground">{sub}</p>
       </div>
       <ul className="divide-y">
@@ -64,7 +64,7 @@ export function InvestorDemandPanel({ investors, lens, title = "Investors to act
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-2">
                 <Flag code={i.hq} />
-                <span className="truncate text-[15px] font-semibold">{i.name}</span>
+                <span className="truncate text-sm font-semibold">{i.name}</span>
                 {i.isPartner && <span className="shrink-0 rounded-full bg-gold-soft px-2 py-0.5 text-xs font-medium text-gold-ink">Partner</span>}
               </div>
               <span className="shrink-0 text-sm text-muted-foreground tabular">{i.ventures.length} ventures</span>

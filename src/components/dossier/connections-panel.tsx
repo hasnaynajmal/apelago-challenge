@@ -27,7 +27,7 @@ export function ConnectionsPanel({ connections }: { connections: ConnectionView[
             <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium", k.cls)}>
               <Icon className="size-3.5" /> {k.label}
             </span>
-            <div className="mt-3 text-base font-semibold">{c.title}</div>
+            <div className="mt-3 text-sm font-semibold">{c.title}</div>
             {hops.length > 0 && (
               <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
                 {hops.map((h, i) => (
@@ -40,7 +40,7 @@ export function ConnectionsPanel({ connections }: { connections: ConnectionView[
                 ))}
               </div>
             )}
-            <p className="mt-3 text-[15px] leading-relaxed text-zinc-600">{c.narrative}</p>
+            <p className="mt-3 text-sm leading-relaxed text-zinc-600">{c.narrative}</p>
           </div>
         );
       })}

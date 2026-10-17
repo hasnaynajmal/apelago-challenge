@@ -36,8 +36,8 @@ async function Content({ searchParams }: { searchParams: PageProps<"/dashboard">
   return (
     <div className="mx-auto max-w-7xl space-y-8">
       <div>
-        <h1 className="text-3xl font-semibold">Overview</h1>
-        <p className="mt-1.5 text-muted-foreground">
+        <h1 className="text-2xl font-semibold">Overview</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           The portfolio through the <span className="font-medium text-foreground">{lensInfo.label}</span> thesis. Click any venture for its full assessment.
         </p>
       </div>
@@ -49,7 +49,7 @@ async function Content({ searchParams }: { searchParams: PageProps<"/dashboard">
               {k.dot && <span className="size-2 rounded-full" style={{ background: k.dot }} />}
               {k.label}
             </div>
-            <div className="mt-2 text-3xl font-semibold tracking-tight tabular">{k.value}</div>
+            <div className="mt-1.5 text-2xl font-semibold tracking-tight tabular">{k.value}</div>
             <div className="mt-1 truncate text-sm text-muted-foreground">{k.sub}</div>
           </div>
         ))}
@@ -58,7 +58,7 @@ async function Content({ searchParams }: { searchParams: PageProps<"/dashboard">
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         <div className="space-y-4">
           <div className="flex items-end justify-between">
-            <h2 className="text-lg font-semibold">Readiness vs thesis fit</h2>
+            <h2 className="text-sm font-semibold">Readiness vs thesis fit</h2>
             <Link href={`/dashboard/ventures?lens=${lens}`} className="inline-flex items-center gap-1 text-sm font-medium text-navy hover:underline">
               All ventures <ArrowRight className="size-3.5" />
             </Link>
@@ -69,7 +69,7 @@ async function Content({ searchParams }: { searchParams: PageProps<"/dashboard">
               <div key={q} className="card-surface flex gap-3 p-4">
                 <span className="mt-1.5 size-2.5 shrink-0 rounded-full" style={{ background: QUADRANTS[q].dot }} />
                 <div>
-                  <div className="text-[15px] font-semibold">{QUADRANTS[q].label} <span className="font-normal text-muted-foreground tabular">· {count(q)}</span></div>
+                  <div className="text-sm font-semibold">{QUADRANTS[q].label} <span className="font-normal text-muted-foreground tabular">· {count(q)}</span></div>
                   <div className="text-sm text-muted-foreground">{QUADRANTS[q].hint}</div>
                 </div>
               </div>

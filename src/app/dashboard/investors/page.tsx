@@ -19,8 +19,8 @@ async function Content({ searchParams }: { searchParams: PageProps<"/dashboard/i
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold">{framing.ownerId ? "Co-investors" : "Investors"}</h1>
-        <p className="mt-1.5 text-muted-foreground">{framing.sub} Ranked by how many ventures they are a top-3 match for.</p>
+        <h1 className="text-2xl font-semibold">{framing.ownerId ? "Co-investors" : "Investors"}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{framing.sub} Ranked by how many ventures they are a top-3 match for.</p>
       </div>
       <InvestorDemandPanel investors={investors} lens={lens} title={framing.demand} sub={framing.demandSub} max={8} />
     </div>

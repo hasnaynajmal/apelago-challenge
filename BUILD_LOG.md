@@ -186,3 +186,7 @@ User: keep the landing page, move pipeline/list into a dashboard with a proper s
   changed per lens ("Rendered more hooks than during the previous render"). Hooks now run at the top level.
   Regression check: puppeteer-core script (scratchpad) clicks each thesis in headless Chrome and asserts the URL,
   topbar and table column update — worth turning into a repo test if time allows.
+- **Dashboard type scale reduced** (matches the compact sidebar): page h1 24px (`text-2xl`), section h2 20px, card titles
+  and body `text-sm`, KPI numbers `text-2xl`, readiness numbers `text-3xl`, promise `text-4xl`, card padding `p-5`.
+  Landing page keeps the larger marketing scale. Rule of thumb for new dashboard UI: body `text-sm`, labels `text-xs`.
+- Matrix dots start at their final position (`initial={{ opacity: 0, x, y }}`) so they never flash at (0,0) before JS runs.

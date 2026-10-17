@@ -63,7 +63,7 @@ export function PortfolioMatrix({ rows, lens }: { rows: PipelineRow[]; lens: str
   ];
 
   return (
-    <div className="card-surface p-6">
+    <div className="card-surface p-5">
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Readiness versus thesis fit">
         {quads.map((q) => (
           <g key={q.q}>
@@ -99,7 +99,7 @@ export function PortfolioMatrix({ rows, lens }: { rows: PipelineRow[]; lens: str
           return (
             <motion.g
               key={p.id}
-              initial={{ opacity: 0 }}
+              initial={{ opacity: 0, x: px, y: py }}
               animate={{ opacity: 1, x: px, y: py }}
               transition={{ delay: i * 0.015, type: "spring", stiffness: 160, damping: 22 }}
               className="cursor-pointer"

@@ -86,9 +86,9 @@ export function LiveRun({ runId, startupId, startupName, lens }: { runId: string
 
   return (
     <div className="grid gap-6 lg:grid-cols-[400px_minmax(0,1fr)]">
-      <div className="card-surface p-6">
+      <div className="card-surface p-5">
         <div className="flex items-baseline justify-between">
-          <span className="text-4xl font-semibold tracking-tight tabular">{progress}%</span>
+          <span className="text-3xl font-semibold tracking-tight tabular">{progress}%</span>
           <span className="text-sm text-muted-foreground">{status === "running" ? `${elapsed}s` : status === "done" ? "Complete" : "Failed"}</span>
         </div>
         <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
@@ -111,7 +111,7 @@ export function LiveRun({ runId, startupId, startupName, lens }: { runId: string
                   {state === "done" ? <Check className="size-3.5" /> : state === "running" ? <Loader2 className="size-3.5 animate-spin" /> : state === "error" ? <CircleAlert className="size-3.5" /> : <span className="size-1.5 rounded-full bg-current" />}
                 </span>
                 <div>
-                  <div className={cn("text-[15px] font-medium", state === "idle" && "text-muted-foreground")}>{s.label}</div>
+                  <div className={cn("text-sm font-medium", state === "idle" && "text-muted-foreground")}>{s.label}</div>
                   <div className="text-sm text-muted-foreground">{s.sub}</div>
                 </div>
               </li>
@@ -123,7 +123,7 @@ export function LiveRun({ runId, startupId, startupName, lens }: { runId: string
       <div className="card-surface flex min-h-[600px] flex-col">
         <div className="flex items-center justify-between border-b px-6 py-4">
           <div>
-            <div className="text-base font-semibold">Live feed</div>
+            <div className="text-sm font-semibold">Live feed</div>
             <div className="text-sm text-muted-foreground">Streaming from the agents as they work</div>
           </div>
           {status === "done" && (
@@ -147,7 +147,7 @@ export function LiveRun({ runId, startupId, startupName, lens }: { runId: string
                 </span>
                 <div className="min-w-0">
                   <div className="text-sm font-medium text-zinc-500">{e.agent ?? e.step}</div>
-                  <div className="text-[15px] text-zinc-800">{e.message}</div>
+                  <div className="text-sm text-zinc-800">{e.message}</div>
                 </div>
               </motion.li>
             ))}

@@ -18,8 +18,8 @@ async function Content({ searchParams }: { searchParams: PageProps<"/dashboard/v
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold">Ventures</h1>
-        <p className="mt-1.5 text-muted-foreground">
+        <h1 className="text-2xl font-semibold">Ventures</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           All {rows.length} ventures ranked for the <span className="font-medium text-foreground">{LENSES.find((l) => l.id === lens)!.label}</span> thesis.
           Filter by group or search, then open a venture for its full assessment.
         </p>

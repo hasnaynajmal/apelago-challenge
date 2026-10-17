@@ -17,7 +17,7 @@ function OppNode({ data }: NodeProps<Node<NodeData>>) {
     <div
       className={cn(
         "rounded-xl border bg-white px-3 py-2 text-[13px] shadow-sm",
-        data.kind === "startup" && "border-navy bg-navy px-4 py-2.5 text-[15px] font-semibold text-white shadow-lg",
+        data.kind === "startup" && "border-navy bg-navy px-4 py-2.5 text-sm font-semibold text-white shadow-lg",
         data.kind === "bridge" && "border-dashed border-gold bg-gold-soft text-gold-ink",
         data.onPath && data.kind !== "startup" && data.kind !== "bridge" && "ring-2 ring-gold/70",
       )}

@@ -20,7 +20,7 @@ export function ReadinessCard({ framework, a }: { framework: Framework; a?: Asse
   const [open, setOpen] = useState(false);
   const meta = FRAMEWORKS[framework];
   const tone = TONE[framework];
-  if (!a) return <div className="card-surface p-6 text-muted-foreground">{meta.label}: not assessed</div>;
+  if (!a) return <div className="card-surface p-5 text-muted-foreground">{meta.label}: not assessed</div>;
 
   const dist = a.distribution;
   const maxP = dist ? Math.max(...Object.values(dist)) : 1;
@@ -29,7 +29,7 @@ export function ReadinessCard({ framework, a }: { framework: Framework; a?: Asse
   return (
     <div className={cn("card-surface card-hover flex flex-col p-6", a.needs_review && "border-amber-300")}>
       <div className="flex items-start justify-between gap-2">
-        <div className="text-[15px] font-medium">{meta.label}</div>
+        <div className="text-sm font-medium">{meta.label}</div>
         {a.needs_review ? (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -47,10 +47,10 @@ export function ReadinessCard({ framework, a }: { framework: Framework; a?: Asse
       </div>
 
       <div className="mt-4 flex items-baseline gap-2">
-        <span className={cn("text-5xl font-semibold tracking-tight tabular", tone.text)}>
+        <span className={cn("text-3xl font-semibold tracking-tight tabular", tone.text)}>
           <CountUp to={a.level} duration={0.8} />
         </span>
-        <span className="text-lg text-muted-foreground">/ {meta.max}</span>
+        <span className="text-base text-muted-foreground">/ {meta.max}</span>
       </div>
       <div className="mt-1 text-sm text-muted-foreground">{Math.round((a.confidence ?? 0) * 100)}% confidence</div>
 
@@ -88,7 +88,7 @@ export function ReadinessCard({ framework, a }: { framework: Framework; a?: Asse
         </div>
       </div>
 
-      <p className={cn("mt-5 text-[15px] leading-relaxed text-zinc-600", !open && "line-clamp-3")}>{a.rationale}</p>
+      <p className={cn("mt-5 text-sm leading-relaxed text-zinc-600", !open && "line-clamp-3")}>{a.rationale}</p>
 
       {open && (
         <div className="mt-4 space-y-4">

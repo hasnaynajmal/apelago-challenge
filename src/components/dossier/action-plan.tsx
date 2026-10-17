@@ -18,14 +18,14 @@ export function ActionPlan({ actions }: { actions: ActionView[] }) {
               <span className={cn("flex size-7 items-center justify-center rounded-full text-sm font-semibold", ci === 0 ? "bg-navy text-white" : "bg-muted text-zinc-600")}>
                 {ci + 1}
               </span>
-              <span className="text-base font-semibold">{col.label}</span>
+              <span className="text-sm font-semibold">{col.label}</span>
               <span className="text-sm text-muted-foreground">{items.length}</span>
             </div>
             <div className="space-y-3">
               {items.map((a) => (
                 <div key={a.rank} className="card-surface card-hover p-5">
                   <div className="flex items-start justify-between gap-3">
-                    <div className="text-[15px] font-semibold leading-snug">{a.title}</div>
+                    <div className="text-sm font-semibold leading-snug">{a.title}</div>
                     <span className={cn("shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium", a.owner === "operator" ? "bg-navy-soft text-navy" : "bg-muted text-zinc-600")}>
                       {a.owner === "operator" ? "Operator" : "Startup"}
                     </span>

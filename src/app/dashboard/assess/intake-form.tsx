@@ -51,7 +51,7 @@ export function IntakeForm({ lens }: { lens: string }) {
           <span className="block text-sm font-medium leading-5">Startup name</span>
           <div className="relative">
             <Building2 className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input value={name} onChange={(e) => setName(e.target.value)} required minLength={2} placeholder="e.g. Clewat" className="h-12 rounded-xl pl-10 text-[15px]" />
+            <Input value={name} onChange={(e) => setName(e.target.value)} required minLength={2} placeholder="e.g. Clewat" className="h-12 rounded-xl pl-10 text-sm" />
           </div>
         </label>
 
@@ -60,7 +60,7 @@ export function IntakeForm({ lens }: { lens: string }) {
             <span className="block text-sm font-medium leading-5">Website <span className="font-normal text-muted-foreground">· optional</span></span>
             <div className="relative">
               <Globe className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="company.com" className="h-12 rounded-xl pl-10 text-[15px]" />
+              <Input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="company.com" className="h-12 rounded-xl pl-10 text-sm" />
             </div>
           </label>
           <div className="space-y-2">
@@ -71,11 +71,11 @@ export function IntakeForm({ lens }: { lens: string }) {
 
         <label className="block space-y-2">
           <span className="text-sm font-medium">What do they do? <span className="font-normal text-muted-foreground">· optional, the agents research the rest</span></span>
-          <Textarea value={oneLiner} onChange={(e) => setOneLiner(e.target.value)} rows={2} placeholder="One line about the venture" className="min-h-20 rounded-xl text-[15px]" />
+          <Textarea value={oneLiner} onChange={(e) => setOneLiner(e.target.value)} rows={2} placeholder="One line about the venture" className="min-h-20 rounded-xl text-sm" />
         </label>
       </div>
 
-      <Button type="submit" size="lg" disabled={busy || name.trim().length < 2} className="mt-6 h-12 w-full rounded-full text-[15px]">
+      <Button type="submit" size="lg" disabled={busy || name.trim().length < 2} className="mt-6 h-12 w-full rounded-full text-sm">
         {busy ? <Loader2 className="animate-spin" /> : null} Run the assessment <ArrowRight />
       </Button>
 

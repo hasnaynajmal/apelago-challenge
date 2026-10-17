@@ -20,8 +20,8 @@ async function Content({ searchParams }: { searchParams: PageProps<"/dashboard/d
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold">Deadlines</h1>
-        <p className="mt-1.5 text-muted-foreground">Funding calls with a fixed deadline in the next 12 months, and which ventures should apply.</p>
+        <h1 className="text-2xl font-semibold">Deadlines</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Funding calls with a fixed deadline in the next 12 months, and which ventures should apply.</p>
       </div>
       <DeadlinesPanel deadlines={deadlines} lens={lens} title="Upcoming calls" sub={`${deadlines.length} calls · rolling programmes are listed on each venture`} max={8} />
     </div>
