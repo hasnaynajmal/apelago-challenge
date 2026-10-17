@@ -201,6 +201,7 @@ export async function runPipeline(startupId: string, opts: PipelineOptions = {})
     await db.from("startups").update({ stage: snap.stage, updated_at: new Date().toISOString() }).eq("id", startupId);
 
     await db.from("pipeline_runs").update({ status: "done", current_step: "done", finished_at: new Date().toISOString() }).eq("id", runId);
+    await refreshCaches();
     const thesisName = (id: string) => theses.find((t) => t.id === id)?.name ?? id;
     await emit({
       step: "done", agent: "Deep Panel", status: "done",
@@ -348,4 +349,15 @@ TOP FUNDING:\n${brief(m.funding)}
 TOP PARTNERS:\n${brief(m.partners)}
 HIDDEN CONNECTIONS:\n${connections.slice(0, 8).map((c) => `- [${c.kind}] ${c.title}: ${c.narrative}`).join("\n")}
 Write the action plan.`;
+}
+
+/** Clear the cached read models so the next page view shows the new scores (no-op outside a request, e.g. CLI). */
+async function refreshCaches() {
+  try {
+    const { revalidateTag } = await import("next/cache");
+    revalidateTag("radar", { expire: 0 });
+  } catch (e) {
+    // Not in a Next.js request context (batch scripts); pages pick up changes when the cache expires (~1 min).
+    console.warn("[pipeline] cache refresh skipped:", (e as Error).message);
+  }
 }

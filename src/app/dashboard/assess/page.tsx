@@ -32,9 +32,7 @@ export default function AssessPage({ searchParams }: PageProps<"/dashboard/asses
 
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-6">
-          <Suspense fallback={<Skeleton className="h-96 rounded-2xl" />}>
-            <FormWithLens searchParams={searchParams} />
-          </Suspense>
+          <IntakeForm />
           <div className="card-surface p-5">
             <h2 className="text-[15px] font-semibold">What happens when you press Run</h2>
             <p className="mt-0.5 text-[13px] text-muted-foreground">You can watch each step live; the venture page opens by itself at the end.</p>
@@ -70,7 +68,7 @@ export default function AssessPage({ searchParams }: PageProps<"/dashboard/asses
               ))}
             </ul>
           </div>
-          <Suspense fallback={<Skeleton className="h-60 rounded-2xl" />}>
+          <Suspense fallback={<RecentRunsSkeleton />}>
             <RecentRuns searchParams={searchParams} />
           </Suspense>
         </div>
@@ -79,15 +77,13 @@ export default function AssessPage({ searchParams }: PageProps<"/dashboard/asses
   );
 }
 
-async function FormWithLens({ searchParams }: { searchParams: PageProps<"/dashboard/assess">["searchParams"] }) {
-  return <IntakeForm lens={resolveLens((await searchParams).lens)} />;
-}
 
 async function RecentRuns({ searchParams }: { searchParams: PageProps<"/dashboard/assess">["searchParams"] }) {
   await connection();
   const lens = resolveLens((await searchParams).lens);
   const runs = await getRecentRuns(6);
   const ago = (iso: string) => {
+    // eslint-disable-next-line react-hooks/purity -- server component rendered per request (after connection())
     const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
     return m < 1 ? "just now" : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`;
   };
@@ -121,6 +117,27 @@ async function RecentRuns({ searchParams }: { searchParams: PageProps<"/dashboar
           </li>
         ))}
         {runs.length === 0 && <li className="px-5 py-6 text-sm text-muted-foreground">No assessments yet.</li>}
+      </ul>
+    </div>
+  );
+}
+
+function RecentRunsSkeleton() {
+  return (
+    <div className="card-surface">
+      <div className="border-b px-5 py-4">
+        <h2 className="text-[15px] font-semibold">Recent assessments</h2>
+      </div>
+      <ul className="divide-y">
+        {[0, 1, 2, 3].map((i) => (
+          <li key={i} className="flex items-center gap-3 px-5 py-3.5">
+            <Skeleton className="size-4 rounded-full" />
+            <span className="flex-1 space-y-1.5">
+              <Skeleton className="h-3.5 w-28 rounded" />
+              <Skeleton className="h-3 w-40 rounded" />
+            </span>
+          </li>
+        ))}
       </ul>
     </div>
   );

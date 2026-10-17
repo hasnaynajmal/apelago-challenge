@@ -82,9 +82,6 @@ export function RadarCopilot({ children }: { children: React.ReactNode }) {
           header={DrawerHeaderSlot}
           // "Thinking…" shimmer instead of "Thought for N seconds".
           messageView={{ reasoningMessage: ThinkingSlot }}
-          // Scroll once to the sent question, then let the answer stream below it without the view chasing every
-          // chunk (the default pin-to-bottom re-scrolls on each token, which blurs the text).
-          autoScroll="pin-to-send"
           labels={{
             modalHeaderTitle: "Ask Atlas",
             chatInputPlaceholder: "Ask Atlas anything…",

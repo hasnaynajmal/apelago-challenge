@@ -17,7 +17,7 @@ const EXAMPLES = [
   { name: "Zeabuz", website: "zeabuz.com", country: "NO", oneLiner: "Autonomous, electric passenger ferries for urban waterways." },
 ];
 
-export function IntakeForm({ lens }: { lens: string }) {
+export function IntakeForm() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [name, setName] = useState("");
@@ -38,6 +38,7 @@ export function IntakeForm({ lens }: { lens: string }) {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed to start");
+      const lens = new URLSearchParams(window.location.search).get("lens") ?? "redstone-blue"; // read at submit: the form never waits on the URL
       router.push(`/dashboard/runs/${json.runId}?startup=${json.startupId}&lens=${lens}`);
     } catch (err) {
       toast.error((err as Error).message);

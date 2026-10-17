@@ -460,3 +460,12 @@ Done (all on `ui-v2`; main/dev untouched):
   visible (no toggle).
 - Ask Atlas feel: `chat-parts.tsx` — ThinkingSlot shows a shimmering "Thinking…" while the model reasons (gone once the answer starts); tool progress lines shimmer too (`.shimmer-text`). Drawer closes on click outside (dim backdrop) and on Esc.
 - Streaming blur was the auto-scroll, not the stream: CopilotKit's default `pin-to-bottom` re-scrolls on every token. Switched to `autoScroll="pin-to-send"` (scroll once to the sent question, answer streams below without the view moving); removed the typewriter renderer (user liked native streaming).
+- Speed (user: deployed pages slow; Assess page showed grey blocks before the form):
+  - Supabase is in eu-west-1 but Vercel functions ran in the default iad1 → every query crossed the Atlantic.
+    `vercel.json` now pins functions to `dub1` (Dublin).
+  - Read models in `lib/queries.ts` are cached (`"use cache"`, `cacheLife("minutes")`, `cacheTag("radar")`);
+    `runPipeline` calls `revalidateTag("radar", { expire: 0 })` when a run finishes so new scores show on the
+    next request (logs a warning if called outside a request, e.g. CLI batches).
+  - Assess form no longer waits for searchParams (reads the lens from the URL at submit), so it is part of the
+    static shell; Recent assessments has a list-shaped skeleton.
+- Ask Atlas scrolling reverted to CopilotKit's default (user preferred following the answer down).
