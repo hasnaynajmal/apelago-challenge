@@ -432,7 +432,7 @@ export interface PlatformGuide {
 export function PlatformCard({ g }: { g: PlatformGuide }) {
   const LABEL: Record<string, string> = { irl: "Investment readiness", thesis_fit: "Thesis fit", impact: "Ocean impact", momentum: "Momentum", team: "Team" };
   return (
-    <Shell icon={Sparkles} title="How Radar works">
+    <Shell icon={Sparkles} title="How Atlas works">
       <div className="space-y-3 px-3 py-3">
         <div className="grid grid-cols-5 gap-1 text-center">
           {Object.entries(g.data).map(([k, v]) => (

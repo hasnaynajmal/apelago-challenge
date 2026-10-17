@@ -37,7 +37,7 @@ export function DashboardTopbar() {
         className="ml-auto inline-flex h-8 items-center gap-2 rounded-full border bg-white px-3 text-[13px] font-medium text-foreground transition-colors hover:border-zinc-300 hover:bg-zinc-50 sm:ml-0"
       >
         <MessageSquareText className="size-3.5 text-navy" />
-        Ask Radar
+        Ask Atlas
         <kbd className="hidden rounded border bg-zinc-50 px-1 font-sans text-[11px] text-muted-foreground md:inline">Ctrl J</kbd>
       </button>
     </header>

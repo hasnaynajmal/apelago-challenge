@@ -309,3 +309,9 @@ Built:
 - Added `explainPlatform` tool (purpose, the 5 challenge questions, live data counts, 6-step agent pipeline, TRL/BRL/
   OIRL/IRL, score weights of the current thesis, groups, theses, pages) + `PlatformCard`; "How does Radar work?" is
   the first suggestion chip outside venture pages. Cards checked on a temporary preview route (deleted).
+
+## Product name: A'Pelago Atlas (2026-10-17)
+User picked **A'Pelago Atlas** (maps the whole archipelago ecosystem) instead of "Ocean Opportunity Radar".
+Renamed every user-facing mention: landing header ("A'Pelago | Atlas"), footer, browser title, sidebar, copilot
+("Ask Atlas" button/drawer, "How does Atlas work?" chip, agent persona "Atlas"), card titles. Internal identifiers
+(`getRadar`, `RadarItem`, `radarCopilot`, the IRL radar chart, the package name) are unchanged on purpose.

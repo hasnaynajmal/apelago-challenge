@@ -9,7 +9,7 @@ export function SiteHeader() {
         <Link href="/" className="flex items-center gap-3">
           <Image src="/brand/apelago-logo-navy.svg" alt="A'Pelago" width={112} height={17} priority />
           <span className="h-4 w-px bg-border" />
-          <span className="text-[15px] font-medium text-foreground">Opportunity Radar</span>
+          <span className="text-[15px] font-medium text-foreground">Atlas</span>
         </Link>
         <div className="ml-auto flex items-center gap-2">
           <Button asChild variant="ghost" size="lg" className="rounded-full px-4 text-[15px]">

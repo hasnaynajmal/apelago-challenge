@@ -1,6 +1,6 @@
 "use client";
 
-// Radar Copilot: CopilotKit chat drawer for the dashboard. Shares the page context with the agent, renders the
+// Atlas copilot: CopilotKit chat drawer for the dashboard. Shares the page context with the agent, renders the
 // agent's tool calls as cards (agentic UI) and exposes frontend tools to navigate the app.
 import { createContext, Suspense, useContext, useEffect, useState, useSyncExternalStore } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -71,10 +71,10 @@ export function RadarCopilot({ children }: { children: React.ReactNode }) {
           toggleButton={{ className: "hidden" }}
           header={DrawerHeaderSlot}
           labels={{
-            modalHeaderTitle: "Radar Copilot",
-            chatInputPlaceholder: "Ask Radar anything…",
+            modalHeaderTitle: "Ask Atlas",
+            chatInputPlaceholder: "Ask Atlas anything…",
             welcomeMessageText: "Ask anything about the portfolio, or about the venture you are looking at.",
-            chatDisclaimerText: "Answers come from the radar's data. Check key facts before acting.",
+            chatDisclaimerText: "Answers come from Atlas data. Check key facts before acting.",
           }}
           />
         </CopilotKit>
@@ -87,7 +87,7 @@ function DrawerHeader() {
   const { setOpen, newChat } = useCopilotDrawer();
   return (
     <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
-      <span className="text-[15px] font-semibold">Radar Copilot</span>
+      <span className="text-[15px] font-semibold">Ask Atlas</span>
       <button
         type="button"
         onClick={newChat}
@@ -159,7 +159,7 @@ function CopilotBrain() {
             { title: "Compare with peers", message: "Compare this venture with the two most similar ventures in the portfolio." },
           ]
         : [
-            { title: "How does Radar work?", message: "Explain what this platform does and how it works." },
+            { title: "How does Atlas work?", message: "Explain what this platform does and how it works." },
             { title: "Top 5 for our thesis", message: "Which 5 ventures are most promising for our thesis right now?" },
             { title: "Investment-ready", message: "Which ventures are investment-ready, and what is the next step for each?" },
             { title: "Deadlines this month", message: "Which funding deadlines close in the next 30 days, and who should apply?" },

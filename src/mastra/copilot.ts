@@ -1,4 +1,4 @@
-// Radar Copilot: the chat agent behind the dashboard drawer. Read-only tools over the radar data.
+// Atlas copilot: the chat agent behind the dashboard drawer. Read-only tools over the radar data.
 // Tool results are compact JSON; the chat renders them as cards (see components/copilot/tool-cards.tsx).
 import { Agent } from "@mastra/core/agent";
 import { createTool } from "@mastra/core/tools";
@@ -93,9 +93,9 @@ export const getVenture = createTool({
   execute: async ({ venture, lens: l }) => {
     const lens = resolveLens(l);
     const hit = await resolveVenture(venture);
-    if (!hit) return { error: `No venture called "${venture}" in the radar.` };
+    if (!hit) return { error: `No venture called "${venture}" in Atlas.` };
     const d = await getDossier(hit.id, lens);
-    if (!d) return { error: `No venture called "${venture}" in the radar.` };
+    if (!d) return { error: `No venture called "${venture}" in Atlas.` };
     const lv = (f: "trl" | "brl" | "oirl" | "irl") => {
       const a = d.assessments[f];
       return a ? { level: a.level, confidence: a.confidence, why: a.rationale?.slice(0, 280) ?? null, gaps: (a.gaps ?? []).slice(0, 3) } : null;
@@ -173,7 +173,7 @@ export const findConnections = createTool({
     let ventureName: string | null = null;
     if (venture) {
       const hit = await resolveVenture(venture);
-      if (!hit) return { error: `No venture called "${venture}" in the radar.`, connections: [] };
+      if (!hit) return { error: `No venture called "${venture}" in Atlas.`, connections: [] };
       q = q.eq("startup_id", hit.id);
       ventureName = hit.name;
     }
@@ -287,7 +287,7 @@ const PAGES = [
 export const explainPlatform = createTool({
   id: "explainPlatform",
   description:
-    "Explains Ocean Opportunity Radar itself: what it is for, the questions it answers, how the AI committee works, " +
+    "Explains A'Pelago Atlas itself (the platform the user is in): what it is for, the questions it answers, how the AI committee works, " +
     "the readiness scales, how scores and groups are calculated, the theses and what each page does. " +
     "Use for 'what is this', 'explain the platform', 'how does it work', 'how is the score calculated'.",
   inputSchema: z.object({ lens: lensInput }),
@@ -363,13 +363,13 @@ export const portfolioOverview = createTool({
   },
 });
 
-const COPILOT_INSTRUCTIONS = `You are Radar Copilot, the assistant inside Ocean Opportunity Radar, a venture-intelligence tool for
+const COPILOT_INSTRUCTIONS = `You are Atlas, the assistant inside A'Pelago Atlas, a venture-intelligence platform for
 A'Pelago (Baltic blue-economy accelerator) and Redstone Blue (blue-economy VC). Users are investment and accelerator
 professionals. Answer questions about the startups, readiness levels, investors, funding calls and next steps.
 
 How to work:
 - Always get facts from the tools; never invent startups, numbers, investors or deadlines.
-- Questions about the platform itself ("what is this", "explain Radar", "how is the score calculated") → explainPlatform.
+- Questions about the platform itself ("what is this", "explain Atlas", "how is the score calculated") → explainPlatform.
 - Warm paths, intros, "who can introduce", consortia, synergies → findConnections (pass the venture and/or investor).
 - Use the "lens" (thesis) from the app context in every tool call. Scores and matches depend on it.
 - If the user is on a venture page ("this startup", "it", "here"), use the venture from the app context.
@@ -384,7 +384,7 @@ Accelerate (fits thesis, early), Refer onwards (mature, off-thesis), Monitor (ea
 
 export const radarCopilot = new Agent({
   id: "radar-copilot",
-  name: "Radar Copilot",
+  name: "Atlas",
   // The app context (lens, page, open venture) arrives via AG-UI in requestContext["ag-ui"]; append it to the prompt.
   instructions: ({ requestContext }) => {
     const ctx = (requestContext?.get("ag-ui") as { context?: { description: string; value: string }[] } | undefined)?.context ?? [];

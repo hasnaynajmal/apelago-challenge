@@ -39,7 +39,7 @@ export function AppSidebar() {
       <SidebarHeader className="border-b px-3 py-3.5">
         <Link href={withLens("/dashboard")} className="flex items-center gap-2 overflow-hidden px-1">
           <Image src="/brand/apelago-logo-navy.svg" alt="A'Pelago" width={88} height={14} className="shrink-0 group-data-[collapsible=icon]:hidden" priority />
-          <span className="truncate text-sm font-medium text-muted-foreground group-data-[collapsible=icon]:hidden">Radar</span>
+          <span className="truncate text-sm font-medium text-muted-foreground group-data-[collapsible=icon]:hidden">Atlas</span>
         </Link>
       </SidebarHeader>
 

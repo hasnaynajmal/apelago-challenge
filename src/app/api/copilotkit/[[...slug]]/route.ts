@@ -1,4 +1,4 @@
-// CopilotKit runtime (AG-UI) for the Radar Copilot drawer. Serves /api/copilotkit/info, /agent/:id/run, etc.
+// CopilotKit runtime (AG-UI) for the Atlas copilot drawer. Serves /api/copilotkit/info, /agent/:id/run, etc.
 import { CopilotRuntime, createCopilotRuntimeHandler } from "@copilotkit/runtime/v2";
 import { MastraAgent } from "@ag-ui/mastra";
 import { radarCopilot } from "@/mastra/copilot";

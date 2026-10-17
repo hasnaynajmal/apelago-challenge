@@ -8,7 +8,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Ocean Opportunity Radar · A'Pelago × Redstone Blue",
+  title: "A'Pelago Atlas · venture intelligence for the blue economy",
   description: "Venture intelligence for the blue economy: readiness, thesis fit, and the next best investors, grants and partners.",
 };
 

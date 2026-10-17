@@ -4,7 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Ocean Opportunity Radar — light, minimal. A'Pelago navy as primary, gold only for highlights. */
+/* A'Pelago Atlas — light, minimal. A'Pelago navy as primary, gold only for highlights. */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -201,7 +201,7 @@
   }
 }
 
-/* Radar Copilot drawer (CopilotKit v2 ships a prefixed, layered stylesheet; these unlayered rules win). */
+/* Atlas copilot drawer (CopilotKit v2 ships a prefixed, layered stylesheet; these unlayered rules win). */
 [data-copilotkit] {
   --primary: #002444;
   --primary-foreground: #ffffff;
