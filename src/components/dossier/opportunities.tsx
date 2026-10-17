@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "motion/react";
 import { Building2, Check, Coins, ExternalLink, FlaskConical, Landmark, Minus } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -96,15 +97,15 @@ function MatchCard({ m, i, roleTags }: { m: MatchView; i: number; roleTags?: boo
           )}
         </div>
       </div>
-      {m.rationale && <p className="mt-4 text-sm leading-relaxed text-zinc-700">{m.rationale}</p>}
-      <div className="mt-4 flex flex-wrap gap-2">
-        {m.reasons.slice(0, 5).map((r) => (
-          <span key={r} className="flex items-center gap-1.5 rounded-lg border bg-white px-2.5 py-1 text-sm text-zinc-700">
+      {m.rationale && <p className="mt-3 text-sm leading-relaxed text-zinc-700">{m.rationale}</p>}
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {m.reasons.slice(0, 3).map((r) => (
+          <span key={r} className="flex items-center gap-1.5 rounded-md bg-muted/70 px-2 py-0.5 text-xs text-zinc-700">
             <Check className="size-3.5 text-emerald-600" /> {r}
           </span>
         ))}
         {m.blockers.map((b) => (
-          <span key={b} className="flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1 text-sm text-amber-800">
+          <span key={b} className="flex items-center gap-1.5 rounded-md bg-amber-50 px-2 py-0.5 text-xs text-amber-800">
             <Minus className="size-3.5" /> {b}
           </span>
         ))}
@@ -120,6 +121,7 @@ export function Opportunities({ matches, investorLabel = "Investors", investorSu
     partner: matches.filter((m) => m.targetType === "partner"),
   };
   const labels = { investor: investorLabel, funding: "Grants & funding", partner: "Partners & clients" };
+  const [showAll, setShowAll] = useState<Record<string, boolean>>({});
   return (
     <Tabs defaultValue="investor" className="w-full">
       <TabsList className="mb-4 h-11 rounded-full p-1">
@@ -132,7 +134,15 @@ export function Opportunities({ matches, investorLabel = "Investors", investorSu
       {(Object.keys(groups) as (keyof typeof groups)[]).map((k) => (
         <TabsContent key={k} value={k} className="space-y-3">
           {k === "investor" && investorSub && <p className="text-sm text-muted-foreground">{investorSub}</p>}
-          {groups[k].slice(0, 8).map((m, i) => <MatchCard key={m.targetId} m={m} i={i} roleTags={roleTags} />)}
+          {groups[k].slice(0, showAll[k] ? 15 : 3).map((m, i) => <MatchCard key={m.targetId} m={m} i={i} roleTags={roleTags} />)}
+          {groups[k].length > 3 && (
+            <button
+              onClick={() => setShowAll((s) => ({ ...s, [k]: !s[k] }))}
+              className="w-full rounded-xl border border-dashed bg-white py-2.5 text-sm font-medium text-navy transition-colors hover:bg-muted/50"
+            >
+              {showAll[k] ? "Show top 3 only" : `Show all ${groups[k].length}`}
+            </button>
+          )}
           {groups[k].length === 0 && <p className="text-muted-foreground">No matches.</p>}
         </TabsContent>
       ))}

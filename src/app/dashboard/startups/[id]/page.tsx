@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { ArrowLeft, ArrowUpRight, CalendarClock, Landmark, ListChecks, ShieldAlert, Target } from "lucide-react";
+import { ArrowLeft, CalendarClock, Landmark, ListChecks, ShieldAlert, Target } from "lucide-react";
 import { ActionPlan } from "@/components/dossier/action-plan";
 import { ConnectionsPanel } from "@/components/dossier/connections-panel";
 import { Constellation } from "@/components/dossier/constellation";
@@ -10,6 +10,7 @@ import { Opportunities } from "@/components/dossier/opportunities";
 import { ReadinessCard } from "@/components/dossier/readiness-card";
 import { CountryLabel } from "@/components/country";
 import { ExpandableText } from "@/components/expandable-text";
+import { WebsiteButton } from "@/components/website-button";
 import { ScoreRing } from "@/components/overview/top-picks";
 import { QUADRANTS } from "@/components/pipeline/quadrants";
 import { RunAssessmentButton } from "@/components/run-assessment-button";
@@ -62,13 +63,13 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <Link href={`/dashboard/ventures?lens=${lens}`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="size-4" /> All ventures
       </Link>
 
       {/* Header */}
-      <section className="card-surface flex flex-col gap-6 p-5 lg:flex-row lg:items-start">
+      <section className="card-surface flex flex-col gap-8 p-6 lg:flex-row lg:items-start">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2.5">
             <h1 className="text-3xl font-semibold tracking-[-0.03em]">{s.name}</h1>
@@ -76,20 +77,16 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
             {quadrant && (
               <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset", QUADRANTS[quadrant].badge)}>{QUADRANTS[quadrant].label}</span>
             )}
+            {s.website && <span className="ml-auto"><WebsiteButton url={s.website} /></span>}
           </div>
-          <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-xs">
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
             {(s.city || s.country) && <Chip><CountryLabel code={s.country} city={s.city} /></Chip>}
             {s.founded && <Chip>Founded {s.founded}</Chip>}
             {s.stage && <Chip>{STAGE_LABELS[s.stage]}</Chip>}
             {s.sectors.map((x) => <Chip key={x}>{SECTORS[x]}</Chip>)}
-            {s.website && (
-              <a href={s.website} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 px-1 text-sm text-navy hover:underline">
-                {s.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")} <ArrowUpRight className="size-3.5" />
-              </a>
-            )}
           </div>
           {(s.profile?.summary ?? s.one_liner) && (
-            <ExpandableText text={(s.profile?.summary ?? s.one_liner)!} className="mt-3 max-w-3xl text-sm text-zinc-600" />
+            <ExpandableText text={(s.profile?.summary ?? s.one_liner)!} className="mt-4 max-w-3xl text-sm text-zinc-600" />
           )}
         </div>
 
@@ -125,7 +122,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
       {score && (
         <>
           {/* At a glance — the decision in one row */}
-          <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <Glance icon={Target} label="Verdict" tone={quadrant ? QUADRANTS[quadrant].dot : undefined}>
               <div className="text-sm font-semibold">{quadrant ? QUADRANTS[quadrant].label : "—"}</div>
               <div className="text-xs leading-snug text-muted-foreground">
@@ -154,12 +151,12 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
           </section>
 
           {/* Readiness */}
-          <section className="space-y-3">
+          <section className="space-y-4">
             <div className="flex items-baseline justify-between">
               <h2 className="text-base font-semibold">Readiness</h2>
               <span className="text-xs text-muted-foreground">Each level checked by a calibrated model · open a card for the reasoning</span>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               <ReadinessCard framework="trl" a={a.trl} />
               <ReadinessCard framework="brl" a={a.brl} />
               <ReadinessCard framework="oirl" a={a.oirl} />
@@ -176,20 +173,20 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
               <TabsTrigger value="deep">Deep dive</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="opportunities" className="pt-5">
+            <TabsContent value="opportunities" className="pt-6">
               <Opportunities matches={d.matches} investorLabel={framing.tab} investorSub={framing.sub} roleTags={!!framing.ownerId} />
             </TabsContent>
 
-            <TabsContent value="plan" className="pt-5">
+            <TabsContent value="plan" className="pt-6">
               <ActionPlan actions={d.actions} />
             </TabsContent>
 
-            <TabsContent value="connections" className="space-y-5 pt-5">
+            <TabsContent value="connections" className="space-y-6 pt-6">
               <Constellation startupName={s.name} matches={d.matches} connections={d.connections} />
               <ConnectionsPanel connections={d.connections} />
             </TabsContent>
 
-            <TabsContent value="deep" className="space-y-5 pt-5">
+            <TabsContent value="deep" className="space-y-6 pt-6">
               <div className="grid gap-5 lg:grid-cols-2">
                 <div className="card-surface p-5">
                   <h3 className="text-sm font-semibold">Investment readiness · 10 dimensions</h3>
@@ -280,8 +277,8 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
 
 function Glance({ icon: Icon, label, tone, children }: { icon: React.ComponentType<{ className?: string }>; label: string; tone?: string; children: React.ReactNode }) {
   return (
-    <div className="card-surface flex gap-3 p-4">
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted" style={tone ? { color: tone } : undefined}>
+    <div className="card-surface flex gap-3.5 p-5">
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted" style={tone ? { color: tone } : undefined}>
         <Icon className="size-4" />
       </span>
       <div className="min-w-0 space-y-0.5">

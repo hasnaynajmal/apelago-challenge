@@ -218,3 +218,9 @@ skim for a verdict in ~10–20 s; details are reference material for due diligen
 3. **Readiness** — 4 cards (rationale clamped to 2 lines, numbers rendered directly; CountUp removed because it showed 0 before JS).
 4. **Tabs** (shadcn Tabs, `variant="line"`): Opportunities · Action plan · Connections (map + panel) · Deep dive
    (IRL radar, Ocean impact, evidence, team, sources).
+- Venture page de-cluttered: more spacing (sections `space-y-8`, header `p-6`, glance cards `p-5`); readiness card
+  simplified (confidence on the number line, no axis labels); opportunities show **top 3 per tab + "Show all N"**, max 3
+  reason chips (small, muted). Website is a `components/website-button.tsx` pill (favicon via Google s2, domain,
+  external icon, `target=_blank rel=noopener noreferrer`) in the name row.
+- Screenshot QA now via puppeteer-core (`scratchpad/pptr/shot.mjs <url> <out> [height] [waitMs]`); Chrome's
+  `--virtual-time-budget` hangs when a page loads remote images (favicons).

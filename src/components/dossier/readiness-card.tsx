@@ -45,16 +45,16 @@ export function ReadinessCard({ framework, a }: { framework: Framework; a?: Asse
         )}
       </div>
 
-      <div className="mt-4 flex items-baseline gap-2">
+      <div className="mt-3 flex items-baseline gap-1.5">
         <span className={cn("text-3xl font-semibold tracking-tight tabular", tone.text)}>
           {a.level}
         </span>
-        <span className="text-base text-muted-foreground">/ {meta.max}</span>
+        <span className="text-sm text-muted-foreground">/ {meta.max}</span>
+        <span className="ml-auto text-xs text-muted-foreground">{Math.round((a.confidence ?? 0) * 100)}% confident</span>
       </div>
-      <div className="mt-1 text-sm text-muted-foreground">{Math.round((a.confidence ?? 0) * 100)}% confidence</div>
 
-      <div className="mt-5">
-        <div className="flex h-9 items-end gap-1">
+      <div className="mt-4">
+        <div className="flex h-7 items-end gap-1">
           {Array.from({ length: meta.max }, (_, i) => i + 1).map((lvl) => {
             const p = dist?.[lvl] ?? 0;
             const isLevel = lvl === a.level;
@@ -79,11 +79,6 @@ export function ReadinessCard({ framework, a }: { framework: Framework; a?: Asse
               </Tooltip>
             );
           })}
-        </div>
-        <div className="mt-1.5 flex justify-between text-xs text-muted-foreground tabular">
-          <span>1</span>
-          <span>{dist ? "Calibrated by Jev" : "Analyst assessment"}</span>
-          <span>{meta.max}</span>
         </div>
       </div>
 
