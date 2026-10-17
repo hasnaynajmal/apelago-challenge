@@ -252,7 +252,7 @@ skim for a verdict in ~10–20 s; details are reference material for due diligen
   Clewat's sectors corrected in the DB (pollution_cleanup, water_management); its matches/scores still reflect the old
   sector until it is re-run (needs the user's OK — costs API).
 
-## Phase 3j — Feedback on venture page polish (2026-10-17) — IN PROGRESS
+## Phase 3j — Feedback on venture page polish (2026-10-17) ✅
 User rejected the last polish (commit e9924da):
 - The number written inside the score ring ("72 / score") looks bad → remove the ring; show the score as a plain large
   number with "/100" and a thin bar (same treatment on Overview top-pick cards for consistency).
@@ -261,3 +261,8 @@ User rejected the last polish (commit e9924da):
   underline, explicit hover colours that never collide); the Opportunities sub-tabs stay as small pills so the
   hierarchy is obvious.
 - Rule: verify hover/active states, not just static screenshots (use puppeteer hover).
+- Done: score rings removed everywhere (venture header + overview top picks) → large number + "/100" + thin bar
+  (gold bar for the #1 top pick). Venture tabs are an underline bar (15px, icons, counts; active = navy text, 2px navy
+  underline, navy count badge; `data-active:hover:text-navy` so hover never collides). Verified with puppeteer
+  (`scratchpad/pptr/tabs-check.mjs`): computed colours on hover of active/inactive tabs + clipped screenshots.
+- Unused now: `.ring-fill` CSS keyframe (kept; harmless).

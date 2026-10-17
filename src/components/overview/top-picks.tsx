@@ -17,22 +17,16 @@ const LEVELS = [
   { k: "irl", label: "Invest", color: "#a87c12" },
 ] as const;
 
-export function ScoreRing({ value, rank }: { value: number; rank: number }) {
-  const r = 26;
-  const c = 2 * Math.PI * r;
+/** Plain score display: large number, "/100", thin bar. */
+function Score({ value, top }: { value: number; top: boolean }) {
   return (
-    <div className="relative size-16 shrink-0">
-      <svg viewBox="0 0 64 64" className="size-16 -rotate-90">
-        <circle cx="32" cy="32" r={r} fill="none" stroke="#f1f1f3" strokeWidth="6" />
-        <circle
-          cx="32" cy="32" r={r} fill="none" stroke={rank === 1 ? "#dfae32" : "#002444"} strokeWidth="6" strokeLinecap="round"
-          className="ring-fill"
-          style={{ strokeDasharray: c, strokeDashoffset: c * (1 - value / 100), ["--ring-c" as string]: c, animationDelay: `${0.1 * rank}s` }}
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-lg font-semibold leading-none tabular">{Math.round(value)}</span>
-        <span className="text-[10px] text-muted-foreground">score</span>
+    <div className="w-20 shrink-0 text-right">
+      <div className="flex items-baseline justify-end gap-0.5">
+        <span className="text-3xl font-semibold leading-none tracking-tight tabular">{Math.round(value)}</span>
+        <span className="text-xs text-muted-foreground">/100</span>
+      </div>
+      <div className="mt-2 h-1.5 rounded-full bg-muted">
+        <div className={cn("bar-grow h-1.5 rounded-full", top ? "bg-gold" : "bg-navy")} style={{ width: `${Math.round(value)}%` }} />
       </div>
     </div>
   );
@@ -59,7 +53,7 @@ export function TopPicks({ rows, lens, investorLabel }: { rows: PipelineRow[]; l
                     {r.country && <CountryLabel code={r.country} />}
                   </div>
                 </div>
-                {r.promise != null && <ScoreRing value={r.promise} rank={i + 1} />}
+                {r.promise != null && <Score value={r.promise} top={i === 0} />}
               </div>
 
               <div className="mt-4 grid grid-cols-4 gap-2">

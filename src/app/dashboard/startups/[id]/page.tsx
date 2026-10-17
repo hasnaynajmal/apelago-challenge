@@ -11,7 +11,6 @@ import { ReadinessCard } from "@/components/dossier/readiness-card";
 import { CountryLabel } from "@/components/country";
 import { ExpandableText } from "@/components/expandable-text";
 import { WebsiteButton } from "@/components/website-button";
-import { ScoreRing } from "@/components/overview/top-picks";
 import { QUADRANTS } from "@/components/pipeline/quadrants";
 import { RunAssessmentButton } from "@/components/run-assessment-button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -92,13 +91,20 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
 
         {score ? (
           <div className="shrink-0 space-y-5 lg:w-[340px] lg:border-l lg:pl-8">
-            <div className="flex items-center gap-4">
-              <ScoreRing value={score.promise} rank={2} />
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold">Overall score</div>
-                <div className="text-xs text-muted-foreground">for {lensInfo.label}</div>
+            <div>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="text-xs font-medium text-muted-foreground">Overall score · {lensInfo.label}</div>
+                  <div className="mt-1 flex items-baseline gap-1">
+                    <span className="text-4xl font-semibold tracking-tight tabular">{Math.round(score.promise)}</span>
+                    <span className="text-sm text-muted-foreground">/ 100</span>
+                  </div>
+                </div>
+                <RunAssessmentButton startupId={s.id} lens={lens} rerun compact />
               </div>
-              <RunAssessmentButton startupId={s.id} lens={lens} rerun compact />
+              <div className="mt-3 h-2 rounded-full bg-muted">
+                <div className="bar-grow h-2 rounded-full bg-navy" style={{ width: `${Math.round(score.promise)}%` }} />
+              </div>
             </div>
             <div className="space-y-2.5">
               {(["irl", "thesis_fit", "impact", "momentum", "team"] as const).map((k) => {
@@ -169,7 +175,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
 
           {/* Everything else, one tab at a time */}
           <Tabs defaultValue="opportunities" className="w-full">
-            <TabsList className="h-auto w-full justify-start gap-1 rounded-xl border bg-white p-1.5 shadow-sm">
+            <TabsList variant="line" className="h-12 w-full justify-start gap-8 rounded-none border-b bg-transparent p-0">
               <TabsTrigger value="opportunities" className={TAB}><Network /> Opportunities <Count n={counts.investor + counts.funding + counts.partner} /></TabsTrigger>
               <TabsTrigger value="plan" className={TAB}><ListChecks /> Action plan <Count n={d.actions.length} /></TabsTrigger>
               <TabsTrigger value="connections" className={TAB}><Route /> Connections <Count n={d.connections.length} /></TabsTrigger>
@@ -292,11 +298,11 @@ function Glance({ icon: Icon, label, tone, children }: { icon: React.ComponentTy
   );
 }
 
-// Prominent segmented tabs: active tab is filled navy.
-const TAB = "group/tab h-9 flex-none rounded-lg px-4 text-sm text-zinc-600 hover:bg-muted/60 data-active:bg-navy data-active:text-white data-active:shadow-sm data-active:hover:bg-navy";
+// Main tabs: underline style. Active = navy text + 2px navy underline; hover never changes the active colour.
+const TAB = "group/tab h-12 flex-none gap-2 rounded-none px-0.5 text-[15px] font-medium text-muted-foreground hover:text-foreground data-active:text-navy data-active:hover:text-navy after:h-[2px] after:bg-navy group-data-horizontal/tabs:after:bottom-[-1px]";
 
 function Count({ n }: { n: number }) {
-  return <span className="ml-0.5 rounded-full bg-muted px-1.5 text-xs text-muted-foreground tabular group-data-active/tab:bg-white/15 group-data-active/tab:text-white">{n}</span>;
+  return <span className="rounded-full bg-muted px-1.5 py-px text-xs text-muted-foreground tabular group-data-active/tab:bg-navy group-data-active/tab:text-white">{n}</span>;
 }
 
 function Chip({ children }: { children: React.ReactNode }) {
