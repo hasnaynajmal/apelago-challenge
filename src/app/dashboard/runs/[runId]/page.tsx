@@ -2,13 +2,14 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { ArrowLeft } from "lucide-react";
 import { LiveRun } from "@/components/live-run";
+import { PageHeader } from "@/components/v2/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { resolveLens } from "@/lib/lens";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export default function RunPage({ params, searchParams }: PageProps<"/dashboard/runs/[runId]">) {
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-[1100px]">
       <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-2xl" />}>
         <Run params={params} searchParams={searchParams} />
       </Suspense>
@@ -27,12 +28,7 @@ async function Run({ params, searchParams }: Pick<PageProps<"/dashboard/runs/[ru
       <Link href={`/dashboard/assess?lens=${lens}`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="size-4" /> Assess another startup
       </Link>
-      <div>
-        <h1 className="text-2xl font-semibold">Assessing {name}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          The Deep Panel researches the venture, scores its readiness, matches it across the ecosystem and writes a plan.
-        </p>
-      </div>
+      <PageHeader title={`Assessing ${name}`} sub="The Deep Panel researches the venture, scores its readiness, matches it across the ecosystem and writes a plan." />
       <LiveRun runId={runId} startupId={startupId} startupName={name} lens={lens} />
     </div>
   );

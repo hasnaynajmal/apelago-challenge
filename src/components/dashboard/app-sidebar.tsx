@@ -151,7 +151,7 @@ function ThesisSwitcher({ lens, pathname, search, onPicked }: { lens: string; pa
           <ChevronsUpDown className="size-4 shrink-0 text-zinc-400 group-data-[collapsible=icon]:hidden" />
         </button>
       </PopoverTrigger>
-      <PopoverContent align="start" sideOffset={6} className="w-[--radix-popover-trigger-width] min-w-64 rounded-xl p-1.5">
+      <PopoverContent align="start" sideOffset={6} className="w-(--radix-popover-trigger-width) min-w-60 rounded-xl p-1.5">
         <div className="px-2 pb-1.5 pt-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Evaluate for</div>
         {LENSES.map((l) => (
           <button

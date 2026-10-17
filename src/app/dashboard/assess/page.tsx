@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { resolveLens } from "@/lib/lens";
 import { getRecentRuns } from "@/lib/queries";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/v2/page-header";
 import { IntakeForm } from "./intake-form";
 
 const OUTPUTS = [
@@ -15,28 +16,50 @@ const OUTPUTS = [
   { icon: Route, title: "Plan", text: "Warm intro paths and next steps" },
 ];
 
+const STEPS = [
+  { title: "Research", time: "~20 s", text: "The Scout searches the web and builds a profile with sources." },
+  { title: "Readiness", time: "~5 s", text: "Four assessors score the levels; the Second Opinion double-checks them." },
+  { title: "Matching", time: "~1 s", text: "Investors, grants and partners are ranked, and warm paths are traced." },
+  { title: "Explain", time: "~10 s", text: "Each top match gets a one-line reason." },
+  { title: "Plan", time: "~10 s", text: "A prioritised action plan with owners and deadlines." },
+  { title: "Score", time: "instant", text: "A 0–100 score and group for every thesis." },
+];
+
 export default function AssessPage({ searchParams }: PageProps<"/dashboard/assess">) {
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Assess a startup</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Add a venture by name. The Deep Panel researches it and scores it for every thesis — about a minute.
-        </p>
-      </div>
+    <div className="mx-auto max-w-[1100px] space-y-6">
+      <PageHeader title="Assess a startup" sub="Add a venture by name. The Deep Panel researches it and scores it for every thesis in about a minute." />
 
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <Suspense fallback={<Skeleton className="h-96 rounded-2xl" />}>
-          <FormWithLens searchParams={searchParams} />
-        </Suspense>
+        <div className="space-y-6">
+          <Suspense fallback={<Skeleton className="h-96 rounded-2xl" />}>
+            <FormWithLens searchParams={searchParams} />
+          </Suspense>
+          <div className="card-surface p-5">
+            <h2 className="text-[15px] font-semibold">What happens when you press Run</h2>
+            <p className="mt-0.5 text-[13px] text-muted-foreground">You can watch each step live; the venture page opens by itself at the end.</p>
+            <ol className="mt-4 grid gap-3 sm:grid-cols-3">
+              {STEPS.map((st, i) => (
+                <li key={st.title} className="rounded-xl border bg-zinc-50/60 p-3.5">
+                  <div className="flex items-center gap-2">
+                    <span className="flex size-6 items-center justify-center rounded-full bg-navy text-[11px] font-semibold text-white">{i + 1}</span>
+                    <span className="text-[13px] font-semibold">{st.title}</span>
+                    <span className="ml-auto text-[11px] text-muted-foreground tabular">{st.time}</span>
+                  </div>
+                  <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{st.text}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
 
         <div className="space-y-6">
           <div className="card-surface p-5">
-            <h2 className="text-sm font-semibold">What you get</h2>
+            <h2 className="text-[15px] font-semibold">What you get</h2>
             <ul className="mt-3 space-y-3">
               {OUTPUTS.map((o) => (
                 <li key={o.title} className="flex items-start gap-3">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-navy-soft text-navy">
+                  <span className="icon-tile size-9 bg-navy-soft text-navy">
                     <o.icon className="size-4" />
                   </span>
                   <span>
@@ -71,7 +94,7 @@ async function RecentRuns({ searchParams }: { searchParams: PageProps<"/dashboar
   return (
     <div className="card-surface">
       <div className="border-b px-5 py-4">
-        <h2 className="text-sm font-semibold">Recent assessments</h2>
+        <h2 className="text-[15px] font-semibold">Recent assessments</h2>
       </div>
       <ul className="divide-y">
         {runs.map((r) => (

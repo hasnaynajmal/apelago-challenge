@@ -7,7 +7,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Bell, MessageSquareText, Search } from "lucide-react";
-import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Flag } from "@/components/country";
 import { useCopilotDrawer } from "@/components/copilot/radar-copilot";
 import { supabaseBrowser } from "@/lib/supabase/browser";
@@ -119,6 +119,8 @@ function VentureSearch({ open, onOpenChange, lens }: { open: boolean; onOpenChan
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange} title="Search ventures" description="Jump to a venture">
+      {/* This shadcn version expects the Command root inside the dialog. */}
+      <Command>
       <CommandInput placeholder="Search ventures by name…" />
       <CommandList>
         <CommandEmpty>{items ? "No venture found." : "Loading…"}</CommandEmpty>
@@ -140,6 +142,7 @@ function VentureSearch({ open, onOpenChange, lens }: { open: boolean; onOpenChan
           ))}
         </CommandGroup>
       </CommandList>
+      </Command>
     </CommandDialog>
   );
 }
