@@ -42,3 +42,30 @@ Branch: `dev` (commits e5332f7 → 93b3626).
   said TRL 7 (55%), so the planned "needs review" flag for disagreements will trigger in practice.
 - **Next:** Phase 2 — core engine: deterministic matching/scoring (`src/lib/engine/`), Jev calibrator with Claude fallback,
   Mastra agents (Scout, 4 assessors, Matchmaker narrative, Connector, Strategist) + workflow writing to Supabase + pipeline_events.
+
+## Phase 2 — Engine, agents, pipeline (2026-10-17) ✅
+Commits 4882a39 → 8969cc4 (no Claude co-author trailers from here on, per user).
+- **Deterministic engine** (`src/lib/engine/`, pure TS, no LLM):
+  - `matching.ts` — investors/funding/partners: hard filters (geo, sector, stage ±1, applicant type, TRL gates, past deadlines) →
+    fit = weighted components → priority = fit × feasibility × urgency × value. Every match has `reasons[]`, `blockers[]`,
+    `status` (ready / stretch / after_milestone). Challenge partners (Redstone, A'Pelago) get a small boost.
+  - `scoring.ts` — IRL from 10 weighted dimensions with gates; thesis fit; promise score 0–100 with breakdown; A'Pelago programme fit.
+  - `connections.ts` — warm-intro paths (BFS over `relationships` + virtual edges to top partner matches), unlock analysis
+    (re-runs matching at TRL+1 / BRL+1 / OIRL+1 and counts newly ready opportunities), consortium builder, value-chain synergies, deadlines.
+- **Calibrator** `src/lib/calibrator/jev.ts` — one Jev request scores TRL/BRL/OIRL (9 levels) + 10 IRL dims (5 levels);
+  `calibrateFits` gives yes-probabilities for top-10 investors (adjusts priority ×0.75–1.25). Returns null on failure → Claude only.
+- **Agents** `src/mastra/agents.ts` + schemas `src/mastra/schemas.ts` — Scout researcher (Claude server-side web search,
+  `anthropic.tools.webSearch_20260209`, max 5 searches) + structurer, TRL/BRL/Ocean Impact assessors, Investment Analyst,
+  Match Narrator (Haiku 5.5), Strategist. Models from env (`RADAR_MODEL`, `RADAR_FAST_MODEL`) via `@ai-sdk/anthropic`.
+- **Pipeline** `src/lib/pipeline/run.ts` — scout → 4 assessors ∥ Jev → matching (+ existing-investor/grant detection from
+  funding history, + Jev fit calibration) → connections → narratives → strategist actions → per-thesis scores. Writes
+  assessments/matches (top 15 per type per thesis)/connections/actions/scores; emits `pipeline_events` (Realtime). ~50 s per
+  startup with stored profile, ~70–90 s with web research.
+  Review flag: Jev confidence ≥ 0.5 AND (argmax differs ≥ 2 or expected differs ≥ 1.5) → `needs_review`.
+- **API** `POST /api/assess` `{ startupId }` or `{ name, website?, oneLiner?, country? }` → `{ runId, startupId }`, runs in `after()`.
+- **Scripts:** `npm run assess -- <id> [--research]`, `npm run assess -- --all`, `npx tsx scripts/inspect.ts <id>`,
+  `scripts/engine-check.ts` (engine only), `scripts/smoke-websearch.ts`.
+- **Gotchas:** Structured-output arrays: avoid `.max()` in Zod (Claude may return more → validation error); trim in code.
+  Mastra `res.sources` items are chunks: URL at `x.payload.url`.
+- **Next:** Phase 3 — UI: theme (A'Pelago tokens, Urbanist), shadcn + Aceternity/React Bits, Radar home, startup dossier,
+  opportunity constellation (React Flow), action plan, live intake with Realtime feed.
