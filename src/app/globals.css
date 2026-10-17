@@ -1,26 +1,186 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
+/* Ocean Opportunity Radar — A'Pelago "deep ocean" theme (single dark theme). Tokens from apelago.fi. */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-urbanist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-heading: var(--font-urbanist), ui-sans-serif, system-ui, sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Brand + data palette */
+  --color-navy-950: #000d1d;
+  --color-navy-900: #001835;
+  --color-navy-800: #001b33;
+  --color-navy-700: #002444;
+  --color-navy-500: #01498f;
+  --color-ice: #cfdee8;
+  --color-ice-soft: #e9f3f8;
+  --color-gold: #dfae32;
+  --color-gold-light: #e6be5c;
+  --color-gold-dark: #be901e;
+  --color-tech: #4acceb; /* TRL */
+  --color-business: #7eb7c1; /* BRL */
+  --color-impact: #3db774; /* OIRL */
+  --color-invest: #dfae32; /* IRL */
+  --color-risk: #f0705a;
+  --color-warn: #e6be5c;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  color-scheme: dark;
+  --background: #001835;
+  --foreground: #f4f8fb;
+  --card: #001f3d;
+  --card-foreground: #f4f8fb;
+  --popover: #002444;
+  --popover-foreground: #f4f8fb;
+  --primary: #dfae32;
+  --primary-foreground: #001835;
+  --secondary: #0a2c4f;
+  --secondary-foreground: #e9f3f8;
+  --muted: #0a2846;
+  --muted-foreground: #8fa6ba;
+  --accent: #0d3358;
+  --accent-foreground: #f4f8fb;
+  --destructive: #f0705a;
+  --border: rgb(207 222 232 / 0.1);
+  --input: rgb(207 222 232 / 0.14);
+  --ring: rgb(223 174 50 / 0.6);
+  --chart-1: #4acceb;
+  --chart-2: #7eb7c1;
+  --chart-3: #3db774;
+  --chart-4: #dfae32;
+  --chart-5: #f0705a;
+  --radius: 0.75rem;
+  --sidebar: #001b33;
+  --sidebar-foreground: #f4f8fb;
+  --sidebar-primary: #dfae32;
+  --sidebar-primary-foreground: #001835;
+  --sidebar-accent: #0d3358;
+  --sidebar-accent-foreground: #f4f8fb;
+  --sidebar-border: rgb(207 222 232 / 0.1);
+  --sidebar-ring: rgb(223 174 50 / 0.6);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(1200px 600px at 15% -10%, rgb(1 73 143 / 0.55), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgb(74 204 235 / 0.08), transparent 60%),
+      radial-gradient(800px 600px at 50% 120%, rgb(1 73 143 / 0.35), transparent 60%);
+    background-attachment: fixed;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    @apply font-sans;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .glass {
+    background: linear-gradient(180deg, rgb(0 36 68 / 0.72), rgb(0 27 51 / 0.6));
+    border: 1px solid rgb(207 222 232 / 0.1);
+    backdrop-filter: blur(14px);
+  }
+  .glass-hover {
+    transition: border-color 0.2s, background-color 0.2s, transform 0.2s;
+  }
+  .glass-hover:hover {
+    border-color: rgb(223 174 50 / 0.35);
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .text-gradient-gold {
+    background: linear-gradient(90deg, #f3d37c, #dfae32 45%, #be901e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .grid-faint {
+    background-image:
+      linear-gradient(rgb(207 222 232 / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(207 222 232 / 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
+
+/* Radar sweep */
+@keyframes radar-sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.radar-sweep {
+  animation: radar-sweep 6s linear infinite;
+  transform-origin: center;
+}
+@keyframes blip-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+.blip-pulse {
+  animation: blip-pulse 2.4s ease-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .radar-sweep,
+  .blip-pulse {
+    animation: none;
+  }
 }
