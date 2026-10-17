@@ -266,6 +266,77 @@ export const findInvestors = createTool({
   },
 });
 
+// What the platform is and how it works (for "explain the platform" questions). Counts are live.
+const PIPELINE = [
+  { step: "Scout", what: "Researches the startup on the web (site, press, funding, customers) and builds an evidence-backed profile." },
+  { step: "Readiness committee", what: "Four AI assessors score TRL, BRL, Ocean Impact (OIRL) and Investment readiness (IRL) in parallel; a second model (Jev) calibrates each level and flags disagreements for review." },
+  { step: "Matchmaker", what: "Ranks every investor, funding programme and partner/client by sector, stage, geography, ticket size and readiness gates." },
+  { step: "Connector", what: "Searches the relationship graph for hidden connections: warm intro paths, grant consortia, synergies between ventures and milestones that unlock new matches." },
+  { step: "Match Narrator", what: "Writes a short reason for each top match." },
+  { step: "Strategist", what: "Turns it all into a prioritised action plan (now / 30 days / 90 days) with owners and deadlines." },
+];
+const PAGES = [
+  { page: "Overview", what: "Where the pipeline stands, top picks, this week's moves, upcoming deadlines and investors to activate." },
+  { page: "Ventures", what: "Every venture with score, readiness and group; filter by group." },
+  { page: "Venture page", what: "One startup: score breakdown, readiness levels with reasoning, opportunities (investors, funding, partners), action plan, connections map and deep dive." },
+  { page: "Deadlines", what: "Funding calls closing soon and which ventures should apply." },
+  { page: "Investors / Co-investors", what: "Which investors are matched most often across the portfolio." },
+  { page: "Assess a startup", what: "Add any startup by name or website; the AI committee assesses it live in about a minute." },
+];
+
+export const explainPlatform = createTool({
+  id: "explainPlatform",
+  description:
+    "Explains Ocean Opportunity Radar itself: what it is for, the questions it answers, how the AI committee works, " +
+    "the readiness scales, how scores and groups are calculated, the theses and what each page does. " +
+    "Use for 'what is this', 'explain the platform', 'how does it work', 'how is the score calculated'.",
+  inputSchema: z.object({ lens: lensInput }),
+  execute: async ({ lens: l }) => {
+    const lens = resolveLens(l);
+    const db = supabaseAdmin();
+    const count = async (t: string) => (await db.from(t).select("*", { count: "exact", head: true })).count ?? 0;
+    const [ventures, investors, funding, partners, relationships, thesis] = await Promise.all([
+      count("startups"), count("investors"), count("funding"), count("partners"), count("relationships"),
+      db.from("theses").select("name,description,config").eq("id", lens).maybeSingle(),
+    ]);
+    const w = (thesis.data?.config as { promise_weights?: Record<string, number> } | undefined)?.promise_weights;
+    return {
+      lens,
+      purpose:
+        "Turns fragmented startup and ecosystem data into venture intelligence for A'Pelago (accelerator) and Redstone Blue (VC): " +
+        "which ocean startups are most promising, why they fit a thesis, how ready they are, who to connect them with next, and what to do now.",
+      answers: [
+        "Which startups are most promising",
+        "Why, and how they fit the investment or accelerator thesis",
+        "Their technology, business, ocean impact and investment readiness",
+        "Which investors, funding, partners and clients are relevant next, in priority order",
+        "What they should do next",
+      ],
+      data: { ventures, investors, funding, partners, relationships },
+      pipeline: PIPELINE,
+      scales: {
+        TRL: "Technology Readiness Level 1–9 (EU scale): from idea to proven in operations.",
+        BRL: "Business Readiness Level 1–9 (KTH): from hypothesis to scaling sales.",
+        OIRL: "Ocean Impact Readiness 1–9, based on the Ocean Impact Navigator (6 impact areas, 30 KPIs).",
+        IRL: "Investment Readiness 1–9 from a weighted 10-dimension rubric (team, market, product, traction, deal…).",
+      },
+      score: {
+        what: "Overall score 0–100 for the selected thesis.",
+        weights: w ? Object.fromEntries(Object.entries(w).map(([k, v]) => [k, `${Math.round(v * 100)}%`])) : null,
+      },
+      groups: {
+        "Investment-ready": "Fits the thesis and mature enough for a round (readiness ≥ 4.5, fit ≥ 75%).",
+        Accelerate: "Fits the thesis but early: programme candidates.",
+        "Refer onwards": "Mature but off-thesis: introduce to better-fitting investors.",
+        Monitor: "Early and off-thesis: revisit later.",
+      },
+      theses: LENSES.map((x) => `${x.label} (${x.kind})`),
+      currentThesis: thesis.data?.name ?? lens,
+      pages: PAGES,
+    };
+  },
+});
+
 export const portfolioOverview = createTool({
   id: "portfolioOverview",
   description: "Portfolio-level summary: how many ventures per group, average readiness levels, top 3 and sector mix.",
@@ -298,6 +369,7 @@ professionals. Answer questions about the startups, readiness levels, investors,
 
 How to work:
 - Always get facts from the tools; never invent startups, numbers, investors or deadlines.
+- Questions about the platform itself ("what is this", "explain Radar", "how is the score calculated") → explainPlatform.
 - Warm paths, intros, "who can introduce", consortia, synergies → findConnections (pass the venture and/or investor).
 - Use the "lens" (thesis) from the app context in every tool call. Scores and matches depend on it.
 - If the user is on a venture page ("this startup", "it", "here"), use the venture from the app context.
@@ -319,5 +391,5 @@ export const radarCopilot = new Agent({
     return COPILOT_INSTRUCTIONS + ctx.map((c) => `\n\n## ${c.description}\n${c.value}`).join("");
   },
   model: () => anthropic(MAIN_MODEL),
-  tools: { searchVentures, getVenture, compareVentures, findConnections, upcomingDeadlines, findInvestors, portfolioOverview },
+  tools: { explainPlatform, searchVentures, getVenture, compareVentures, findConnections, upcomingDeadlines, findInvestors, portfolioOverview },
 });

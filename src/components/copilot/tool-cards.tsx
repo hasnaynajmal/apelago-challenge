@@ -419,3 +419,67 @@ export function ConnectionsCard({ connections, total, lens }: { connections: Con
     </Shell>
   );
 }
+
+export interface PlatformGuide {
+  purpose: string;
+  data: Record<string, number>;
+  pipeline: { step: string; what: string }[];
+  scales: Record<string, string>;
+  score: { weights: Record<string, string> | null };
+  currentThesis: string;
+}
+
+export function PlatformCard({ g }: { g: PlatformGuide }) {
+  const LABEL: Record<string, string> = { irl: "Investment readiness", thesis_fit: "Thesis fit", impact: "Ocean impact", momentum: "Momentum", team: "Team" };
+  return (
+    <Shell icon={Sparkles} title="How Radar works">
+      <div className="space-y-3 px-3 py-3">
+        <div className="grid grid-cols-5 gap-1 text-center">
+          {Object.entries(g.data).map(([k, v]) => (
+            <div key={k} className="rounded-lg bg-muted/70 py-1.5">
+              <div className="text-sm font-semibold tabular">{v}</div>
+              <div className="text-[9px] text-muted-foreground capitalize">{k}</div>
+            </div>
+          ))}
+        </div>
+        <ol className="space-y-2">
+          {g.pipeline.map((p, i) => (
+            <li key={p.step} className="flex gap-2.5">
+              <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-navy-soft text-[10px] font-semibold text-navy">{i + 1}</span>
+              <div className="min-w-0">
+                <div className="text-xs font-semibold">{p.step}</div>
+                <div className="text-[11px] leading-snug text-muted-foreground">{p.what}</div>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <div className="grid grid-cols-4 gap-1.5">
+          {LEVELS.map((l) => (
+            <div key={l.k} className="rounded-lg border px-2 py-1.5">
+              <div className="text-[11px] font-semibold" style={{ color: l.color }}>{l.k.toUpperCase()}</div>
+              <div className="text-[10px] text-muted-foreground">{l.label}</div>
+            </div>
+          ))}
+        </div>
+        {g.score.weights && (
+          <div>
+            <div className="mb-1 text-[11px] text-muted-foreground">Score for {g.currentThesis}</div>
+            <div className="flex h-2 overflow-hidden rounded-full">
+              {Object.entries(g.score.weights).map(([k, v], i) => (
+                <div key={k} title={`${LABEL[k] ?? k} ${v}`} style={{ width: v, background: ["#002444", "#2563eb", "#059669", "#0891b2", "#a87c12"][i % 5] }} />
+              ))}
+            </div>
+            <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-muted-foreground">
+              {Object.entries(g.score.weights).map(([k, v], i) => (
+                <span key={k} className="inline-flex items-center gap-1">
+                  <span className="size-1.5 rounded-full" style={{ background: ["#002444", "#2563eb", "#059669", "#0891b2", "#a87c12"][i % 5] }} />
+                  {LABEL[k] ?? k} {v}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </Shell>
+  );
+}

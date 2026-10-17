@@ -306,3 +306,6 @@ Built:
   `findConnections` and keep answers to 2–4 sentences. "Ask Radar" button is now a quiet white pill (no navy/gold).
   Custom drawer header with **New chat** (remounts the CopilotKit tree) + close. Hidden: the "+" attachment menu
   (not wired) and CopilotKit's floating bubble.
+- Added `explainPlatform` tool (purpose, the 5 challenge questions, live data counts, 6-step agent pipeline, TRL/BRL/
+  OIRL/IRL, score weights of the current thesis, groups, theses, pages) + `PlatformCard`; "How does Radar work?" is
+  the first suggestion chip outside venture pages. Cards checked on a temporary preview route (deleted).

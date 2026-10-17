@@ -23,6 +23,7 @@ import {
   DeadlinesCard,
   InvestorsCard,
   OverviewCard,
+  PlatformCard,
   ToolPending,
   VentureListCard,
   VentureSnapshotCard,
@@ -158,16 +159,27 @@ function CopilotBrain() {
             { title: "Compare with peers", message: "Compare this venture with the two most similar ventures in the portfolio." },
           ]
         : [
+            { title: "How does Radar work?", message: "Explain what this platform does and how it works." },
             { title: "Top 5 for our thesis", message: "Which 5 ventures are most promising for our thesis right now?" },
             { title: "Investment-ready", message: "Which ventures are investment-ready, and what is the next step for each?" },
             { title: "Deadlines this month", message: "Which funding deadlines close in the next 30 days, and who should apply?" },
-            { title: "Portfolio snapshot", message: "Give me a quick snapshot of the portfolio." },
           ],
     },
     [ventureId],
   );
 
   // ---- Agentic UI: backend tool calls rendered as cards ----
+  useRenderTool(
+    {
+      name: "explainPlatform",
+      parameters: anyArgs,
+      render: ({ status, result }) => {
+        const r = parse<Parameters<typeof PlatformCard>[0]["g"]>(result);
+        return status !== "complete" || !r ? <ToolPending label="Opening the platform guide…" /> : <PlatformCard g={r} />;
+      },
+    },
+    [],
+  );
   useRenderTool(
     {
       name: "searchVentures",
