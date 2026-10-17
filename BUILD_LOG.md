@@ -375,3 +375,4 @@ agents"). Old pipeline events in the DB still say "Committee" (historic rows, no
 - Live check: all pages 200 (~1–3 s), real Supabase data, copilot drawer opens. Not yet tested live: a paid
   assessment run (`after()` on Vercel, maxDuration 300) and a copilot message.
 - Redeploy: `npx vercel deploy --prod` from the repo (or push once the Git integration's production branch is set).
+- Favicon: `src/app/icon.svg` = A'Pelago compass-O (white ring, gold needle, cut from the official logo) on a navy rounded square; `apple-icon.png` 180 px full-bleed for iOS. Default Next favicon.ico removed.
