@@ -83,8 +83,8 @@ function MatchCard({ m, i, roleTags }: { m: MatchView; i: number; roleTags?: boo
           </div>
         </div>
         <div className="w-24 shrink-0 text-right">
-          <div className="text-xl font-semibold tracking-tight tabular">{Math.round(m.fit * 100)}<span className="text-sm font-normal text-muted-foreground">%</span></div>
-          <div className="text-xs text-muted-foreground">fit</div>
+          <div className="whitespace-nowrap text-xl font-semibold tracking-tight tabular">{Math.round(m.fit * 100)}%<span className="ml-1 text-xs font-normal text-muted-foreground">fit</span></div>
+          <div className="ml-auto mt-1.5 h-1 w-16 overflow-hidden rounded-full bg-zinc-100"><div className="h-full rounded-full bg-navy" style={{ width: `${Math.round(m.fit * 100)}%` }} /></div>
           {m.calibratedFit != null && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -97,7 +97,7 @@ function MatchCard({ m, i, roleTags }: { m: MatchView; i: number; roleTags?: boo
           )}
         </div>
       </div>
-      {m.rationale && <p className="mt-3 text-sm leading-relaxed text-zinc-700">{m.rationale}</p>}
+      {m.rationale && <p title={m.rationale} className="mt-3 line-clamp-3 text-sm leading-relaxed text-zinc-700">{m.rationale}</p>}
       <div className="mt-3 flex flex-wrap gap-1.5">
         {m.reasons.slice(0, 3).map((r) => (
           <span key={r} className="flex items-center gap-1.5 rounded-md bg-muted/70 px-2 py-0.5 text-xs text-zinc-700">
@@ -124,10 +124,10 @@ export function Opportunities({ matches, investorLabel = "Investors", investorSu
   const [showAll, setShowAll] = useState<Record<string, boolean>>({});
   return (
     <Tabs defaultValue="investor" className="w-full">
-      <TabsList className="no-scrollbar mb-4 h-11 max-w-full justify-start overflow-x-auto rounded-full p-1">
+      <TabsList className="no-scrollbar mb-3 h-auto max-w-full justify-start gap-1 overflow-x-auto rounded-none bg-transparent p-0">
         {(Object.keys(groups) as (keyof typeof groups)[]).map((k) => (
-          <TabsTrigger key={k} value={k} className="flex-none rounded-full px-3 text-sm sm:px-4">
-            {labels[k]} <span className="ml-1.5 text-muted-foreground tabular">{groups[k].length}</span>
+          <TabsTrigger key={k} value={k} className="h-8 flex-none rounded-lg border border-transparent px-3 text-[13px] text-zinc-600 hover:text-foreground focus-visible:ring-2 focus-visible:ring-navy/20 data-active:border-zinc-200 data-active:bg-white data-active:text-foreground data-active:shadow-[0_1px_2px_rgb(16_24_40/0.06)]">
+            {labels[k]} <span className="ml-1 text-muted-foreground tabular">{groups[k].length}</span>
           </TabsTrigger>
         ))}
       </TabsList>

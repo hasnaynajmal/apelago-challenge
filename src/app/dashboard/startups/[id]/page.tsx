@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { ArrowLeft, CalendarClock, Landmark, ListChecks, Microscope, Network, Route, ShieldAlert, Target } from "lucide-react";
+import { ArrowLeft, CalendarClock, Gauge, Landmark, LayoutGrid, ListChecks, Microscope, Network, Quote, Route, ShieldAlert, Target, TriangleAlert } from "lucide-react";
+import { BarRow, GroupPill, LEVEL_META, Panel, ScoreGauge, TINTS, VentureAvatar, type Tint } from "@/components/v2/primitives";
 import { ActionPlan } from "@/components/dossier/action-plan";
 import { ConnectionsPanel } from "@/components/dossier/connections-panel";
 import { Constellation } from "@/components/dossier/constellation";
@@ -62,66 +63,52 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
     partner: d.matches.filter((m) => m.targetType === "partner").length,
   };
 
+  const LEVEL_NAME = { trl: "Technology", brl: "Business", oirl: "Ocean impact", irl: "Investment" } as const;
+
   return (
-    <div className="space-y-8">
-      <Link href={`/dashboard/ventures?lens=${lens}`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+    <div className="space-y-5">
+      <Link href={`/dashboard/ventures?lens=${lens}`} className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground">
         <ArrowLeft className="size-4" /> All ventures
       </Link>
 
       {/* Header */}
-      <section className="card-surface flex flex-col gap-8 p-6 lg:flex-row">
+      <section className="card-surface flex flex-col gap-6 p-6 lg:flex-row lg:items-stretch">
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="text-3xl font-semibold tracking-[-0.03em]">{s.name}</h1>
-            {s.apelago_alumnus && <span className="rounded-full bg-navy-soft px-2.5 py-0.5 text-xs font-medium text-navy">A&apos;Pelago alumni</span>}
-            {quadrant && (
-              <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset", QUADRANTS[quadrant].badge)}>{QUADRANTS[quadrant].label}</span>
-            )}
-            {s.website && <span className="ml-auto"><WebsiteButton url={s.website} /></span>}
-          </div>
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-            {(s.city || s.country) && <Chip><CountryLabel code={s.country} city={s.city} /></Chip>}
-            {s.founded && <Chip>Founded {s.founded}</Chip>}
-            {s.stage && <Chip>{STAGE_LABELS[s.stage]}</Chip>}
-            {s.sectors.map((x) => <Chip key={x}>{SECTORS[x]}</Chip>)}
+          <div className="flex items-start gap-4">
+            <VentureAvatar name={s.name} size="lg" />
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-[26px] font-semibold leading-tight tracking-tight">{s.name}</h1>
+                <GroupPill quadrant={quadrant} />
+                {s.apelago_alumnus && <span className="rounded-full bg-navy-soft px-2.5 py-0.5 text-xs font-medium text-navy">A&apos;Pelago alumni</span>}
+              </div>
+              <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-muted-foreground">
+                {(s.city || s.country) && <CountryLabel code={s.country} city={s.city} />}
+                {s.founded && <span>Founded {s.founded}</span>}
+                {s.stage && <span>{STAGE_LABELS[s.stage]}</span>}
+                {s.sectors.slice(0, 2).map((x) => <span key={x}>{SECTORS[x]}</span>)}
+              </div>
+            </div>
+            {s.website && <span className="hidden sm:block"><WebsiteButton url={s.website} /></span>}
           </div>
           {(s.profile?.summary ?? s.one_liner) && (
-            <FitText text={(s.profile?.summary ?? s.one_liner)!} className="mt-4 flex-1 text-sm text-zinc-600" />
+            <FitText text={(s.profile?.summary ?? s.one_liner)!} className="mt-4 flex-1 text-[14px] text-zinc-600" />
           )}
+          {s.website && <span className="mt-3 sm:hidden"><WebsiteButton url={s.website} /></span>}
         </div>
 
         {score ? (
-          <div className="shrink-0 space-y-5 lg:w-[340px] lg:border-l lg:pl-8">
-            <div>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="text-xs font-medium text-muted-foreground">Overall score · {lensInfo.label}</div>
-                  <div className="mt-1 flex items-baseline gap-1">
-                    <span className="text-4xl font-semibold tracking-tight tabular">{Math.round(score.promise)}</span>
-                    <span className="text-sm text-muted-foreground">/ 100</span>
-                  </div>
-                </div>
-                <RunAssessmentButton startupId={s.id} lens={lens} rerun compact />
-              </div>
-              <div className="mt-3 h-2 rounded-full bg-muted">
-                <div className="bar-grow h-2 rounded-full bg-navy" style={{ width: `${Math.round(score.promise)}%` }} />
-              </div>
-            </div>
-            <div className="space-y-2.5">
-              {(["irl", "thesis_fit", "impact", "momentum", "team"] as const).map((k) => {
-                const v = Math.round(Number(breakdown?.[k] ?? 0) * 100);
-                return (
-                  <div key={k} className="flex items-center gap-3 text-xs">
-                    <span className="w-20 shrink-0 text-muted-foreground">{{ irl: "Readiness", thesis_fit: "Thesis fit", impact: "Impact", momentum: "Momentum", team: "Team" }[k]}</span>
-                    <div className="h-1.5 flex-1 rounded-full bg-muted"><div className="bar-grow h-1.5 rounded-full bg-navy" style={{ width: `${v}%` }} /></div>
-                    <span className="w-7 text-right font-medium tabular">{v}</span>
-                  </div>
-                );
-              })}
+          <div className="relative flex shrink-0 flex-col items-center justify-center rounded-2xl bg-zinc-50/80 px-6 pb-5 pt-6 lg:w-[300px]">
+            <div className="absolute right-3 top-3"><RunAssessmentButton startupId={s.id} lens={lens} rerun compact /></div>
+            <div className="mb-1 text-xs font-medium text-muted-foreground">Overall score</div>
+            <ScoreGauge value={score.promise} label={`for ${lensInfo.label}`} />
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs">
+              <span className="rounded-full bg-white px-2.5 py-1 font-medium ring-1 ring-zinc-200">Thesis fit {Math.round(score.thesis_fit * 100)}%</span>
+              {score.programme && <span className="rounded-full bg-gold-soft px-2.5 py-1 font-medium text-gold-ink">{PROGRAMMES[score.programme]}</span>}
             </div>
           </div>
         ) : (
-          <div className="shrink-0 lg:w-[400px] lg:border-l lg:pl-6">
+          <div className="flex shrink-0 flex-col justify-center rounded-2xl bg-zinc-50/80 p-6 lg:w-[320px]">
             <div className="text-sm font-semibold">Not assessed yet</div>
             <p className="mt-1 text-sm text-muted-foreground">Research, four readiness scores, matching and an action plan — about a minute.</p>
             <div className="mt-3"><RunAssessmentButton startupId={s.id} lens={lens} /></div>
@@ -130,68 +117,105 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
       </section>
 
       {score && (
-        <>
-          {/* At a glance — the decision in one row */}
-          <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
-            <Glance icon={Target} label="Verdict" tone={quadrant ? QUADRANTS[quadrant].dot : undefined}>
-              <div className="text-sm font-semibold">{quadrant ? QUADRANTS[quadrant].label : "—"}</div>
-              <div className="text-xs leading-snug text-muted-foreground">
-                {score.programme ? `Programme fit: ${PROGRAMMES[score.programme]}` : quadrant ? QUADRANTS[quadrant].hint : ""}
-              </div>
-            </Glance>
-            <Glance icon={ListChecks} label="Next move">
-              <div className="line-clamp-2 text-sm font-semibold leading-snug">{nextAction?.title ?? "—"}</div>
-              <div className="text-xs text-muted-foreground">
-                {nextAction ? (nextAction.owner === "operator" ? "Your team" : "Startup") : ""}
-                {nextAction?.deadline_date ? ` · due ${new Date(nextAction.deadline_date).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}` : ""}
-              </div>
-            </Glance>
-            <Glance icon={Landmark} label={framing.column}>
-              <div className="truncate text-sm font-semibold">{topInvestor ? (topInvestor.target as { name: string }).name.replace(/\s*\(.*\)$/, "") : "—"}</div>
-              <div className="text-xs text-muted-foreground">
-                {topInvestor ? `${Math.round(topInvestor.fit * 100)}% fit${framing.ownerId ? (topInvestor.status === "ready" ? " · co-invest now" : " · next round") : ""}` : ""}
-              </div>
-            </Glance>
-            <Glance icon={CalendarClock} label={nextDeadline ? "Next deadline" : "Best funding"} tone={nextDeadline && daysTo((nextDeadline.target as Funding).deadline_date!) <= 30 ? "#d97706" : undefined}>
-              <div className="line-clamp-1 text-sm font-semibold">{((nextDeadline ?? topFunding)?.target as { name: string } | undefined)?.name.split(" – ")[0] ?? "—"}</div>
-              <div className="text-xs text-muted-foreground">
-                {nextDeadline ? `${daysTo((nextDeadline.target as Funding).deadline_date!)} days left` : topFunding ? "Rolling — apply any time" : ""}
-              </div>
-            </Glance>
-          </section>
-
-          {/* Readiness */}
-          <section className="space-y-4">
-            <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-              <h2 className="text-base font-semibold">Readiness</h2>
-              <span className="text-xs text-muted-foreground">Every level double-checked by the Second Opinion model · open a card for the reasoning</span>
-            </div>
-            <ReadinessGrid assessments={a} />
-          </section>
-
-          {/* Everything else, one tab at a time */}
-          <Tabs defaultValue="opportunities" className="w-full">
-            <TabsList variant="line" className="no-scrollbar h-12 w-full justify-start gap-5 overflow-x-auto overflow-y-hidden rounded-none border-b bg-transparent p-0 sm:gap-8">
-              <TabsTrigger value="opportunities" className={TAB}><Network /> Opportunities <Count n={counts.investor + counts.funding + counts.partner} /></TabsTrigger>
-              <TabsTrigger value="plan" className={TAB}><ListChecks /> Action plan <Count n={d.actions.length} /></TabsTrigger>
-              <TabsTrigger value="connections" className={TAB}><Route /> Connections <Count n={d.connections.length} /></TabsTrigger>
-              <TabsTrigger value="deep" className={TAB}><Microscope /> Deep dive</TabsTrigger>
+        <Tabs defaultValue="overview" className="w-full gap-5">
+          <div className="no-scrollbar -mx-1 overflow-x-auto px-1">
+            <TabsList className="h-auto gap-0.5 rounded-xl bg-zinc-200/60 p-1">
+              <TabsTrigger value="overview" className={SEG}><LayoutGrid /> Overview</TabsTrigger>
+              <TabsTrigger value="readiness" className={SEG}><Gauge /> Readiness</TabsTrigger>
+              <TabsTrigger value="opportunities" className={SEG}><Network /> Opportunities <Count n={counts.investor + counts.funding + counts.partner} /></TabsTrigger>
+              <TabsTrigger value="plan" className={SEG}><ListChecks /> Action plan <Count n={d.actions.length} /></TabsTrigger>
+              <TabsTrigger value="connections" className={SEG}><Route /> Connections <Count n={d.connections.length} /></TabsTrigger>
+              <TabsTrigger value="deep" className={SEG}><Microscope /> Deep dive</TabsTrigger>
             </TabsList>
+          </div>
 
-            <TabsContent value="opportunities" className="pt-6">
-              <Opportunities matches={d.matches} investorLabel={framing.tab} investorSub={framing.sub} roleTags={!!framing.ownerId} />
-            </TabsContent>
+          <TabsContent value="overview" className="space-y-4">
+            {score.headline && (
+              <div className="card-surface flex gap-4 p-5">
+                <span className={cn("icon-tile size-10", TINTS.navy)}><Quote className="size-4" /></span>
+                <div>
+                  <div className="text-xs font-medium text-muted-foreground">Investment view</div>
+                  <p className="mt-1 text-[15px] leading-relaxed text-foreground">{score.headline}</p>
+                </div>
+              </div>
+            )}
 
-            <TabsContent value="plan" className="pt-6">
-              <ActionPlan actions={d.actions} />
-            </TabsContent>
+            <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+              <Glance icon={Target} tint="emerald" label="Verdict">
+                <div className="text-[15px] font-semibold">{quadrant ? QUADRANTS[quadrant].label : "—"}</div>
+                <div className="text-xs leading-snug text-muted-foreground">{quadrant ? QUADRANTS[quadrant].hint : ""}</div>
+              </Glance>
+              <Glance icon={ListChecks} tint="navy" label="Next move">
+                <div className="line-clamp-2 text-[15px] font-semibold leading-snug">{nextAction?.title ?? "—"}</div>
+                <div className="text-xs text-muted-foreground">
+                  {nextAction ? (nextAction.owner === "operator" ? "Your team" : "Startup") : ""}
+                  {nextAction?.deadline_date ? ` · due ${new Date(nextAction.deadline_date).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}` : ""}
+                </div>
+              </Glance>
+              <Glance icon={Landmark} tint="violet" label={framing.column}>
+                <div className="truncate text-[15px] font-semibold">{topInvestor ? (topInvestor.target as { name: string }).name.replace(/\s*\(.*\)$/, "") : "—"}</div>
+                <div className="text-xs text-muted-foreground">
+                  {topInvestor ? `${Math.round(topInvestor.fit * 100)}% fit${framing.ownerId ? (topInvestor.status === "ready" ? " · co-invest now" : " · next round") : ""}` : ""}
+                </div>
+              </Glance>
+              <Glance icon={CalendarClock} tint={nextDeadline && daysTo((nextDeadline.target as Funding).deadline_date!) <= 30 ? "amber" : "sky"} label={nextDeadline ? "Next deadline" : "Best funding"}>
+                <div className="line-clamp-1 text-[15px] font-semibold">{((nextDeadline ?? topFunding)?.target as { name: string } | undefined)?.name.split(" – ")[0] ?? "—"}</div>
+                <div className="text-xs text-muted-foreground">
+                  {nextDeadline ? `${daysTo((nextDeadline.target as Funding).deadline_date!)} days left` : topFunding ? "Rolling — apply any time" : ""}
+                </div>
+              </Glance>
+            </div>
 
-            <TabsContent value="connections" className="space-y-6 pt-6">
-              <Constellation startupName={s.name} matches={d.matches} connections={d.connections} />
-              <ConnectionsPanel connections={d.connections} />
-            </TabsContent>
+            <div className="grid gap-4 lg:grid-cols-5">
+              <Panel title="Why this score" sub={`What the ${Math.round(score.promise)} is made of, for ${lensInfo.label}`} className="lg:col-span-3">
+                <div className="space-y-3.5 pt-1">
+                  {(["irl", "thesis_fit", "impact", "momentum", "team"] as const).map((k) => (
+                    <BarRow key={k} label={{ irl: "Readiness", thesis_fit: "Thesis fit", impact: "Ocean impact", momentum: "Momentum", team: "Team" }[k]} value={Math.round(Number(breakdown?.[k] ?? 0) * 100)} />
+                  ))}
+                </div>
+              </Panel>
+              <Panel title="Readiness" sub="1–9 scales · reasoning in the Readiness tab" className="lg:col-span-2">
+                <div className="grid grid-cols-2 gap-2.5">
+                  {LEVEL_META.map((l) => {
+                    const x = a[l.k];
+                    return (
+                      <div key={l.k} className="rounded-xl border p-3">
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          {LEVEL_NAME[l.k]}
+                          {x?.needs_review && <TriangleAlert className="size-3.5 text-amber-600" />}
+                        </div>
+                        <div className="mt-1 flex items-baseline gap-1">
+                          <span className="text-2xl font-semibold tabular" style={{ color: l.color }}>{x?.level ?? "–"}</span>
+                          <span className="text-xs text-muted-foreground">/ 9</span>
+                        </div>
+                        <div className="text-[11px] text-muted-foreground">{x?.confidence != null ? `${Math.round(x.confidence * 100)}% confident` : ""}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </Panel>
+            </div>
+          </TabsContent>
 
-            <TabsContent value="deep" className="space-y-6 pt-6">
+          <TabsContent value="readiness" className="space-y-3">
+            <p className="text-[13px] text-muted-foreground">Every level is double-checked by the Second Opinion model. Open a card for the reasoning, what is needed next and what evidence is missing.</p>
+            <ReadinessGrid assessments={a} />
+          </TabsContent>
+
+          <TabsContent value="opportunities">
+            <Opportunities matches={d.matches} investorLabel={framing.tab} investorSub={framing.sub} roleTags={!!framing.ownerId} />
+          </TabsContent>
+
+          <TabsContent value="plan">
+            <ActionPlan actions={d.actions} />
+          </TabsContent>
+
+          <TabsContent value="connections" className="space-y-5">
+            <Constellation startupName={s.name} matches={d.matches} connections={d.connections} />
+            <ConnectionsPanel connections={d.connections} />
+          </TabsContent>
+
+          <TabsContent value="deep" className="space-y-5">
               <div className="grid gap-5 lg:grid-cols-2">
                 <div className="card-surface p-5">
                   <h3 className="text-sm font-semibold">Investment readiness · 10 dimensions</h3>
@@ -272,21 +296,18 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
                   </div>
                 </div>
               )}
-            </TabsContent>
-          </Tabs>
-        </>
+          </TabsContent>
+        </Tabs>
       )}
     </div>
   );
 }
 
-function Glance({ icon: Icon, label, tone, children }: { icon: React.ComponentType<{ className?: string }>; label: string; tone?: string; children: React.ReactNode }) {
+function Glance({ icon: Icon, label, tint, children }: { icon: React.ComponentType<{ className?: string }>; label: string; tint: Tint; children: React.ReactNode }) {
   return (
-    <div className="card-surface flex gap-3.5 p-4 sm:p-5">
-      <span className="hidden size-9 shrink-0 items-center justify-center rounded-lg bg-muted sm:flex" style={tone ? { color: tone } : undefined}>
-        <Icon className="size-4" />
-      </span>
-      <div className="min-w-0 space-y-0.5">
+    <div className="card-surface p-4 sm:p-5">
+      <span className={cn("icon-tile hidden size-9 sm:flex", TINTS[tint])}><Icon className="size-4" /></span>
+      <div className="min-w-0 space-y-0.5 sm:mt-3">
         <div className="text-xs text-muted-foreground">{label}</div>
         {children}
       </div>
@@ -294,11 +315,11 @@ function Glance({ icon: Icon, label, tone, children }: { icon: React.ComponentTy
   );
 }
 
-// Main tabs: underline style. Active = navy text + 2px navy underline; hover never changes the active colour.
-const TAB = "group/tab h-12 flex-none gap-2 rounded-none px-0.5 text-[15px] font-medium text-muted-foreground hover:text-foreground data-active:text-navy data-active:hover:text-navy after:h-[2px] after:bg-navy group-data-horizontal/tabs:after:bottom-[-1px]";
+// Segmented pill tabs: the active tab is a white pill on a grey track.
+const SEG = "h-9 flex-none gap-1.5 rounded-lg border-0 px-3 text-[13px] font-medium text-zinc-600 hover:text-foreground focus-visible:border-0 focus-visible:ring-2 focus-visible:ring-navy/20 focus-visible:outline-none data-active:bg-white data-active:text-foreground data-active:shadow-[0_1px_3px_rgb(16_24_40/0.1)] [&_svg]:size-4";
 
 function Count({ n }: { n: number }) {
-  return <span className="rounded-full bg-muted px-1.5 py-px text-xs text-muted-foreground tabular group-data-active/tab:bg-navy group-data-active/tab:text-white">{n}</span>;
+  return <span className="rounded-md bg-zinc-200/70 px-1.5 text-[11px] text-zinc-600 tabular">{n}</span>;
 }
 
 function Chip({ children }: { children: React.ReactNode }) {
