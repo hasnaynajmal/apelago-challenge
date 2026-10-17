@@ -9,7 +9,8 @@
     "lint": "eslint",
     "db:migrate": "tsx scripts/db-migrate.ts",
     "db:seed": "tsx scripts/seed.ts",
-    "smoke": "tsx scripts/smoke-mastra.ts"
+    "smoke": "tsx scripts/smoke-mastra.ts",
+    "assess": "tsx scripts/assess.ts"
   },
   "dependencies": {
     "@ag-ui/client": "^1.0.3",
