@@ -296,3 +296,19 @@ body {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+/* Shimmering text for "Thinking…" / tool progress lines in Ask Atlas. */
+.shimmer-text {
+  background: linear-gradient(90deg, #667085 0%, #667085 35%, #002444 50%, #667085 65%, #667085 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer-text 1.8s linear infinite;
+}
+@keyframes shimmer-text {
+  from { background-position: 100% 0; }
+  to { background-position: -150% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-text { animation: none; color: #667085; }
+}

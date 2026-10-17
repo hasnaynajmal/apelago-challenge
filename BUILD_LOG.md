@@ -458,3 +458,4 @@ Done (all on `ui-v2`; main/dev untouched):
   answer format: bold one-line answer + ≤3 bullets, <90 words. Readiness tab rebuilt: 2-column cards with icon tile,
   question, big level, confidence pill, Second Opinion distribution, reasoning, next steps + missing evidence all
   visible (no toggle).
+- Ask Atlas feel: `chat-parts.tsx` — SmoothMarkdown types answers out at ~90 chars/s (catches up if >3 s behind; finished messages show at once), ThinkingSlot shows a shimmering "Thinking…" while the model reasons (gone once the answer starts); tool progress lines shimmer too (`.shimmer-text`). Drawer closes on click outside (dim backdrop) and on Esc.

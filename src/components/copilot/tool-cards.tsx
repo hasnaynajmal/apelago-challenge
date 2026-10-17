@@ -87,9 +87,9 @@ function MiniLevels({ levels }: { levels: Levels }) {
 /** Running state shown while a tool executes. */
 export function ToolPending({ label }: { label: string }) {
   return (
-    <div className="my-2.5 flex items-center gap-2.5 rounded-2xl border bg-white px-3.5 py-3 text-[13px] text-muted-foreground">
+    <div className="my-2.5 flex items-center gap-2.5 rounded-2xl border border-dashed bg-white/70 px-3.5 py-3 text-[13px]">
       <span className="flex size-7 items-center justify-center rounded-lg bg-navy-soft"><Loader2 className="size-3.5 animate-spin text-navy" /></span>
-      {label}
+      <span className="shimmer-text font-medium">{label}</span>
     </div>
   );
 }

@@ -16,8 +16,10 @@ import {
 } from "@copilotkit/react-core/v2";
 import "@copilotkit/react-core/v2/styles.css";
 import { LENSES, resolveLens } from "@/lib/lens";
+import { cn } from "@/lib/utils";
 import { useLensTransition } from "@/components/dashboard/lens-transition";
 import { Plus, X } from "lucide-react";
+import { SmoothMarkdown, ThinkingSlot } from "./chat-parts";
 import {
   CompareCard,
   ConnectionsCard,
@@ -43,13 +45,14 @@ export function RadarCopilot({ children }: { children: React.ReactNode }) {
   // Remounting the CopilotKit tree with a new key starts a fresh conversation.
   const [session, setSession] = useState(0);
   const newChat = () => setSession((n) => n + 1);
-  // ⌘J / Ctrl+J toggles the drawer.
+  // ⌘J / Ctrl+J toggles the drawer; Esc closes it.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "j") {
         e.preventDefault();
         setOpen((v) => !v);
       }
+      if (e.key === "Escape") setOpen(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -59,6 +62,12 @@ export function RadarCopilot({ children }: { children: React.ReactNode }) {
   return (
     <OpenContext.Provider value={{ open, setOpen, newChat }}>
       {children}
+      {/* Click anywhere outside the drawer to close it. */}
+      <div
+        aria-hidden
+        onClick={() => setOpen(false)}
+        className={cn("fixed inset-0 z-[1150] bg-zinc-900/15 transition-opacity duration-200", open ? "opacity-100" : "pointer-events-none opacity-0")}
+      />
       {mounted && (
         <CopilotKit key={session} runtimeUrl="/api/copilotkit" enableInspector={false}>
           <Suspense>
@@ -71,8 +80,8 @@ export function RadarCopilot({ children }: { children: React.ReactNode }) {
           width={440}
           toggleButton={{ className: "hidden" }}
           header={DrawerHeaderSlot}
-          // Hide the model's "Thought for N seconds" rows; answers and cards are what matter here.
-          messageView={{ reasoningMessage: "hidden" }}
+          // "Thinking…" shimmer instead of "Thought for N seconds"; answers type out at a reading pace.
+          messageView={{ reasoningMessage: ThinkingSlot, assistantMessage: { markdownRenderer: SmoothMarkdown } }}
           labels={{
             modalHeaderTitle: "Ask Atlas",
             chatInputPlaceholder: "Ask Atlas anything…",
