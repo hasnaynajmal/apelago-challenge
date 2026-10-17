@@ -403,3 +403,9 @@ venture page 656 px wide, Ventures table cut off. Fixes:
   thesis. Ask Atlas opens full-screen on phones (CopilotKit default) — verified.
 - After: every page 390/390 wide, no console errors; production build passes. Old lint errors fixed in the venture
   page; remaining lint errors are inside vendored React Bits components (pre-existing, not built into lint).
+- Thesis switch feedback (`components/dashboard/lens-transition.tsx`): `LensTransitionProvider` runs the switch in a
+  React transition; while pending the page content dims (`LensContent`, aria-busy), an indeterminate navy bar runs
+  under the topbar, the topbar pill reads "Switching to …" with a spinner and the sidebar radio moves immediately.
+  When the new RSC payload lands, content fades/rises in (Web Animations API) and a toast confirms "Now evaluating
+  for … · Scores, groups, rankings and matches updated." Ask Atlas's switchLens tool uses the same path.
+  Dashboard content padding is smaller on phones (px-4 py-6).

@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, BookOpen, CalendarClock, Check, Info, LayoutDashboard, Landmark, Plus, Rows3 } from "lucide-react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { ArrowLeft, BookOpen, CalendarClock, Check, Info, LayoutDashboard, Landmark, Loader2, Plus, Rows3 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader,
@@ -11,10 +11,10 @@ import {
 } from "@/components/ui/sidebar";
 import { INVESTOR_FRAMING, LENSES, resolveLens } from "@/lib/lens";
 import { cn } from "@/lib/utils";
+import { useLensTransition } from "@/components/dashboard/lens-transition";
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
   const params = useSearchParams();
   const lens = resolveLens(params.get("lens") ?? undefined);
   const withLens = (href: string) => `${href}?lens=${lens}`;
@@ -31,10 +31,10 @@ export function AppSidebar() {
   const active = (n: (typeof NAV)[number]) =>
     n.exact ? pathname === n.href : pathname.startsWith(n.href) || (!!n.also && pathname.startsWith(n.also));
 
+  const { switchLens, pending, target } = useLensTransition();
+  const selected = pending && target ? target : lens; // move the radio immediately, data follows
   const setLens = (id: string) => {
-    const next = new URLSearchParams(params);
-    next.set("lens", id);
-    router.push(`${pathname}?${next.toString()}`, { scroll: false });
+    switchLens(id, pathname, params.toString());
   };
 
   return (
@@ -100,14 +100,14 @@ export function AppSidebar() {
                   onClick={() => { setLens(l.id); close(); }}
                   className={cn(
                     "flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left transition-colors",
-                    lens === l.id ? "bg-sidebar-accent" : "hover:bg-sidebar-accent/60",
+                    selected === l.id ? "bg-sidebar-accent" : "hover:bg-sidebar-accent/60",
                   )}
                 >
-                  <span className={cn("flex size-3.5 shrink-0 items-center justify-center rounded-full border", lens === l.id ? "border-navy bg-navy text-white" : "border-zinc-300")}>
-                    {lens === l.id && <Check className="size-2" />}
+                  <span className={cn("flex size-3.5 shrink-0 items-center justify-center rounded-full border", selected === l.id ? "border-navy bg-navy text-white" : "border-zinc-300")}>
+                    {selected === l.id && (pending ? <Loader2 className="size-2.5 animate-spin" /> : <Check className="size-2" />)}
                   </span>
                   <span className="min-w-0">
-                    <span className={cn("block truncate text-[13px]", lens === l.id ? "font-medium text-foreground" : "text-zinc-600")}>{l.label}</span>
+                    <span className={cn("block truncate text-[13px]", selected === l.id ? "font-medium text-foreground" : "text-zinc-600")}>{l.label}</span>
                     <span className="block truncate text-xs text-muted-foreground">{l.kind}</span>
                   </span>
                 </button>

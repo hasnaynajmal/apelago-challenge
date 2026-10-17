@@ -238,3 +238,11 @@ body {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+/* Indeterminate progress bar under the topbar while a thesis switch loads. */
+@keyframes lens-progress {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+.lens-progress {
+  animation: lens-progress 0.9s ease-in-out infinite;
+}

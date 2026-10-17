@@ -16,6 +16,7 @@ import {
 } from "@copilotkit/react-core/v2";
 import "@copilotkit/react-core/v2/styles.css";
 import { LENSES, resolveLens } from "@/lib/lens";
+import { useLensTransition } from "@/components/dashboard/lens-transition";
 import { Plus, X } from "lucide-react";
 import {
   CompareCard,
@@ -145,6 +146,7 @@ function CopilotBrain() {
   const pathname = usePathname();
   const params = useSearchParams();
   const router = useRouter();
+  const { switchLens } = useLensTransition();
   const lens = resolveLens(params.get("lens") ?? undefined);
   const lensLabel = LENSES.find((l) => l.id === lens)!.label;
   const ventureId = pathname.match(/^\/dashboard\/startups\/([^/]+)/)?.[1] ?? null;
@@ -299,13 +301,11 @@ function CopilotBrain() {
       description: "Switch which thesis the app evaluates for: redstone-blue (VC), apelago-accelerator, or nordic-climate-generalist.",
       parameters: z.object({ lens: z.enum(["redstone-blue", "apelago-accelerator", "nordic-climate-generalist"]) }),
       handler: async ({ lens: next }) => {
-        const sp = new URLSearchParams(params.toString());
-        sp.set("lens", next);
-        router.replace(`${pathname}?${sp}`);
+        switchLens(next, pathname, params.toString()); // same dim → fade-in → toast as the sidebar switch
         return `Now evaluating for ${LENSES.find((l) => l.id === next)!.label}`;
       },
     },
-    [pathname, params, router],
+    [pathname, params, switchLens],
   );
 
   return null;
