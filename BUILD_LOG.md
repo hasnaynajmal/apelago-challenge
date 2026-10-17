@@ -251,3 +251,13 @@ skim for a verdict in ~10–20 s; details are reference material for due diligen
 - Data fix: ventures added via intake now take sectors from the latest research (seed startups keep curated sectors).
   Clewat's sectors corrected in the DB (pollution_cleanup, water_management); its matches/scores still reflect the old
   sector until it is re-run (needs the user's OK — costs API).
+
+## Phase 3j — Feedback on venture page polish (2026-10-17) — IN PROGRESS
+User rejected the last polish (commit e9924da):
+- The number written inside the score ring ("72 / score") looks bad → remove the ring; show the score as a plain large
+  number with "/100" and a thin bar (same treatment on Overview top-pick cards for consistency).
+- The navy segmented tabs look bad, and hovering the active tab turned its text navy-on-navy (base TabsTrigger has
+  `hover:text-foreground`). Plan: main venture tabs become a clear underline tab bar (15px, icons, counts, 2px navy
+  underline, explicit hover colours that never collide); the Opportunities sub-tabs stay as small pills so the
+  hierarchy is obvious.
+- Rule: verify hover/active states, not just static screenshots (use puppeteer hover).
