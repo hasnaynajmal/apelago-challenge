@@ -31,6 +31,30 @@ export function PortfolioMatrix({ rows, lens }: { rows: PipelineRow[]; lens: str
   const cx = x(READY_AT);
   const cy = y(FIT_AT);
 
+  // Dot positions, then collision-free label placement for the labelled (top-3) ventures.
+  const pos = new Map(pts.map((p) => {
+    const j = jitter(p.id);
+    return [p.id, { px: round(x(p.readiness!) + j.dx), py: round(y(p.thesisFit!) + j.dy) }];
+  }));
+  type Box = { x0: number; x1: number; y0: number; y1: number };
+  const overlaps = (a: Box, b: Box) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+  const taken: Box[] = [...pos.values()].map(({ px, py }) => ({ x0: px - 8, x1: px + 8, y0: py - 8, y1: py + 8 }));
+  const labelAt = new Map<string, { dx: number; dy: number; anchor: "start" | "end" | "middle" }>();
+  for (const p of pts.filter((q) => labelled.has(q.id)).sort((a, b) => (b.promise ?? 0) - (a.promise ?? 0))) {
+    const { px, py } = pos.get(p.id)!;
+    const w = p.name.length * 7.4;
+    const options = [
+      { dx: 12, dy: 4.5, anchor: "start" as const, box: { x0: px + 10, x1: px + 12 + w, y0: py - 9, y1: py + 7 } },
+      { dx: -12, dy: 4.5, anchor: "end" as const, box: { x0: px - 12 - w, x1: px - 10, y0: py - 9, y1: py + 7 } },
+      { dx: 0, dy: 24, anchor: "middle" as const, box: { x0: px - w / 2, x1: px + w / 2, y0: py + 10, y1: py + 27 } },
+      { dx: 0, dy: -14, anchor: "middle" as const, box: { x0: px - w / 2, x1: px + w / 2, y0: py - 27, y1: py - 10 } },
+    ].filter((o) => o.box.x0 > PAD.l && o.box.x1 < W - PAD.r);
+    const pick = options.find((o) => !taken.some((b) => overlaps(o.box, b))) ?? options[0];
+    if (!pick) continue;
+    taken.push(pick.box);
+    labelAt.set(p.id, { dx: pick.dx, dy: pick.dy, anchor: pick.anchor });
+  }
+
   const quads = [
     { q: "accelerate" as const, x0: PAD.l, y0: PAD.t, x1: cx, y1: cy, ax: "start", lx: PAD.l + 12, ly: PAD.t + 22 },
     { q: "invest" as const, x0: cx, y0: PAD.t, x1: W - PAD.r, y1: cy, ax: "end", lx: W - PAD.r - 12, ly: PAD.t + 22 },
@@ -68,10 +92,8 @@ export function PortfolioMatrix({ rows, lens }: { rows: PipelineRow[]; lens: str
         </text>
 
         {pts.map((p, i) => {
-          const j = jitter(p.id);
-          const px = round(x(p.readiness!) + j.dx);
-          const py = round(y(p.thesisFit!) + j.dy);
-          const left = px > W * 0.72;
+          const { px, py } = pos.get(p.id)!;
+          const label = labelAt.get(p.id) ?? { dx: px > W * 0.72 ? -12 : 12, dy: 4.5, anchor: px > W * 0.72 ? ("end" as const) : ("start" as const) };
           const color = QUADRANTS[p.quadrant!].dot;
           const show = labelled.has(p.id) || hover === p.id;
           return (
@@ -87,7 +109,7 @@ export function PortfolioMatrix({ rows, lens }: { rows: PipelineRow[]; lens: str
             >
               <circle r={hover === p.id ? 9 : 7} fill={color} stroke="#fff" strokeWidth={2} />
               {show && (
-                <text x={left ? -11 : 11} y={4.5} textAnchor={left ? "end" : "start"} fontSize={13} fontWeight={hover === p.id ? 600 : 500} fill="#18181b" paintOrder="stroke" stroke="#fff" strokeWidth={4}>
+                <text x={label.dx} y={label.dy} textAnchor={label.anchor} fontSize={13} fontWeight={hover === p.id ? 600 : 500} fill="#18181b" paintOrder="stroke" stroke="#fff" strokeWidth={4}>
                   {p.name}
                 </text>
               )}

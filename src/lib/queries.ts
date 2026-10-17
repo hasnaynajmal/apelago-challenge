@@ -219,6 +219,39 @@ export async function getDeadlines(lens: string, horizonDays = 120): Promise<Dea
   }));
 }
 
+export interface InvestorDemand {
+  id: string;
+  name: string;
+  hq: string | null;
+  isPartner: boolean;
+  ventures: { id: string; name: string }[];
+}
+
+/** Investors that appear most often among ventures' top-3 investor matches — the relationships worth activating first. */
+export async function getInvestorDemand(lens: string, limit = 5): Promise<InvestorDemand[]> {
+  const db = supabaseAdmin();
+  const [{ data: m }, { data: inv }, { data: s }] = await Promise.all([
+    db.from("matches").select("startup_id,target_id").eq("thesis_id", lens).eq("target_type", "investor").lte("rank", 3),
+    db.from("investors").select("id,name,hq,is_challenge_partner"),
+    db.from("startups").select("id,name"),
+  ]);
+  const by = new Map<string, string[]>();
+  for (const r of m ?? []) by.set(r.target_id, [...(by.get(r.target_id) ?? []), r.startup_id]);
+  return [...by.entries()]
+    .sort((a, b) => b[1].length - a[1].length)
+    .slice(0, limit)
+    .map(([id, ventures]) => {
+      const i = inv?.find((x) => x.id === id);
+      return {
+        id,
+        name: (i?.name ?? id).replace(/\s*\(.*\)$/, ""),
+        hq: i?.hq ?? null,
+        isPartner: !!i?.is_challenge_partner,
+        ventures: ventures.map((v) => ({ id: v, name: s?.find((x) => x.id === v)?.name ?? v })),
+      };
+    });
+}
+
 export async function getStartupNames(): Promise<{ id: string; name: string }[]> {
   const { data } = await supabaseAdmin().from("startups").select("id,name").order("name");
   return data ?? [];

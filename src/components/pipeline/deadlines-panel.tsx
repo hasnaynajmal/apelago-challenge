@@ -1,51 +1,77 @@
 import Link from "next/link";
-import type { DeadlineRow } from "@/lib/queries";
+import { Flag } from "@/components/country";
+import type { DeadlineRow, InvestorDemand } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 
 const eur = (n: number | null) => (n == null ? null : n >= 1_000_000 ? `€${+(n / 1_000_000).toFixed(1)}M` : `€${Math.round(n / 1000)}k`);
 
+function VentureLinks({ items, lens, max = 3 }: { items: { id: string; name: string }[]; lens: string; max?: number }) {
+  return (
+    <div className="mt-2 flex flex-wrap gap-1.5">
+      {items.slice(0, max).map((e) => (
+        <Link key={e.id} href={`/startups/${e.id}?lens=${lens}`} className="rounded-md bg-muted px-2 py-0.5 text-sm text-zinc-700 transition-colors hover:bg-navy-soft hover:text-navy">
+          {e.name}
+        </Link>
+      ))}
+      {items.length > max && <span className="px-1 py-0.5 text-sm text-muted-foreground">+{items.length - max} more</span>}
+    </div>
+  );
+}
+
 export function DeadlinesPanel({ deadlines, lens }: { deadlines: DeadlineRow[]; lens: string }) {
   return (
-    <div className="card-surface flex h-full flex-col">
+    <div className="card-surface">
       <div className="border-b px-5 py-4">
         <h3 className="text-base font-semibold">Upcoming deadlines</h3>
-        <p className="text-sm text-muted-foreground">Funding calls in the next 4 months and which ventures fit</p>
+        <p className="text-sm text-muted-foreground">Funding calls in the next 4 months</p>
       </div>
-      <ul className="flex-1 divide-y">
+      <ul className="divide-y">
         {deadlines.map((d) => {
           const date = new Date(d.date);
+          const urgent = d.days <= 30;
           return (
-            <li key={d.id} className="flex gap-4 px-5 py-4">
-              <div className={cn("flex w-14 shrink-0 flex-col items-center rounded-xl border py-2", d.days <= 30 && "border-amber-300 bg-amber-50")}>
-                <span className="text-xl font-semibold leading-none tabular">{date.getUTCDate()}</span>
-                <span className="mt-1 text-xs uppercase text-muted-foreground">{date.toLocaleString("en-GB", { month: "short", timeZone: "UTC" })}</span>
+            <li key={d.id} className="flex items-start gap-4 px-5 py-4">
+              <div className={cn("flex size-12 shrink-0 flex-col items-center justify-center rounded-lg border", urgent && "border-amber-300 bg-amber-50")}>
+                <span className="text-lg font-semibold leading-none tabular">{date.getUTCDate()}</span>
+                <span className="mt-0.5 text-[11px] font-medium uppercase text-muted-foreground">{date.toLocaleString("en-GB", { month: "short", timeZone: "UTC" })}</span>
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-[15px] font-semibold leading-snug">{d.name}</div>
-                <div className="mt-0.5 text-sm text-muted-foreground">
-                  {d.days} days left{d.amount ? ` · up to ${eur(d.amount)}` : ""}
+                <div className={cn("mt-0.5 text-sm", urgent ? "text-amber-700" : "text-muted-foreground")}>
+                  {d.days} days left{d.amount ? ` · up to ${eur(d.amount)}` : ""} · {d.eligible.length} ventures fit
                 </div>
-                <div className="mt-2 text-sm">
-                  {d.eligible.length ? (
-                    <>
-                      <span className="font-medium">{d.eligible.length} venture{d.eligible.length === 1 ? "" : "s"} fit: </span>
-                      {d.eligible.slice(0, 4).map((e, i) => (
-                        <span key={e.id}>
-                          <Link href={`/startups/${e.id}?lens=${lens}`} className="text-navy hover:underline">{e.name}</Link>
-                          {i < Math.min(4, d.eligible.length) - 1 ? ", " : ""}
-                        </span>
-                      ))}
-                      {d.eligible.length > 4 && <span className="text-muted-foreground"> +{d.eligible.length - 4}</span>}
-                    </>
-                  ) : (
-                    <span className="text-muted-foreground">No matching ventures yet</span>
-                  )}
-                </div>
+                {d.eligible.length > 0 && <VentureLinks items={d.eligible} lens={lens} />}
               </div>
             </li>
           );
         })}
         {deadlines.length === 0 && <li className="px-5 py-8 text-muted-foreground">No deadlines in the next 4 months.</li>}
+      </ul>
+    </div>
+  );
+}
+
+export function InvestorDemandPanel({ investors, lens }: { investors: InvestorDemand[]; lens: string }) {
+  return (
+    <div className="card-surface">
+      <div className="border-b px-5 py-4">
+        <h3 className="text-base font-semibold">Investors to activate</h3>
+        <p className="text-sm text-muted-foreground">Most frequent top-3 match across the portfolio</p>
+      </div>
+      <ul className="divide-y">
+        {investors.map((i) => (
+          <li key={i.id} className="px-5 py-3.5">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-2">
+                <Flag code={i.hq} />
+                <span className="truncate text-[15px] font-semibold">{i.name}</span>
+                {i.isPartner && <span className="shrink-0 rounded-full bg-gold-soft px-2 py-0.5 text-xs font-medium text-gold-ink">Partner</span>}
+              </div>
+              <span className="shrink-0 text-sm text-muted-foreground tabular">{i.ventures.length} ventures</span>
+            </div>
+            <VentureLinks items={i.ventures} lens={lens} />
+          </li>
+        ))}
       </ul>
     </div>
   );

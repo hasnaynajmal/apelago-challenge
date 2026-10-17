@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import type { Quadrant } from "@/lib/quadrant";
 import type { PipelineRow } from "@/lib/queries";
 import { SECTORS } from "@/lib/taxonomy";
+import { CountryLabel } from "@/components/country";
 import { cn } from "@/lib/utils";
 import { QUADRANTS } from "./quadrants";
 
@@ -80,8 +81,9 @@ export function PipelineTable({ rows, lens }: { rows: PipelineRow[]; lens: strin
                     <span className="text-[15px] font-semibold">{r.name}</span>
                     {r.alumnus && <span title="A'Pelago accelerator alumni" className="whitespace-nowrap rounded-full bg-navy-soft px-2 py-0.5 text-xs font-medium text-navy">Alumni</span>}
                   </div>
-                  <div className="mt-0.5 text-sm text-muted-foreground">
-                    {[r.sectors[0] && SECTORS[r.sectors[0]], r.country].filter(Boolean).join(" · ")}
+                  <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-sm text-muted-foreground">
+                    {r.sectors[0] && <span>{SECTORS[r.sectors[0]]}</span>}
+                    {r.country && <CountryLabel code={r.country} />}
                   </div>
                   {r.quadrant && (
                     <span className={cn("mt-2 inline-flex rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset", QUADRANTS[r.quadrant].badge)}>

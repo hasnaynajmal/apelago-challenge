@@ -16,6 +16,7 @@ import { LENSES, PROGRAMMES, resolveLens } from "@/lib/lens";
 import { getDossier } from "@/lib/queries";
 import { IMPACT_AREAS, SECTORS, STAGE_LABELS, type ImpactArea, type IrlDimension } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
+import { CountryLabel } from "@/components/country";
 
 export default function StartupPage({ params, searchParams }: PageProps<"/startups/[id]">) {
   return (
@@ -57,7 +58,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/startups/[id]"
             </div>
             <p className="mt-4 max-w-3xl text-lg leading-relaxed text-zinc-600">{s.profile?.summary ?? s.one_liner}</p>
             <div className="mt-5 flex flex-wrap items-center gap-2 text-sm">
-              {(s.city || s.country) && <Chip>{[s.city, s.country].filter(Boolean).join(", ")}</Chip>}
+              {(s.city || s.country) && <Chip><CountryLabel code={s.country} city={s.city} /></Chip>}
               {s.founded && <Chip>Founded {s.founded}</Chip>}
               {s.stage && <Chip>{STAGE_LABELS[s.stage]}</Chip>}
               {s.sectors.map((x) => <Chip key={x}>{SECTORS[x]}</Chip>)}

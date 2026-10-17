@@ -2,14 +2,14 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { Hero } from "@/components/home/hero";
 import { LensSwitcher } from "@/components/lens-switcher";
-import { DeadlinesPanel } from "@/components/pipeline/deadlines-panel";
+import { DeadlinesPanel, InvestorDemandPanel } from "@/components/pipeline/deadlines-panel";
 import { PipelineTable } from "@/components/pipeline/pipeline-table";
 import { PortfolioMatrix } from "@/components/pipeline/portfolio-matrix";
 import { QUADRANTS } from "@/components/pipeline/quadrants";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LENSES, resolveLens } from "@/lib/lens";
 import type { Quadrant } from "@/lib/quadrant";
-import { getDeadlines, getPipeline } from "@/lib/queries";
+import { getDeadlines, getInvestorDemand, getPipeline } from "@/lib/queries";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export default function Home({ searchParams }: PageProps<"/">) {
@@ -24,7 +24,7 @@ async function HomeContent({ searchParams }: { searchParams: PageProps<"/">["sea
   await connection(); // deadlines and stats depend on "now"
   const lens = resolveLens((await searchParams).lens);
   const lensInfo = LENSES.find((l) => l.id === lens)!;
-  const [rows, deadlines, stats] = await Promise.all([getPipeline(lens), getDeadlines(lens), getStats()]);
+  const [rows, deadlines, demand, stats] = await Promise.all([getPipeline(lens), getDeadlines(lens), getInvestorDemand(lens), getStats()]);
   const count = (q: Quadrant) => rows.filter((r) => r.quadrant === q).length;
 
   return (
@@ -62,8 +62,9 @@ async function HomeContent({ searchParams }: { searchParams: PageProps<"/">["sea
               ))}
             </div>
           </div>
-          <div id="deadlines" className="scroll-mt-20">
+          <div id="deadlines" className="scroll-mt-20 space-y-6">
             <DeadlinesPanel deadlines={deadlines} lens={lens} />
+            <InvestorDemandPanel investors={demand} lens={lens} />
           </div>
         </div>
 

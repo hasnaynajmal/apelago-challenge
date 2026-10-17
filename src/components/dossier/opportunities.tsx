@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import type { MatchView } from "@/lib/queries";
 import type { Funding, Investor, Partner } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { countryName } from "@/components/country";
 
 const eur = (n: number | null | undefined) =>
   n == null ? null : n >= 1_000_000 ? `€${+(n / 1_000_000).toFixed(1)}M` : `€${Math.round(n / 1000)}k`;
@@ -22,7 +23,7 @@ function meta(m: MatchView): { icon: React.ReactNode; line: string; link?: strin
     const t = m.target as Investor;
     return {
       icon: <Landmark className="size-4" />,
-      line: [t.type === "vc" ? "VC" : t.type === "cvc" ? "Corporate VC" : t.type === "pe" ? "Growth equity" : t.type === "angel_network" ? "Angel network" : "Public investor", t.hq, t.ticket_min_eur != null && `${eur(t.ticket_min_eur)}–${eur(t.ticket_max_eur)} tickets`].filter(Boolean).join(" · "),
+      line: [t.type === "vc" ? "VC" : t.type === "cvc" ? "Corporate VC" : t.type === "pe" ? "Growth equity" : t.type === "angel_network" ? "Angel network" : "Public investor", countryName(t.hq), t.ticket_min_eur != null && `${eur(t.ticket_min_eur)}–${eur(t.ticket_max_eur)} tickets`].filter(Boolean).join(" · "),
       link: t.website,
     };
   }
@@ -37,7 +38,7 @@ function meta(m: MatchView): { icon: React.ReactNode; line: string; link?: strin
   const t = m.target as Partner;
   return {
     icon: t.kind === "research" ? <FlaskConical className="size-4" /> : <Building2 className="size-4" />,
-    line: [t.kind === "research" ? "Research" : t.kind === "corporate" ? "Corporate" : t.kind === "public" ? "Public body" : "Ecosystem", t.hq, t.role.slice(0, 2).join(", ").replaceAll("_", " ")].filter(Boolean).join(" · "),
+    line: [t.kind === "research" ? "Research" : t.kind === "corporate" ? "Corporate" : t.kind === "public" ? "Public body" : "Ecosystem", countryName(t.hq), t.role.slice(0, 2).join(", ").replaceAll("_", " ")].filter(Boolean).join(" · "),
   };
 }
 
