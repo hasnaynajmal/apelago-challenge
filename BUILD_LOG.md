@@ -324,3 +324,6 @@ User: the pipeline bar is good, but the page still packs too much data together.
 - This week's moves: 5 items max (2 deadlines, 1 intro, 2 venture steps), one-line details.
 - Deadlines + investors side panels on the Overview: no venture chips, just counts (chips stay on their own pages).
 - Done as planned; verified with a full-page screenshot. Deadlines/Investors pages keep their venture chips (`max` prop; 0 hides).
+- Venture header description: replaced "Read more / Show less" (`ExpandableText`, deleted) with `FitText` — the
+  summary uses the full left column (no max-width) and as many lines as fit the header's height (set by the score
+  column), ending in "…"; full text on hover. Min 3 lines; 4-line fallback on mobile. Checked at 1440/1100/390 px.

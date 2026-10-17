@@ -9,7 +9,7 @@ import { IrlRadar } from "@/components/dossier/irl-radar";
 import { Opportunities } from "@/components/dossier/opportunities";
 import { ReadinessCard } from "@/components/dossier/readiness-card";
 import { CountryLabel } from "@/components/country";
-import { ExpandableText } from "@/components/expandable-text";
+import { FitText } from "@/components/fit-text";
 import { WebsiteButton } from "@/components/website-button";
 import { QUADRANTS } from "@/components/pipeline/quadrants";
 import { RunAssessmentButton } from "@/components/run-assessment-button";
@@ -68,8 +68,8 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
       </Link>
 
       {/* Header */}
-      <section className="card-surface flex flex-col gap-8 p-6 lg:flex-row lg:items-start">
-        <div className="min-w-0 flex-1">
+      <section className="card-surface flex flex-col gap-8 p-6 lg:flex-row">
+        <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex flex-wrap items-center gap-2.5">
             <h1 className="text-3xl font-semibold tracking-[-0.03em]">{s.name}</h1>
             {s.apelago_alumnus && <span className="rounded-full bg-navy-soft px-2.5 py-0.5 text-xs font-medium text-navy">A'Pelago alumni</span>}
@@ -85,7 +85,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
             {s.sectors.map((x) => <Chip key={x}>{SECTORS[x]}</Chip>)}
           </div>
           {(s.profile?.summary ?? s.one_liner) && (
-            <ExpandableText text={(s.profile?.summary ?? s.one_liner)!} className="mt-4 max-w-3xl text-sm text-zinc-600" />
+            <FitText text={(s.profile?.summary ?? s.one_liner)!} className="mt-4 flex-1 text-sm text-zinc-600" />
           )}
         </div>
 
