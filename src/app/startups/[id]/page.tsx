@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { ArrowLeft, ExternalLink, GraduationCap, MapPin, ShieldAlert, Users } from "lucide-react";
 import { ActionPlan } from "@/components/dossier/action-plan";
 import { ConnectionsPanel } from "@/components/dossier/connections-panel";
+import { Constellation } from "@/components/dossier/constellation";
 import { IrlRadar } from "@/components/dossier/irl-radar";
 import { Opportunities } from "@/components/dossier/opportunities";
 import { ReadinessCard } from "@/components/dossier/readiness-card";
@@ -171,6 +172,10 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/startups/[id]"
               )}
             </div>
           </div>
+
+          <Section title="Opportunity constellation" sub="The venture's position in the ecosystem — drag to explore, gold routes are warm intro paths">
+            <Constellation startupName={s.name} matches={d.matches} connections={d.connections} />
+          </Section>
 
           <Section title="Hidden connections" sub="Warm intro paths, unlocks, consortia and synergies the engine found in the ecosystem graph">
             <ConnectionsPanel connections={d.connections} />
