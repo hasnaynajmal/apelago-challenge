@@ -54,7 +54,7 @@ export function CountrySelect({ value, onChange, className }: { value: string; o
             <CommandGroup heading="Nordics & Baltics">
               {COUNTRIES.filter(([c]) => NORDIC_BALTIC.has(c)).map(([c, n]) => item(c, n))}
             </CommandGroup>
-            <CommandGroup heading="Rest of the world">
+            <CommandGroup heading="All countries">
               {COUNTRIES.filter(([c]) => !NORDIC_BALTIC.has(c)).map(([c, n]) => item(c, n))}
             </CommandGroup>
           </CommandList>

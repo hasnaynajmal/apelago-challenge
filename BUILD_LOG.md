@@ -157,3 +157,7 @@ User: "why investment opportunities for Redstone VC — Redstone itself is a VC?
   / *Next round* (later-stage funds). Table column "Best co-investor", panel "Co-investors to activate".
 - A'Pelago lens: "Investors to introduce" / "Best investor intro". Custom lens: generic "Investors".
 - Dev server was restarted with a clean `.next` to fix the user's stale intake form (old "FI" text input).
+- Countries: now ALL 255 ISO countries. `scripts/gen-countries.ts` writes `src/lib/countries.ts` (code + English name
+  via Intl.DisplayNames) and copies flag SVGs to `public/flags/` (served as static files, zero JS bundle cost).
+  `country-flag-icons` is only a devDependency for that script. Picker groups: Nordics & Baltics, then all countries.
+- Reminder: after a dev-server restart the user's open tab loses HMR → old client components; hard refresh (Ctrl+Shift+R).
