@@ -10,10 +10,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { CountrySelect } from "@/components/country-select";
 import { Flag } from "@/components/country";
 
+// Real Nordic ocean startups that are not in the seed data, so a demo click runs a fresh assessment.
 const EXAMPLES = [
-  { name: "Clewat", country: "FI" },
-  { name: "Sulapac", country: "FI" },
-  { name: "Kelluu", country: "FI" },
+  { name: "Origin by Ocean", website: "originbyocean.com", country: "FI", oneLiner: "Turns invasive seaweed and algal blooms into bio-based ingredients for industry." },
+  { name: "Norsepower", website: "norsepower.com", country: "FI", oneLiner: "Rotor Sails that cut ships' fuel use and emissions with wind power." },
+  { name: "Zeabuz", website: "zeabuz.com", country: "NO", oneLiner: "Autonomous, electric passenger ferries for urban waterways." },
 ];
 
 export function IntakeForm({ lens }: { lens: string }) {
@@ -85,7 +86,7 @@ export function IntakeForm({ lens }: { lens: string }) {
           <button
             key={e.name}
             type="button"
-            onClick={() => { setName(e.name); setCountry(e.country); }}
+            onClick={() => { setName(e.name); setWebsite(e.website); setCountry(e.country); setOneLiner(e.oneLiner); }}
             className="inline-flex items-center gap-1.5 rounded-full border bg-white px-2.5 py-0.5 text-zinc-700 transition-colors hover:border-navy hover:text-navy"
           >
             <Flag code={e.country} /> {e.name}

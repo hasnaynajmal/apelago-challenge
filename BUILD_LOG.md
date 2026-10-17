@@ -352,3 +352,11 @@ agents"). Old pipeline events in the DB still say "Committee" (historic rows, no
 - Audit: all 25 startups assessed; 22 seed ones have solid Sonnet profiles (4–14 evidence) and were left as is.
   Re-assessed on Haiku with fresh research: Kelluu (TRL 7 · BRL 6 · score 53), Sulapac (TRL 7 · BRL 5 · 50),
   Clewat (TRL 6 · BRL 2 · 36). Spend ≈ $0.45 (5 runs + 2 diagnostic research calls).
+
+## Phase 4d — Demo-ready intake + faster runs (2026-10-17)
+- Assess page examples now fill name, website, country and one-liner: Origin by Ocean (FI), Norsepower (FI),
+  Zeabuz (NO) — real Nordic ocean startups not in the seed data, so a demo click runs a fresh assessment.
+  Keep them unassessed before the demo video (running one adds it to the DB).
+- Speed: Match Narrator and Strategist now run in parallel (independent); Scout capped at 3 searches and told to stop
+  once it has website/funding/customers/traction. Kelluu re-run on stored profile: post-research part 19 s
+  (was ~40 s). Expected full fresh run ≈ 40–50 s on Haiku.

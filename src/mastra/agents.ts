@@ -32,12 +32,13 @@ current fundraising, impact claims and any measured impact. Prefer the company w
 pages and LinkedIn/Crunchbase snippets. Write dense factual notes with a source URL for every fact. Note when a fact is old.
 If a search returns pages, summarise what they say — never write that searches failed when results came back.
 Prefer the most recent facts; flag conflicting numbers between sources.
-ALWAYS call web_search at least twice before writing (company name + country, then funding/customers). Never answer from memory.`,
+ALWAYS call web_search at least twice before writing (company name + country, then funding/customers). Never answer from memory.
+Use at most 3 searches; stop searching once you have the website, funding, customers and traction.`,
   model: main,
   defaultOptions: effort(EFFORT === "low" ? "medium" : EFFORT), // research needs enough effort to actually use web search
   // Classic web search (direct tool calls). The 2026 version runs search inside code execution, which Haiku
   // often calls with invalid input until the use limit is hit, leaving research empty.
-  tools: { web_search: anthropic.tools.webSearch_20250305({ maxUses: 4 }) },
+  tools: { web_search: anthropic.tools.webSearch_20250305({ maxUses: 3 }) },
 });
 
 export const scoutStructurer = new Agent({

@@ -160,29 +160,30 @@ export async function runPipeline(startupId: string, opts: PipelineOptions = {})
     }
     await emit({ step: "connect", agent: "Connector", status: "done", message: `${connections.length} connections found`, payload: { titles: connections.slice(0, 4).map((c) => c.title) } });
 
-    // 5. Narratives for top matches
+    // 5 + 6. Match explanations and the action plan are independent: run them in parallel (saves ~10 s per run).
     await emit({ step: "narrate", agent: "Match Narrator", status: "started", message: "Explaining the top matches" });
-    const rationales = await narrate(startup, snap, m);
-    const matchRows = theses.flatMap((t) =>
-      (["investors", "funding", "partners"] as const).flatMap((k) =>
-        m[k].slice(0, TOP_N).map((x, i) => ({
-          startup_id: startupId, thesis_id: t.id, target_type: x.target_type, target_id: x.target_id,
-          fit: x.fit, priority: x.priority, rank: i + 1, status: x.status, reasons: x.reasons, blockers: x.blockers,
-          rationale: rationales[`${x.target_type}:${x.target_id}`] ?? null,
-          calibrated_fit: (x.components.calibrated as number | undefined) ?? null,
-        })),
-      ),
-    );
-    await db.from("matches").delete().eq("startup_id", startupId);
-    await db.from("matches").insert(matchRows);
-    await emit({ step: "narrate", agent: "Match Narrator", status: "done", message: `${Object.keys(rationales).length} match explanations written` });
-
-    // 6. Strategy
     await emit({ step: "strategy", agent: "Strategist", status: "started", message: "Drafting the action plan" });
-    const plan = await structured(strategist, strategyPrompt(startup, snap, { trl, brl, oirl, inv }, m, connections), actionsSchema);
-    await db.from("actions").delete().eq("startup_id", startupId);
-    await db.from("actions").insert(plan.actions.slice(0, 10).map((a, i) => ({ startup_id: startupId, thesis_id: null, rank: i + 1, ...a })));
-    await emit({ step: "strategy", agent: "Strategist", status: "done", message: `${plan.actions.length} next steps`, payload: { first: plan.actions[0]?.title } });
+    const narrateStep = narrate(startup, snap, m).then(async (rationales) => {
+      const matchRows = theses.flatMap((t) =>
+        (["investors", "funding", "partners"] as const).flatMap((k) =>
+          m[k].slice(0, TOP_N).map((x, i) => ({
+            startup_id: startupId, thesis_id: t.id, target_type: x.target_type, target_id: x.target_id,
+            fit: x.fit, priority: x.priority, rank: i + 1, status: x.status, reasons: x.reasons, blockers: x.blockers,
+            rationale: rationales[`${x.target_type}:${x.target_id}`] ?? null,
+            calibrated_fit: (x.components.calibrated as number | undefined) ?? null,
+          })),
+        ),
+      );
+      await db.from("matches").delete().eq("startup_id", startupId);
+      await db.from("matches").insert(matchRows);
+      await emit({ step: "narrate", agent: "Match Narrator", status: "done", message: `${Object.keys(rationales).length} match explanations written` });
+    });
+    const strategyStep = structured(strategist, strategyPrompt(startup, snap, { trl, brl, oirl, inv }, m, connections), actionsSchema).then(async (plan) => {
+      await db.from("actions").delete().eq("startup_id", startupId);
+      await db.from("actions").insert(plan.actions.slice(0, 10).map((a, i) => ({ startup_id: startupId, thesis_id: null, rank: i + 1, ...a })));
+      await emit({ step: "strategy", agent: "Strategist", status: "done", message: `${plan.actions.length} next steps`, payload: { first: plan.actions[0]?.title } });
+    });
+    await Promise.all([narrateStep, strategyStep]);
 
     // 7. Thesis scores
     const scoreRows = theses.map((t) => {
