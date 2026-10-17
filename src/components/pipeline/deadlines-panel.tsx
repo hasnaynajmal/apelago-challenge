@@ -9,7 +9,7 @@ function VentureLinks({ items, lens, max = 3 }: { items: { id: string; name: str
   return (
     <div className="mt-2 flex flex-wrap gap-1.5">
       {items.slice(0, max).map((e) => (
-        <Link key={e.id} href={`/startups/${e.id}?lens=${lens}`} className="rounded-md bg-muted px-2 py-0.5 text-sm text-zinc-700 transition-colors hover:bg-navy-soft hover:text-navy">
+        <Link key={e.id} href={`/dashboard/startups/${e.id}?lens=${lens}`} className="rounded-md bg-muted px-2 py-0.5 text-sm text-zinc-700 transition-colors hover:bg-navy-soft hover:text-navy">
           {e.name}
         </Link>
       ))}
@@ -18,12 +18,12 @@ function VentureLinks({ items, lens, max = 3 }: { items: { id: string; name: str
   );
 }
 
-export function DeadlinesPanel({ deadlines, lens }: { deadlines: DeadlineRow[]; lens: string }) {
+export function DeadlinesPanel({ deadlines, lens, title = "Upcoming deadlines", sub = "Funding calls in the next 4 months", max = 3 }: { deadlines: DeadlineRow[]; lens: string; title?: string; sub?: string; max?: number }) {
   return (
     <div className="card-surface">
       <div className="border-b px-5 py-4">
-        <h3 className="text-base font-semibold">Upcoming deadlines</h3>
-        <p className="text-sm text-muted-foreground">Funding calls in the next 4 months</p>
+        <h3 className="text-base font-semibold">{title}</h3>
+        <p className="text-sm text-muted-foreground">{sub}</p>
       </div>
       <ul className="divide-y">
         {deadlines.map((d) => {
@@ -40,18 +40,18 @@ export function DeadlinesPanel({ deadlines, lens }: { deadlines: DeadlineRow[]; 
                 <div className={cn("mt-0.5 text-sm", urgent ? "text-amber-700" : "text-muted-foreground")}>
                   {d.days} days left{d.amount ? ` · up to ${eur(d.amount)}` : ""} · {d.eligible.length} ventures fit
                 </div>
-                {d.eligible.length > 0 && <VentureLinks items={d.eligible} lens={lens} />}
+                {d.eligible.length > 0 && <VentureLinks items={d.eligible} lens={lens} max={max} />}
               </div>
             </li>
           );
         })}
-        {deadlines.length === 0 && <li className="px-5 py-8 text-muted-foreground">No deadlines in the next 4 months.</li>}
+        {deadlines.length === 0 && <li className="px-5 py-8 text-muted-foreground">No upcoming deadlines.</li>}
       </ul>
     </div>
   );
 }
 
-export function InvestorDemandPanel({ investors, lens, title = "Investors to activate", sub = "Most frequent top-3 match across the portfolio" }: { investors: InvestorDemand[]; lens: string; title?: string; sub?: string }) {
+export function InvestorDemandPanel({ investors, lens, title = "Investors to activate", sub = "Most frequent top-3 match across the portfolio", max = 3 }: { investors: InvestorDemand[]; lens: string; title?: string; sub?: string; max?: number }) {
   return (
     <div className="card-surface">
       <div className="border-b px-5 py-4">
@@ -69,7 +69,7 @@ export function InvestorDemandPanel({ investors, lens, title = "Investors to act
               </div>
               <span className="shrink-0 text-sm text-muted-foreground tabular">{i.ventures.length} ventures</span>
             </div>
-            <VentureLinks items={i.ventures} lens={lens} />
+            <VentureLinks items={i.ventures} lens={lens} max={max} />
           </li>
         ))}
       </ul>

@@ -72,7 +72,7 @@ export function PipelineTable({ rows, lens, investorColumn = "Best investor matc
             {shown.map((r) => (
               <tr
                 key={r.id}
-                onClick={() => router.push(`/startups/${r.id}?lens=${lens}`)}
+                onClick={() => router.push(`/dashboard/startups/${r.id}?lens=${lens}`)}
                 className="group cursor-pointer align-top transition-colors hover:bg-muted/50"
               >
                 <td className="px-4 py-4 text-sm text-muted-foreground tabular">{rows.indexOf(r) + 1}</td>

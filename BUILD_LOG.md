@@ -161,3 +161,21 @@ User: "why investment opportunities for Redstone VC — Redstone itself is a VC?
   via Intl.DisplayNames) and copies flag SVGs to `public/flags/` (served as static files, zero JS bundle cost).
   `country-flag-icons` is only a devDependency for that script. Picker groups: Nordics & Baltics, then all countries.
 - Reminder: after a dev-server restart the user's open tab loses HMR → old client components; hard refresh (Ctrl+Shift+R).
+
+## Phase 3f — Landing page + dashboard with sidebar (2026-10-17) ✅
+User: keep the landing page, move pipeline/list into a dashboard with a proper sidebar (navigate without scrolling).
+- **Route layout:**
+  - `src/app/layout.tsx` — minimal shell (fonts, TooltipProvider, Toaster).
+  - `src/app/(site)/layout.tsx` + `(site)/page.tsx` — landing: top header (`site-header.tsx`: "Assess a startup",
+    "Open dashboard"), hero with stats, 4 feature cards, CTA to the dashboard.
+  - `src/app/dashboard/layout.tsx` — shadcn **Sidebar** (`components/ui/sidebar.tsx`, `src/hooks/use-mobile.ts`) +
+    `components/dashboard/app-sidebar.tsx` (Assess button, nav: Overview / Ventures / Deadlines / Co-investors|Investors,
+    "Viewing as" thesis radio list, Back to site; collapsible to icons) + `components/dashboard/topbar.tsx`
+    (sidebar trigger, page title, current lens).
+- **Dashboard pages:** `/dashboard` Overview (4 KPI cards, matrix + quadrant cards, top-3 deadlines, co-investors to
+  activate), `/dashboard/ventures` (pipeline table), `/dashboard/deadlines` (12-month horizon), `/dashboard/investors`
+  (top 20 by demand), `/dashboard/assess` (intake), `/dashboard/startups/[id]` (dossier), `/dashboard/runs/[runId]`.
+- Lens is still `?lens=` in the URL; the sidebar carries it on every link and switches it in place.
+- Redirects in `next.config.ts`: `/startups/:id`, `/runs/:runId`, `/intake` → dashboard routes. Dev badge moved bottom-right.
+- Removed: `lens-switcher.tsx` (replaced by the sidebar), unused Urbanist font.
+- Moving route folders on Windows fails while `next dev` is running (file locks) — stop the server first.

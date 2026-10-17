@@ -4,9 +4,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { resolveLens } from "@/lib/lens";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
-export default function RunPage({ params, searchParams }: PageProps<"/runs/[runId]">) {
+export default function RunPage({ params, searchParams }: PageProps<"/dashboard/runs/[runId]">) {
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12">
+    <div className="mx-auto max-w-7xl">
       <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-2xl" />}>
         <Run params={params} searchParams={searchParams} />
       </Suspense>
@@ -14,7 +14,7 @@ export default function RunPage({ params, searchParams }: PageProps<"/runs/[runI
   );
 }
 
-async function Run({ params, searchParams }: Pick<PageProps<"/runs/[runId]">, "params" | "searchParams">) {
+async function Run({ params, searchParams }: Pick<PageProps<"/dashboard/runs/[runId]">, "params" | "searchParams">) {
   const [{ runId }, sp] = await Promise.all([params, searchParams]);
   const { data: run } = await supabaseAdmin().from("pipeline_runs").select("startup_id, startups(name)").eq("id", runId).maybeSingle();
   const startupId = run?.startup_id ?? String(sp.startup ?? "");

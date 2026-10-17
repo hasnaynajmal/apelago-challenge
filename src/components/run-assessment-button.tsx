@@ -19,7 +19,7 @@ export function RunAssessmentButton({ startupId, lens, rerun }: { startupId: str
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed to start");
-      router.push(`/runs/${json.runId}?startup=${startupId}&lens=${lens}`);
+      router.push(`/dashboard/runs/${json.runId}?startup=${startupId}&lens=${lens}`);
     } catch (e) {
       toast.error((e as Error).message);
       setBusy(false);

@@ -105,7 +105,7 @@ export function PortfolioMatrix({ rows, lens }: { rows: PipelineRow[]; lens: str
               className="cursor-pointer"
               onMouseEnter={() => setHover(p.id)}
               onMouseLeave={() => setHover(null)}
-              onClick={() => router.push(`/startups/${p.id}?lens=${lens}`)}
+              onClick={() => router.push(`/dashboard/startups/${p.id}?lens=${lens}`)}
             >
               <circle r={hover === p.id ? 9 : 7} fill={color} stroke="#fff" strokeWidth={2} />
               {show && (

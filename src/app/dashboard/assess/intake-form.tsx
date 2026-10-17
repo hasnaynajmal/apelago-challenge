@@ -37,7 +37,7 @@ export function IntakeForm({ lens }: { lens: string }) {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed to start");
-      router.push(`/runs/${json.runId}?startup=${json.startupId}&lens=${lens}`);
+      router.push(`/dashboard/runs/${json.runId}?startup=${json.startupId}&lens=${lens}`);
     } catch (err) {
       toast.error((err as Error).message);
       setBusy(false);

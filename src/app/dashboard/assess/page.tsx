@@ -10,9 +10,9 @@ const STEPS = [
   { icon: Route, title: "Plan", text: "next steps" },
 ];
 
-export default function IntakePage({ searchParams }: PageProps<"/intake">) {
+export default function IntakePage({ searchParams }: PageProps<"/dashboard/assess">) {
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10">
+    <div className="mx-auto max-w-5xl py-4">
       <div className="text-center">
         <h1 className="text-4xl font-semibold tracking-[-0.03em]">Assess a new venture</h1>
         <p className="mx-auto mt-3 max-w-xl text-[17px] text-muted-foreground">
@@ -45,6 +45,6 @@ export default function IntakePage({ searchParams }: PageProps<"/intake">) {
   );
 }
 
-async function FormWithLens({ searchParams }: { searchParams: PageProps<"/intake">["searchParams"] }) {
+async function FormWithLens({ searchParams }: { searchParams: PageProps<"/dashboard/assess">["searchParams"] }) {
   return <IntakeForm lens={resolveLens((await searchParams).lens)} />;
 }

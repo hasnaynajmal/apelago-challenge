@@ -54,10 +54,10 @@ export function Hero({ stats }: { stats: HeroStats }) {
 
         <div className="mt-8 flex items-center justify-center gap-3">
           <Button asChild size="lg" className="h-11 rounded-full px-6 text-[15px]">
-            <Link href="/intake">Assess a startup <ArrowRight /></Link>
+            <Link href="/dashboard">Open dashboard <ArrowRight /></Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="h-11 rounded-full bg-white px-6 text-[15px]">
-            <Link href="#pipeline">View the pipeline</Link>
+            <Link href="/dashboard/assess">Assess a startup</Link>
           </Button>
         </div>
 

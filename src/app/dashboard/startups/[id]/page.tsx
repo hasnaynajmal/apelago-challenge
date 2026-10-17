@@ -9,7 +9,6 @@ import { IrlRadar } from "@/components/dossier/irl-radar";
 import { Opportunities } from "@/components/dossier/opportunities";
 import { PromiseScore } from "@/components/dossier/promise-score";
 import { ReadinessCard } from "@/components/dossier/readiness-card";
-import { LensSwitcher } from "@/components/lens-switcher";
 import { RunAssessmentButton } from "@/components/run-assessment-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { INVESTOR_FRAMING, LENSES, PROGRAMMES, resolveLens } from "@/lib/lens";
@@ -18,9 +17,9 @@ import { IMPACT_AREAS, SECTORS, STAGE_LABELS, type ImpactArea, type IrlDimension
 import { cn } from "@/lib/utils";
 import { CountryLabel } from "@/components/country";
 
-export default function StartupPage({ params, searchParams }: PageProps<"/startups/[id]">) {
+export default function StartupPage({ params, searchParams }: PageProps<"/dashboard/startups/[id]">) {
   return (
-    <div className="mx-auto max-w-7xl px-6 py-10">
+    <div className="mx-auto max-w-7xl">
       <Suspense fallback={<DossierSkeleton />}>
         <Dossier params={params} searchParams={searchParams} />
       </Suspense>
@@ -28,7 +27,7 @@ export default function StartupPage({ params, searchParams }: PageProps<"/startu
   );
 }
 
-async function Dossier({ params, searchParams }: Pick<PageProps<"/startups/[id]">, "params" | "searchParams">) {
+async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/startups/[id]">, "params" | "searchParams">) {
   const [{ id }, sp] = await Promise.all([params, searchParams]);
   const lens = resolveLens(sp.lens);
   const d = await getDossier(id, lens);
@@ -45,13 +44,12 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/startups/[id]"
       {/* Header */}
       <section>
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <Link href={`/?lens=${lens}`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+          <Link href={`/dashboard/ventures?lens=${lens}`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
             <ArrowLeft className="size-4" /> All ventures
           </Link>
-          <Suspense><LensSwitcher /></Suspense>
         </div>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
           <div>
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-5xl font-semibold tracking-[-0.035em]">{s.name}</h1>

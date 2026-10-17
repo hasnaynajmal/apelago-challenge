@@ -128,7 +128,7 @@ export function LiveRun({ runId, startupId, startupName, lens }: { runId: string
           </div>
           {status === "done" && (
             <Button asChild className="rounded-full">
-              <Link href={`/startups/${startupId}?lens=${lens}`}>Open {startupName} <ArrowRight /></Link>
+              <Link href={`/dashboard/startups/${startupId}?lens=${lens}`}>Open {startupName} <ArrowRight /></Link>
             </Button>
           )}
         </div>
