@@ -18,9 +18,9 @@ const LEVELS = [
   { k: "irl", label: "Invest", cls: "text-invest" },
 ] as const;
 
-export function PipelineTable({ rows, lens, investorColumn = "Best investor match" }: { rows: PipelineRow[]; lens: string; investorColumn?: string }) {
+export function PipelineTable({ rows, lens, investorColumn = "Best investor match", initialFilter = "all" }: { rows: PipelineRow[]; lens: string; investorColumn?: string; initialFilter?: Quadrant | "all" }) {
   const router = useRouter();
-  const [filter, setFilter] = useState<Quadrant | "all">("all");
+  const [filter, setFilter] = useState<Quadrant | "all">(initialFilter);
   const [query, setQuery] = useState("");
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: rows.length };

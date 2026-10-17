@@ -190,3 +190,19 @@ User: keep the landing page, move pipeline/list into a dashboard with a proper s
   and body `text-sm`, KPI numbers `text-2xl`, readiness numbers `text-3xl`, promise `text-4xl`, card padding `p-5`.
   Landing page keeps the larger marketing scale. Rule of thumb for new dashboard UI: body `text-sm`, labels `text-xs`.
 - Matrix dots start at their final position (`initial={{ opacity: 0, x, y }}`) so they never flash at (0,0) before JS runs.
+
+## Phase 3g — Overview redesign (2026-10-17) ✅
+User: the 2×2 pipeline graph was not understandable; wanted something clear that stands out.
+- **Removed** the readiness-vs-fit scatter (`portfolio-matrix.tsx` deleted). Quadrants still exist as groups/badges.
+- **New Overview** (`src/app/dashboard/page.tsx`), answering three questions in order:
+  1. `components/overview/stage-bar.tsx` — *Where the pipeline stands*: one segmented bar (Investment-ready /
+     Accelerate / Refer onwards / Monitor) + plain-language legend; segments link to `/dashboard/ventures?group=…`
+     (the table now accepts `initialFilter`).
+  2. `components/overview/top-picks.tsx` — *Top picks*: 3 React Bits **SpotlightCard**s (light theme) with score ring,
+     4 mini readiness bars, headline, best investor/co-investor, next move.
+  3. `components/overview/weekly-moves.tsx` — *This week's moves*: portfolio-wide to-do list built server-side from
+     urgent deadlines (≤45 days), the strongest warm intro paths (`getWarmPaths`, excludes paths into the lens owner),
+     and the next step of the top ventures.
+  Side column keeps Upcoming deadlines + Co-investors to activate.
+- Data reveals that must not depend on JS (score rings, mini bars) use CSS keyframes (`.ring-fill`, `.bar-grow` in
+  globals.css) with the final value inline — framer-motion `initial` values showed empty in slow loads.

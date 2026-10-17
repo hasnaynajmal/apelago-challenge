@@ -257,6 +257,40 @@ export async function getInvestorDemand(lens: string, limit = 5): Promise<Invest
     });
 }
 
+export interface WarmPathView {
+  startupId: string;
+  startupName: string;
+  investorId: string;
+  hops: string[];
+  score: number;
+}
+
+/** Strongest warm-intro paths across the portfolio (excluding paths into the lens owner itself). */
+export async function getWarmPaths(lens: string, limit = 3): Promise<WarmPathView[]> {
+  const db = supabaseAdmin();
+  const [{ data: c }, { data: s }] = await Promise.all([
+    db.from("connections").select("startup_id,payload,score").eq("kind", "warm_path").order("score", { ascending: false }).limit(40),
+    db.from("startups").select("id,name"),
+  ]);
+  const owner = ownerOf(lens);
+  const seen = new Set<string>();
+  const out: WarmPathView[] = [];
+  for (const r of c ?? []) {
+    const p = r.payload as { investor_id: string; hops: { name: string }[] };
+    if (p.investor_id === owner || seen.has(r.startup_id)) continue;
+    seen.add(r.startup_id);
+    out.push({
+      startupId: r.startup_id,
+      startupName: s?.find((x) => x.id === r.startup_id)?.name ?? r.startup_id,
+      investorId: p.investor_id,
+      hops: p.hops.map((h) => h.name),
+      score: r.score,
+    });
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
 export async function getStartupNames(): Promise<{ id: string; name: string }[]> {
   const { data } = await supabaseAdmin().from("startups").select("id,name").order("name");
   return data ?? [];

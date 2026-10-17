@@ -3,6 +3,7 @@ import { PipelineTable } from "@/components/pipeline/pipeline-table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { INVESTOR_FRAMING, LENSES, resolveLens } from "@/lib/lens";
 import { getPipeline } from "@/lib/queries";
+import type { Quadrant } from "@/lib/quadrant";
 
 export default function VenturesPage({ searchParams }: PageProps<"/dashboard/ventures">) {
   return (
@@ -13,7 +14,9 @@ export default function VenturesPage({ searchParams }: PageProps<"/dashboard/ven
 }
 
 async function Content({ searchParams }: { searchParams: PageProps<"/dashboard/ventures">["searchParams"] }) {
-  const lens = resolveLens((await searchParams).lens);
+  const sp = await searchParams;
+  const lens = resolveLens(sp.lens);
+  const group = ["invest", "accelerate", "refer", "monitor"].includes(String(sp.group)) ? (String(sp.group) as Quadrant) : "all";
   const rows = await getPipeline(lens);
   return (
     <div className="mx-auto max-w-7xl space-y-6">
@@ -24,7 +27,7 @@ async function Content({ searchParams }: { searchParams: PageProps<"/dashboard/v
           Filter by group or search, then open a venture for its full assessment.
         </p>
       </div>
-      <PipelineTable rows={rows} lens={lens} investorColumn={INVESTOR_FRAMING[lens].column} />
+      <PipelineTable key={group} rows={rows} lens={lens} investorColumn={INVESTOR_FRAMING[lens].column} initialFilter={group} />
     </div>
   );
 }
