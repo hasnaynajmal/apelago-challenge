@@ -16,7 +16,7 @@ export function CountrySelect({ value, onChange, className }: { value: string; o
     setOpen(false);
   };
   const item = (code: string, name: string) => (
-    <CommandItem key={code} value={`${name} ${code}`} onSelect={() => pick(code)} className="gap-2.5 py-2 text-[15px]">
+    <CommandItem key={code} value={`${name} ${code}`} onSelect={() => pick(code)} className="gap-2.5 py-1.5 text-sm">
       <Flag code={code} className="h-4" />
       <span className="flex-1">{name}</span>
       <Check className={cn("size-4", value === code ? "opacity-100" : "opacity-0")} />
@@ -31,7 +31,7 @@ export function CountrySelect({ value, onChange, className }: { value: string; o
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "flex h-12 w-full items-center gap-2.5 rounded-xl border border-input bg-white px-3.5 text-left text-[15px] transition-colors hover:border-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30",
+            "flex h-10 w-full items-center gap-2.5 rounded-lg border border-input bg-white px-3 text-left text-sm transition-colors hover:border-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30",
             className,
           )}
         >
@@ -48,7 +48,7 @@ export function CountrySelect({ value, onChange, className }: { value: string; o
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] min-w-72 p-0" align="start">
         <Command>
-          <CommandInput placeholder="Search country…" className="text-[15px]" />
+          <CommandInput placeholder="Search country…" className="text-sm" />
           <CommandList className="max-h-72">
             <CommandEmpty>No country found.</CommandEmpty>
             <CommandGroup heading="Nordics & Baltics">

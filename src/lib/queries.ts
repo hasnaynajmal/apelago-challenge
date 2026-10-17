@@ -291,6 +291,31 @@ export async function getWarmPaths(lens: string, limit = 3): Promise<WarmPathVie
   return out;
 }
 
+export interface RecentRun {
+  id: string;
+  startupId: string;
+  name: string;
+  status: "running" | "done" | "error";
+  startedAt: string;
+  seconds: number | null;
+}
+
+export async function getRecentRuns(limit = 5): Promise<RecentRun[]> {
+  const { data } = await supabaseAdmin()
+    .from("pipeline_runs")
+    .select("id,startup_id,status,started_at,finished_at,startups(name)")
+    .order("started_at", { ascending: false })
+    .limit(limit);
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    startupId: r.startup_id,
+    name: (r.startups as unknown as { name: string } | null)?.name ?? r.startup_id,
+    status: r.status,
+    startedAt: r.started_at,
+    seconds: r.finished_at ? Math.round((new Date(r.finished_at).getTime() - new Date(r.started_at).getTime()) / 1000) : null,
+  }));
+}
+
 export async function getStartupNames(): Promise<{ id: string; name: string }[]> {
   const { data } = await supabaseAdmin().from("startups").select("id,name").order("name");
   return data ?? [];

@@ -224,3 +224,15 @@ skim for a verdict in ~10–20 s; details are reference material for due diligen
   external icon, `target=_blank rel=noopener noreferrer`) in the name row.
 - Screenshot QA now via puppeteer-core (`scratchpad/pptr/shot.mjs <url> <out> [height] [waitMs]`); Chrome's
   `--virtual-time-budget` hangs when a page loads remote images (favicons).
+
+## Phase 3i — Assess + live run redesign, Scout fix (2026-10-17) ✅
+- **Scout quality bug (found from the user's Clewat test):** on Haiku + low effort the researcher answered from memory →
+  0 sources → TRL/BRL 1. Fix: Scout always runs at ≥ medium effort, instructions require ≥ 2 `web_search` calls, the
+  pipeline retries once with a forcing prompt if no sources, and the feed shows an amber warning (`payload.warning =
+  "no_sources"`) if research still comes back empty. Clewat should be re-assessed.
+- **/dashboard/assess**: dashboard-style header, compact form (h-10 fields, country picker), right column "What you get"
+  + **Recent assessments** (`getRecentRuns`, status + duration + link to venture/run).
+- **/dashboard/runs/[runId]** (`components/live-run.tsx`): status card (current step, elapsed, progress bar; on finish:
+  duration, score, group badge, "Open venture"), pipeline steps with each step's latest result, **Readiness tiles**
+  as soon as the committee reports, live feed with status dots, amber warnings, auto-scroll and "Live" indicator.
+- Final pipeline event now reads "score 58 for Redstone Blue VC · …" (thesis names, not ids).

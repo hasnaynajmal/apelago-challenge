@@ -45,48 +45,48 @@ export function IntakeForm({ lens }: { lens: string }) {
   };
 
   return (
-    <form onSubmit={submit} className="card-surface p-7 shadow-xl shadow-zinc-200/50">
+    <form onSubmit={submit} className="card-surface p-6">
       <div className="space-y-5">
         <label className="block space-y-2">
-          <span className="block text-sm font-medium leading-5">Startup name</span>
+          <span className="block text-xs font-medium leading-5 text-zinc-700">Startup name</span>
           <div className="relative">
-            <Building2 className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input value={name} onChange={(e) => setName(e.target.value)} required minLength={2} placeholder="e.g. Clewat" className="h-12 rounded-xl pl-10 text-sm" />
+            <Building2 className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input value={name} onChange={(e) => setName(e.target.value)} required minLength={2} placeholder="e.g. Clewat" className="h-10 rounded-lg pl-9 text-sm" />
           </div>
         </label>
 
         <div className="grid gap-5 sm:grid-cols-[1fr_220px]">
           <label className="block space-y-2">
-            <span className="block text-sm font-medium leading-5">Website <span className="font-normal text-muted-foreground">· optional</span></span>
+            <span className="block text-xs font-medium leading-5 text-zinc-700">Website <span className="font-normal text-muted-foreground">· optional</span></span>
             <div className="relative">
-              <Globe className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="company.com" className="h-12 rounded-xl pl-10 text-sm" />
+              <Globe className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="company.com" className="h-10 rounded-lg pl-9 text-sm" />
             </div>
           </label>
           <div className="space-y-2">
-            <span className="block text-sm font-medium leading-5">Country</span>
+            <span className="block text-xs font-medium leading-5 text-zinc-700">Country</span>
             <CountrySelect value={country} onChange={setCountry} />
           </div>
         </div>
 
         <label className="block space-y-2">
-          <span className="text-sm font-medium">What do they do? <span className="font-normal text-muted-foreground">· optional, the agents research the rest</span></span>
-          <Textarea value={oneLiner} onChange={(e) => setOneLiner(e.target.value)} rows={2} placeholder="One line about the venture" className="min-h-20 rounded-xl text-sm" />
+          <span className="text-xs font-medium text-zinc-700">What do they do? <span className="font-normal text-muted-foreground">· optional, the agents research the rest</span></span>
+          <Textarea value={oneLiner} onChange={(e) => setOneLiner(e.target.value)} rows={2} placeholder="One line about the venture" className="min-h-16 rounded-lg text-sm" />
         </label>
       </div>
 
-      <Button type="submit" size="lg" disabled={busy || name.trim().length < 2} className="mt-6 h-12 w-full rounded-full text-sm">
+      <Button type="submit" size="lg" disabled={busy || name.trim().length < 2} className="mt-6 h-10 w-full rounded-lg text-sm">
         {busy ? <Loader2 className="animate-spin" /> : null} Run the assessment <ArrowRight />
       </Button>
 
-      <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground">
+      <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
         <span>Try an example:</span>
         {EXAMPLES.map((e) => (
           <button
             key={e.name}
             type="button"
             onClick={() => { setName(e.name); setCountry(e.country); }}
-            className="inline-flex items-center gap-1.5 rounded-full border bg-white px-3 py-1 text-zinc-700 transition-colors hover:border-navy hover:text-navy"
+            className="inline-flex items-center gap-1.5 rounded-full border bg-white px-2.5 py-0.5 text-zinc-700 transition-colors hover:border-navy hover:text-navy"
           >
             <Flag code={e.country} /> {e.name}
           </button>

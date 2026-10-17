@@ -192,7 +192,11 @@ export async function runPipeline(startupId: string, opts: PipelineOptions = {})
     await db.from("startups").update({ stage: snap.stage, updated_at: new Date().toISOString() }).eq("id", startupId);
 
     await db.from("pipeline_runs").update({ status: "done", current_step: "done", finished_at: new Date().toISOString() }).eq("id", runId);
-    await emit({ step: "done", agent: "Committee", status: "done", message: `Assessment complete — promise ${scoreRows.map((s) => `${s.thesis_id}: ${s.promise}`).join(" · ")}` });
+    const thesisName = (id: string) => theses.find((t) => t.id === id)?.name ?? id;
+    await emit({
+      step: "done", agent: "Committee", status: "done",
+      message: `Assessment complete — score ${scoreRows.map((s) => `${Math.round(s.promise)} for ${thesisName(s.thesis_id)}`).join(" · ")}`,
+    });
     return { runId, snap, scores: scoreRows };
   } catch (e) {
     const message = (e as Error).message;
