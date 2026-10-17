@@ -26,7 +26,7 @@ export function RunAssessmentButton({ startupId, lens, rerun }: { startupId: str
     }
   };
   return (
-    <Button onClick={start} disabled={busy} variant={rerun ? "outline" : "default"} className={rerun ? "" : "shadow-[0_0_24px_-6px_#dfae32]"}>
+    <Button onClick={start} disabled={busy} variant={rerun ? "outline" : "default"} className="rounded-full">
       {busy ? <Loader2 className="animate-spin" /> : rerun ? <RotateCw /> : <Play />}
       {rerun ? "Re-run committee" : "Run the AI committee"}
     </Button>

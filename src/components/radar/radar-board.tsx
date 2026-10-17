@@ -4,23 +4,32 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowUpRight, CircleDashed, Sparkles, TriangleAlert } from "lucide-react";
+import { ChevronRight, TriangleAlert } from "lucide-react";
 import { SECTORS, STAGE_LABELS, type Sector } from "@/lib/taxonomy";
 import { PROGRAMMES } from "@/lib/lens";
 import type { RadarItem } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 
-const SIZE = 760;
+const SIZE = 900;
 const C = SIZE / 2;
-const R = 330;
+const R = 300;
+// Crop the viewBox to the circle plus label margin (labels sit left/right, so trim top/bottom).
+const VB_Y = C - R - 45;
+const VB_H = 2 * R + 90;
+const SHORT: Record<Sector, string> = {
+  aquaculture_fisheries: "Aquaculture", blue_biotech: "Blue biotech", blue_energy: "Blue energy", ocean_observation: "Ocean data",
+  shipping_ports: "Shipping & ports", water_management: "Water", pollution_cleanup: "Pollution cleanup", restoration_blue_carbon: "Restoration",
+  coastal_tourism: "Coastal tourism", circular_materials: "Circular materials", seafood_alt_protein: "Seafood & protein", climate_software: "Climate software",
+};
+// Round SVG coordinates so server and client render identical markup (avoids hydration mismatch).
+const q = (n: number) => Math.round(n * 100) / 100;
 const SECTOR_IDS = Object.keys(SECTORS) as Sector[];
 const WEDGE = (2 * Math.PI) / SECTOR_IDS.length;
-const RINGS = [
-  { label: "HOT", at: 0.3 },
-  { label: "WARM", at: 0.55 },
-  { label: "WATCH", at: 0.78 },
-  { label: "EARLY", at: 1 },
-];
+const RINGS = [0.3, 0.55, 0.78, 1];
+const RING_LABEL = ["Hot", "Warm", "Watch", "Early"];
+
+const NAVY = "#002444";
+const GOLD = "#dfae32";
 
 function hash01(s: string) {
   let h = 2166136261;
@@ -28,107 +37,106 @@ function hash01(s: string) {
   return ((h >>> 0) % 1000) / 1000;
 }
 
-function place(item: RadarItem) {
+function place(item: RadarItem, min: number, max: number) {
   const sector = SECTOR_IDS.indexOf(item.sectors[0] ?? "climate_software");
-  const angle = -Math.PI / 2 + sector * WEDGE + (0.18 + 0.64 * hash01(item.id)) * WEDGE;
-  const radius = item.promise == null ? 0.93 : Math.min(0.9, Math.max(0.1, 0.1 + 0.85 * (1 - (item.promise - 30) / 55)));
-  return { x: C + Math.cos(angle) * radius * R, y: C + Math.sin(angle) * radius * R };
+  const angle = -Math.PI / 2 + sector * WEDGE + (0.2 + 0.6 * hash01(item.id)) * WEDGE;
+  // Radius is relative to the spread of promise scores in this lens, so the field uses the whole radar.
+  const rel = item.promise == null ? 1 : max > min ? (item.promise - min) / (max - min) : 0.5;
+  const radius = item.promise == null ? 0.94 : 0.14 + 0.76 * (1 - rel);
+  return { x: q(C + Math.cos(angle) * radius * R), y: q(C + Math.sin(angle) * radius * R) };
 }
 
-const levelColor = { trl: "text-tech", brl: "text-business", oirl: "text-impact", irl: "text-invest" } as const;
+export const LEVEL_TONE = { trl: "text-tech", brl: "text-business", oirl: "text-impact", irl: "text-invest" } as const;
 
 export function RadarBoard({ items, lens }: { items: RadarItem[]; lens: string }) {
   const router = useRouter();
   const [hover, setHover] = useState<string | null>(null);
   const assessed = items.filter((i) => i.assessed);
   const top = new Set(assessed.slice(0, 3).map((i) => i.id));
-  const placed = useMemo(() => items.map((i) => ({ item: i, ...place(i) })), [items]);
+  const placed = useMemo(() => {
+    const ps = items.filter((i) => i.promise != null).map((i) => i.promise as number);
+    const min = Math.min(...ps);
+    const max = Math.max(...ps);
+    return items.map((i) => ({ item: i, ...place(i, min, max) }));
+  }, [items]);
   const hovered = placed.find((p) => p.item.id === hover);
   const href = (id: string) => `/startups/${id}?lens=${lens}`;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_440px] lg:items-start">
       {/* Radar */}
-      <div className="glass relative overflow-hidden rounded-3xl p-4">
-        <div className="pointer-events-none absolute inset-0 grid-faint opacity-60" />
-        <div className="relative mx-auto aspect-square w-full max-w-[760px]">
-          <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="h-full w-full" role="img" aria-label="Opportunity radar">
+      <div className="card-surface relative p-6">
+        <div className="relative mx-auto w-full max-w-[760px]" style={{ aspectRatio: `${SIZE} / ${VB_H}` }}>
+          <svg viewBox={`0 ${VB_Y} ${SIZE} ${VB_H}`} className="h-full w-full" role="img" aria-label="Opportunity radar">
             <defs>
-              <radialGradient id="radar-bg" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#01498f" stopOpacity="0.35" />
-                <stop offset="70%" stopColor="#001b33" stopOpacity="0.15" />
-                <stop offset="100%" stopColor="#001835" stopOpacity="0" />
-              </radialGradient>
               <linearGradient id="sweep" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#dfae32" stopOpacity="0" />
-                <stop offset="100%" stopColor="#dfae32" stopOpacity="0.28" />
+                <stop offset="0%" stopColor={NAVY} stopOpacity="0" />
+                <stop offset="100%" stopColor={NAVY} stopOpacity="0.07" />
               </linearGradient>
             </defs>
-            <circle cx={C} cy={C} r={R} fill="url(#radar-bg)" />
-            {RINGS.map((ring) => (
-              <g key={ring.label}>
-                <circle cx={C} cy={C} r={ring.at * R} fill="none" stroke="#cfdee8" strokeOpacity={ring.label === "HOT" ? 0.22 : 0.1} strokeDasharray={ring.label === "EARLY" ? "0" : "2 6"} />
-                <text x={C + 6} y={C - ring.at * R + 14} fill="#cfdee8" fillOpacity={0.35} fontSize={10} letterSpacing={2}>
-                  {ring.label}
-                </text>
+            <circle cx={C} cy={C} r={R} fill="#fafafa" />
+            {RINGS.map((at, i) => (
+              <g key={at}>
+                <circle cx={C} cy={C} r={at * R} fill="none" stroke="#e4e4e7" strokeDasharray={i === RINGS.length - 1 ? undefined : "3 5"} />
+                <text x={C + 8} y={C - at * R + 20} fill="#a1a1aa" fontSize={14}>{RING_LABEL[i]}</text>
               </g>
             ))}
             {SECTOR_IDS.map((s, i) => {
               const a = -Math.PI / 2 + i * WEDGE;
               const mid = a + WEDGE / 2;
-              const lx = C + Math.cos(mid) * (R + 22);
-              const ly = C + Math.sin(mid) * (R + 22);
+              const cos = Math.cos(mid);
               return (
                 <g key={s}>
-                  <line x1={C} y1={C} x2={C + Math.cos(a) * R} y2={C + Math.sin(a) * R} stroke="#cfdee8" strokeOpacity={0.06} />
+                  <line x1={C} y1={C} x2={q(C + Math.cos(a) * R)} y2={q(C + Math.sin(a) * R)} stroke="#ededf0" />
                   <text
-                    x={lx} y={ly} fill="#8fa6ba" fontSize={10.5} textAnchor={Math.cos(mid) > 0.2 ? "start" : Math.cos(mid) < -0.2 ? "end" : "middle"}
-                    dominantBaseline="middle"
+                    x={q(C + cos * (R + 18))} y={q(C + Math.sin(mid) * (R + 18))}
+                    fill="#52525b" fontSize={16} dominantBaseline="middle"
+                    textAnchor={cos > 0.2 ? "start" : cos < -0.2 ? "end" : "middle"}
                   >
-                    {SECTORS[s]}
+                    {SHORT[s]}
                   </text>
                 </g>
               );
             })}
-            {/* sweep */}
             <g className="radar-sweep" style={{ transformOrigin: `${C}px ${C}px` }}>
-              <path d={`M ${C} ${C} L ${C + R} ${C} A ${R} ${R} 0 0 0 ${C + Math.cos(-0.55) * R} ${C + Math.sin(-0.55) * R} Z`} fill="url(#sweep)" />
-              <line x1={C} y1={C} x2={C + R} y2={C} stroke="#dfae32" strokeOpacity={0.5} strokeWidth={1.2} />
+              <path d={`M ${C} ${C} L ${C + R} ${C} A ${R} ${R} 0 0 0 ${q(C + Math.cos(-0.6) * R)} ${q(C + Math.sin(-0.6) * R)} Z`} fill="url(#sweep)" />
+              <line x1={C} y1={C} x2={C + R} y2={C} stroke={NAVY} strokeOpacity={0.18} />
             </g>
-            <circle cx={C} cy={C} r={3} fill="#dfae32" />
+            <circle cx={C} cy={C} r={3.5} fill={NAVY} />
 
-            {/* blips */}
             {placed.map(({ item, x, y }, idx) => {
               const isTop = top.has(item.id);
               const isHover = hover === item.id;
-              const r = item.assessed ? 5 + (item.levels.oirl ?? 3) * 0.9 : 4.5;
-              const color = isTop ? "#dfae32" : item.assessed ? "#4acceb" : "#8fa6ba";
+              const rank = isTop ? assessed.findIndex((a) => a.id === item.id) + 1 : 0;
+              const r = isTop ? 16 : item.assessed ? 5.5 + (item.levels.oirl ?? 3) * 0.9 : 5;
+              const fill = isTop ? GOLD : NAVY;
               return (
                 <motion.g
                   key={item.id}
-                  initial={{ opacity: 0, scale: 0.3 }}
+                  initial={{ opacity: 0, scale: 0.4 }}
                   animate={{ opacity: 1, scale: 1, x, y }}
-                  transition={{ delay: idx * 0.025, type: "spring", stiffness: 140, damping: 20 }}
+                  transition={{ delay: idx * 0.02, type: "spring", stiffness: 150, damping: 22 }}
                   onMouseEnter={() => setHover(item.id)}
                   onMouseLeave={() => setHover(null)}
                   onClick={() => router.push(href(item.id))}
                   className="cursor-pointer"
-                  style={{ originX: 0, originY: 0 }}
                 >
-                  {isTop && <circle r={r} fill={color} className="blip-pulse" />}
-                  {item.needsReview && <circle r={r + 4} fill="none" stroke="#e6be5c" strokeWidth={1.4} strokeDasharray="2 2" />}
+                  {isTop && <circle r={r} fill={GOLD} className="blip-pulse" />}
+                  {item.needsReview && <circle r={r + 4} fill="none" stroke="#d97706" strokeWidth={1.3} strokeDasharray="2 2" />}
                   <circle
-                    r={isHover ? r + 2.5 : r}
-                    fill={item.assessed ? color : "transparent"}
-                    fillOpacity={item.assessed ? 0.9 : 0}
-                    stroke={color}
-                    strokeOpacity={item.assessed ? 1 : 0.7}
-                    strokeDasharray={item.assessed ? undefined : "2 2.5"}
-                    strokeWidth={1.5}
-                    style={{ filter: item.assessed ? `drop-shadow(0 0 ${isTop ? 10 : 5}px ${color})` : undefined, transition: "r 0.15s" }}
+                    r={isHover ? r + 2 : r}
+                    fill={item.assessed ? fill : "#fff"}
+                    fillOpacity={item.assessed ? (isTop ? 1 : 0.85) : 1}
+                    stroke={item.assessed ? "#fff" : "#a1a1aa"}
+                    strokeWidth={item.assessed ? 2 : 1.4}
+                    strokeDasharray={item.assessed ? undefined : "2 2"}
+                    style={{ transition: "r 0.15s" }}
                   />
-                  {(isTop || isHover) && (
-                    <text x={r + 6} y={4} fill={isTop ? "#f3d37c" : "#e9f3f8"} fontSize={12} fontWeight={600}>
+                  {isTop && (
+                    <text textAnchor="middle" y={6} fill="#002444" fontSize={17} fontWeight={700} style={{ pointerEvents: "none" }}>{rank}</text>
+                  )}
+                  {isHover && (
+                    <text x={r + 7} y={4.5} fill="#0a0a0b" fontSize={16} fontWeight={600} paintOrder="stroke" stroke="#fff" strokeWidth={4}>
                       {item.name}
                     </text>
                   )}
@@ -144,11 +152,11 @@ export function RadarBoard({ items, lens }: { items: RadarItem[]; lens: string }
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="pointer-events-none absolute z-10 w-64 rounded-xl border border-border bg-popover/95 p-3 text-xs shadow-2xl backdrop-blur"
+                className="pointer-events-none absolute z-10 w-72 rounded-xl border bg-white p-4 shadow-xl"
                 style={{
                   left: `${(hovered.x / SIZE) * 100}%`,
-                  top: `${(hovered.y / SIZE) * 100}%`,
-                  transform: `translate(${hovered.x > C ? "-105%" : "12px"}, ${hovered.y > C ? "-105%" : "12px"})`,
+                  top: `${((hovered.y - VB_Y) / VB_H) * 100}%`,
+                  transform: `translate(${hovered.x > C ? "-105%" : "14px"}, ${hovered.y > C ? "-105%" : "14px"})`,
                 }}
               >
                 <BlipCard item={hovered.item} />
@@ -156,74 +164,57 @@ export function RadarBoard({ items, lens }: { items: RadarItem[]; lens: string }
             )}
           </AnimatePresence>
         </div>
-        <div className="relative mt-2 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[11px] text-muted-foreground">
-          <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-full bg-gold shadow-[0_0_8px_#dfae32]" /> Top 3 for this lens</span>
-          <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-full bg-tech" /> Assessed</span>
-          <span className="flex items-center gap-1.5"><CircleDashed className="size-3" /> Not yet assessed</span>
-          <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-full border border-dashed border-warn" /> Needs human review</span>
-          <span>Closer to centre = more promising · size = ocean impact</span>
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+          <Legend dot="bg-gold" label="Top 3" />
+          <Legend dot="bg-navy" label="Assessed" />
+          <Legend dot="border border-dashed border-zinc-400 bg-white" label="Not yet assessed" />
+          <Legend dot="border border-dashed border-warn bg-white" label="Needs review" />
+          <span>Centre = most promising · size = ocean impact</span>
         </div>
       </div>
 
-      {/* Ranked list */}
-      <div className="glass flex max-h-[860px] flex-col rounded-3xl">
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <div>
-            <h2 className="text-sm font-semibold">Ranked opportunities</h2>
-            <p className="text-xs text-muted-foreground">{assessed.length} assessed · {items.length - assessed.length} waiting</p>
-          </div>
-          <Sparkles className="size-4 text-gold" />
+      {/* Ranking */}
+      <div id="ranking" className="card-surface flex max-h-[790px] flex-col overflow-hidden">
+        <div className="flex items-baseline justify-between border-b px-5 py-4">
+          <h3 className="text-base font-semibold">Ranking</h3>
+          <span className="text-sm text-muted-foreground">{assessed.length} assessed</span>
         </div>
-        <ol className="flex-1 space-y-1 overflow-y-auto p-2">
+        <ol className="flex-1 divide-y overflow-y-auto">
           {items.map((item, i) => (
             <li key={item.id}>
               <Link
                 href={href(item.id)}
                 onMouseEnter={() => setHover(item.id)}
                 onMouseLeave={() => setHover(null)}
-                className={cn(
-                  "group flex items-center gap-3 rounded-xl px-3 py-2.5 transition",
-                  hover === item.id ? "bg-accent/70" : "hover:bg-accent/40",
-                )}
+                className={cn("group flex items-center gap-4 px-5 py-3.5 transition-colors", hover === item.id ? "bg-muted/70" : "hover:bg-muted/50")}
               >
-                <span className={cn("w-5 text-right text-xs tabular", top.has(item.id) ? "text-gold" : "text-muted-foreground")}>
+                <span className={cn("w-5 text-right text-sm tabular", top.has(item.id) ? "font-semibold text-gold-ink" : "text-muted-foreground")}>
                   {item.assessed ? i + 1 : "–"}
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="truncate text-sm font-medium">{item.name}</span>
-                    {item.alumnus && <span className="rounded bg-navy-500/40 px-1.5 py-px text-[9px] font-semibold uppercase tracking-wider text-ice">Alumni</span>}
-                    {item.needsReview && <TriangleAlert className="size-3 shrink-0 text-warn" />}
+                    <span className="truncate text-[15px] font-medium">{item.name}</span>
+                    {item.alumnus && <span className="rounded-full bg-navy-soft px-2 py-0.5 text-xs font-medium text-navy">Alumni</span>}
+                    {item.needsReview && <TriangleAlert className="size-3.5 shrink-0 text-warn" />}
                   </div>
-                  <div className="truncate text-[11px] text-muted-foreground">
-                    {item.assessed ? (
-                      <>
-                        {(["trl", "brl", "oirl", "irl"] as const).map((k) => (
-                          <span key={k} className="mr-2">
-                            <span className="uppercase opacity-70">{k}</span> <span className={cn("font-semibold tabular", levelColor[k])}>{item.levels[k] ?? "–"}</span>
+                  <div className="mt-0.5 truncate text-sm text-muted-foreground">
+                    {item.assessed
+                      ? (["trl", "brl", "oirl", "irl"] as const).map((k) => (
+                          <span key={k} className="mr-3">
+                            {k.toUpperCase()} <span className={cn("font-semibold tabular", LEVEL_TONE[k])}>{item.levels[k] ?? "–"}</span>
                           </span>
-                        ))}
-                      </>
-                    ) : (
-                      item.oneLiner
-                    )}
+                        ))
+                      : item.oneLiner}
                   </div>
                 </div>
                 {item.assessed ? (
-                  <div className="w-16 text-right">
-                    <div className={cn("text-lg font-bold leading-none tabular", top.has(item.id) ? "text-gradient-gold" : "text-foreground")}>
-                      {item.promise?.toFixed(0)}
-                    </div>
-                    <div className="mt-1 h-1 rounded-full bg-muted">
-                      <div className={cn("h-1 rounded-full", top.has(item.id) ? "bg-gold" : "bg-tech")} style={{ width: `${item.promise ?? 0}%` }} />
-                    </div>
-                  </div>
-                ) : (
-                  <span className="rounded-md border border-dashed border-border px-2 py-1 text-[10px] text-muted-foreground transition group-hover:border-gold/50 group-hover:text-gold">
-                    Assess
+                  <span className={cn("text-xl font-semibold tabular", top.has(item.id) ? "text-gold-ink" : "text-foreground")}>
+                    {item.promise?.toFixed(0)}
                   </span>
+                ) : (
+                  <span className="rounded-full border px-2.5 py-1 text-xs text-muted-foreground group-hover:border-navy group-hover:text-navy">Assess</span>
                 )}
-                <ArrowUpRight className="size-3.5 shrink-0 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
+                <ChevronRight className="size-4 shrink-0 text-zinc-300 transition group-hover:translate-x-0.5 group-hover:text-zinc-500" />
               </Link>
             </li>
           ))}
@@ -233,34 +224,42 @@ export function RadarBoard({ items, lens }: { items: RadarItem[]; lens: string }
   );
 }
 
+function Legend({ dot, label }: { dot: string; label: string }) {
+  return (
+    <span className="flex items-center gap-2">
+      <span className={cn("size-2.5 rounded-full", dot)} /> {label}
+    </span>
+  );
+}
+
 function BlipCard({ item }: { item: RadarItem }) {
   return (
-    <div className="space-y-2">
-      <div className="flex items-start justify-between gap-2">
+    <div className="space-y-3">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-sm font-semibold text-foreground">{item.name}</div>
-          <div className="text-[11px] text-muted-foreground">
+          <div className="text-[15px] font-semibold">{item.name}</div>
+          <div className="text-sm text-muted-foreground">
             {[item.country, item.stage && STAGE_LABELS[item.stage], item.sectors[0] && SECTORS[item.sectors[0]]].filter(Boolean).join(" · ")}
           </div>
         </div>
-        {item.promise != null && <div className="text-xl font-bold text-gradient-gold tabular">{item.promise.toFixed(0)}</div>}
+        {item.promise != null && <div className="text-2xl font-semibold tabular">{item.promise.toFixed(0)}</div>}
       </div>
       {item.assessed ? (
         <>
-          <div className="grid grid-cols-4 gap-1 text-center">
+          <div className="grid grid-cols-4 gap-1.5 text-center">
             {(["trl", "brl", "oirl", "irl"] as const).map((k) => (
-              <div key={k} className="rounded-md bg-muted/60 py-1">
-                <div className="text-[9px] uppercase text-muted-foreground">{k}</div>
-                <div className={cn("text-sm font-bold tabular", levelColor[k])}>{item.levels[k] ?? "–"}</div>
+              <div key={k} className="rounded-lg bg-muted py-1.5">
+                <div className="text-[11px] font-medium text-muted-foreground">{k.toUpperCase()}</div>
+                <div className={cn("text-base font-semibold tabular", LEVEL_TONE[k])}>{item.levels[k] ?? "–"}</div>
               </div>
             ))}
           </div>
-          {item.headline && <p className="line-clamp-3 text-[11px] leading-snug text-ice/80">{item.headline}</p>}
-          {item.topMatch && <div className="text-[11px] text-muted-foreground">Top investor: <span className="text-gold">{item.topMatch}</span></div>}
-          {item.programme && <div className="text-[11px] text-muted-foreground">Programme: <span className="text-ice">{PROGRAMMES[item.programme]}</span></div>}
+          {item.headline && <p className="line-clamp-3 text-sm leading-snug text-zinc-600">{item.headline}</p>}
+          {item.topMatch && <div className="text-sm text-muted-foreground">Top investor: <span className="font-medium text-foreground">{item.topMatch}</span></div>}
+          {item.programme && <div className="text-sm text-muted-foreground">Programme: <span className="font-medium text-foreground">{PROGRAMMES[item.programme]}</span></div>}
         </>
       ) : (
-        <p className="text-[11px] text-muted-foreground">{item.oneLiner} — click to run the agent committee.</p>
+        <p className="text-sm text-muted-foreground">{item.oneLiner} — click to run the committee.</p>
       )}
     </div>
   );

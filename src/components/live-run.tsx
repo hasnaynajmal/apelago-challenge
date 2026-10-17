@@ -18,12 +18,12 @@ interface EventRow {
 }
 
 const STEPS = [
-  { id: "scout", label: "Scout", sub: "Web research & evidence" },
-  { id: "assess", label: "Committee", sub: "TRL · BRL · Ocean Impact · Investment · Jev calibration" },
-  { id: "match", label: "Matchmaker", sub: "42 investors · 32 funding · 42 partners" },
-  { id: "connect", label: "Connector", sub: "Warm paths, unlocks, consortia" },
-  { id: "narrate", label: "Narrator", sub: "Explains every top match" },
-  { id: "strategy", label: "Strategist", sub: "Action plan" },
+  { id: "scout", label: "Scout", sub: "Researches the web and gathers evidence" },
+  { id: "assess", label: "Committee", sub: "Technology, business, ocean impact and investment readiness" },
+  { id: "match", label: "Matchmaker", sub: "Scores every investor, grant and partner" },
+  { id: "connect", label: "Connector", sub: "Finds warm paths, unlocks and consortia" },
+  { id: "narrate", label: "Narrator", sub: "Explains the top matches" },
+  { id: "strategy", label: "Strategist", sub: "Writes the action plan" },
 ] as const;
 
 export function LiveRun({ runId, startupId, startupName, lens }: { runId: string; startupId: string; startupName: string; lens: string }) {
@@ -40,7 +40,6 @@ export function LiveRun({ runId, startupId, startupName, lens }: { runId: string
         const seen = new Set(prev.map((e) => e.id));
         return [...prev, ...rows.filter((r) => !seen.has(r.id))].sort((a, b) => a.id - b.id);
       });
-
     const channel = db
       .channel(`run-${runId}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "pipeline_events", filter: `run_id=eq.${runId}` }, (p) => add([p.new as EventRow]))
@@ -49,8 +48,7 @@ export function LiveRun({ runId, startupId, startupName, lens }: { runId: string
         if (s === "done" || s === "error") setStatus(s);
       })
       .subscribe();
-
-    // Backfill + polling fallback in case Realtime is slow to connect.
+    // Backfill and fallback polling in case Realtime is slow to connect.
     const poll = async () => {
       const [{ data: ev }, { data: run }] = await Promise.all([
         db.from("pipeline_events").select("*").eq("run_id", runId).order("id"),
@@ -83,49 +81,38 @@ export function LiveRun({ runId, startupId, startupName, lens }: { runId: string
     }
     return st;
   }, [events]);
-  const doneCount = STEPS.filter((s) => stepState[s.id] === "done").length;
+  const progress = Math.round((STEPS.filter((s) => stepState[s.id] === "done").length / STEPS.length) * 100);
   const error = events.find((e) => e.status === "error");
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[380px_minmax(0,1fr)]">
-      {/* Pipeline */}
-      <div className="glass rounded-3xl p-5">
-        <div className="relative mx-auto mb-6 flex size-44 items-center justify-center">
-          {status === "running" &&
-            [0, 1, 2].map((i) => (
-              <motion.span
-                key={i}
-                className="absolute inset-0 rounded-full border border-gold/40"
-                initial={{ scale: 0.4, opacity: 0.8 }}
-                animate={{ scale: 1.15, opacity: 0 }}
-                transition={{ duration: 2.4, repeat: Infinity, delay: i * 0.8, ease: "easeOut" }}
-              />
-            ))}
-          <div className="absolute inset-6 rounded-full border border-border bg-navy-950/40" />
-          <div className="relative text-center">
-            <div className="text-4xl font-bold tabular text-gradient-gold">{Math.round((doneCount / STEPS.length) * 100)}%</div>
-            <div className="text-[11px] text-muted-foreground">{status === "running" ? `${elapsed}s elapsed` : status === "done" ? "Complete" : "Failed"}</div>
-          </div>
+    <div className="grid gap-6 lg:grid-cols-[400px_minmax(0,1fr)]">
+      <div className="card-surface p-6">
+        <div className="flex items-baseline justify-between">
+          <span className="text-4xl font-semibold tracking-tight tabular">{progress}%</span>
+          <span className="text-sm text-muted-foreground">{status === "running" ? `${elapsed}s` : status === "done" ? "Complete" : "Failed"}</span>
         </div>
-        <ol className="space-y-2">
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
+          <motion.div className="h-full rounded-full bg-navy" animate={{ width: `${progress}%` }} transition={{ type: "spring", stiffness: 80, damping: 20 }} />
+        </div>
+        <ol className="mt-6 space-y-1">
           {STEPS.map((s) => {
             const state = stepState[s.id];
             return (
-              <li key={s.id} className={cn("flex items-center gap-3 rounded-xl px-3 py-2.5 transition", state === "running" && "bg-gold/10")}>
+              <li key={s.id} className={cn("flex items-start gap-3 rounded-xl px-3 py-3 transition-colors", state === "running" && "bg-muted")}>
                 <span
                   className={cn(
-                    "flex size-7 shrink-0 items-center justify-center rounded-full border",
-                    state === "done" && "border-impact bg-impact/20 text-impact",
-                    state === "running" && "border-gold text-gold",
-                    state === "error" && "border-risk text-risk",
-                    state === "idle" && "border-border text-muted-foreground",
+                    "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border",
+                    state === "done" && "border-emerald-600 bg-emerald-600 text-white",
+                    state === "running" && "border-navy text-navy",
+                    state === "error" && "border-red-600 text-red-600",
+                    state === "idle" && "text-zinc-300",
                   )}
                 >
                   {state === "done" ? <Check className="size-3.5" /> : state === "running" ? <Loader2 className="size-3.5 animate-spin" /> : state === "error" ? <CircleAlert className="size-3.5" /> : <span className="size-1.5 rounded-full bg-current" />}
                 </span>
                 <div>
-                  <div className={cn("text-sm font-semibold", state === "idle" && "text-muted-foreground")}>{s.label}</div>
-                  <div className="text-[11px] text-muted-foreground">{s.sub}</div>
+                  <div className={cn("text-[15px] font-medium", state === "idle" && "text-muted-foreground")}>{s.label}</div>
+                  <div className="text-sm text-muted-foreground">{s.sub}</div>
                 </div>
               </li>
             );
@@ -133,49 +120,43 @@ export function LiveRun({ runId, startupId, startupName, lens }: { runId: string
         </ol>
       </div>
 
-      {/* Live feed */}
-      <div className="glass flex min-h-[560px] flex-col rounded-3xl">
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+      <div className="card-surface flex min-h-[600px] flex-col">
+        <div className="flex items-center justify-between border-b px-6 py-4">
           <div>
-            <div className="text-sm font-semibold">Committee feed · {startupName}</div>
-            <div className="text-xs text-muted-foreground">Streaming live from the agents via Supabase Realtime</div>
+            <div className="text-base font-semibold">Live feed</div>
+            <div className="text-sm text-muted-foreground">Streaming from the agents as they work</div>
           </div>
           {status === "done" && (
-            <Button asChild>
-              <Link href={`/startups/${startupId}?lens=${lens}`}>Open dossier <ArrowRight /></Link>
+            <Button asChild className="rounded-full">
+              <Link href={`/startups/${startupId}?lens=${lens}`}>Open {startupName} <ArrowRight /></Link>
             </Button>
           )}
         </div>
-        <ul className="flex-1 space-y-2 overflow-y-auto p-4">
+        <ul className="flex-1 space-y-2 overflow-y-auto p-5">
           <AnimatePresence initial={false}>
             {events.map((e) => (
               <motion.li
                 key={e.id}
                 layout
-                initial={{ opacity: 0, x: -12, scale: 0.98 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                className={cn(
-                  "flex gap-3 rounded-xl border px-3 py-2.5 text-sm",
-                  e.status === "error" ? "border-risk/40 bg-risk/10" : e.status === "done" ? "border-impact/25 bg-impact/5" : "border-border bg-navy-950/30",
-                )}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={cn("flex gap-4 rounded-xl border px-4 py-3", e.status === "error" ? "border-red-200 bg-red-50" : e.status === "done" ? "border-emerald-100 bg-emerald-50/50" : "bg-white")}
               >
-                <span className="w-14 shrink-0 pt-0.5 text-[10px] text-muted-foreground tabular">
+                <span className="w-12 shrink-0 pt-0.5 text-sm text-muted-foreground tabular">
                   {new Date(e.created_at).toLocaleTimeString([], { minute: "2-digit", second: "2-digit" })}
                 </span>
                 <div className="min-w-0">
-                  <div className={cn("text-[11px] font-semibold uppercase tracking-wider", e.status === "done" ? "text-impact" : e.status === "error" ? "text-risk" : "text-gold")}>
-                    {e.agent ?? e.step}
-                  </div>
-                  <div className="text-ice/85">{e.message}</div>
+                  <div className="text-sm font-medium text-zinc-500">{e.agent ?? e.step}</div>
+                  <div className="text-[15px] text-zinc-800">{e.message}</div>
                 </div>
               </motion.li>
             ))}
           </AnimatePresence>
           {events.length === 0 && (
-            <li className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" /> Waiting for the committee…</li>
+            <li className="flex items-center gap-2 text-muted-foreground"><Loader2 className="size-4 animate-spin" /> Waiting for the committee…</li>
           )}
         </ul>
-        {error && <div className="border-t border-border px-5 py-3 text-sm text-risk">Run failed: {error.message}</div>}
+        {error && <div className="border-t px-6 py-3 text-sm text-red-600">Run failed: {error.message}</div>}
       </div>
     </div>
   );

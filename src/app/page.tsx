@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { CalendarClock, Network, Radar, Waves } from "lucide-react";
+import { Hero } from "@/components/home/hero";
+import { LensSwitcher } from "@/components/lens-switcher";
 import { RadarBoard } from "@/components/radar/radar-board";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LENSES, resolveLens } from "@/lib/lens";
@@ -9,11 +10,9 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export default function Home({ searchParams }: PageProps<"/">) {
   return (
-    <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6">
-      <Suspense fallback={<HomeSkeleton />}>
-        <HomeContent searchParams={searchParams} />
-      </Suspense>
-    </div>
+    <Suspense fallback={<HomeSkeleton />}>
+      <HomeContent searchParams={searchParams} />
+    </Suspense>
   );
 }
 
@@ -21,32 +20,26 @@ async function HomeContent({ searchParams }: { searchParams: PageProps<"/">["sea
   const lens = resolveLens((await searchParams).lens);
   const lensInfo = LENSES.find((l) => l.id === lens)!;
   const [items, stats] = await Promise.all([getRadar(lens), getStats()]);
-  const assessed = items.filter((i) => i.assessed);
 
   return (
-    <div className="space-y-6">
-      <section className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div className="max-w-2xl">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">
-            <Radar className="size-3.5" /> {lensInfo.label} · {lensInfo.kind}
+    <>
+      <Hero stats={{ ...stats, assessed: items.filter((i) => i.assessed).length, total: items.length }} />
+      <section className="mx-auto max-w-7xl px-6 py-16">
+        <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="eyebrow">Viewing through the {lensInfo.label} thesis</p>
+            <h2 className="mt-1 text-3xl font-semibold">The radar</h2>
+            <p className="mt-2 max-w-xl text-muted-foreground">
+              Each dot is a venture. The closer to the centre, the more promising it is for this thesis. Switch the lens to see how priorities change.
+            </p>
           </div>
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            Ocean Opportunity <span className="text-gradient-gold">Radar</span>
-          </h1>
-          <p className="mt-3 text-base text-ice/75">
-            An AI investment committee scores every ocean venture on technology, business, ocean impact and investment readiness,
-            then finds the hidden paths to its next investor, grant and pilot partner.
-          </p>
+          <Suspense fallback={<Skeleton className="h-11 w-96 rounded-full" />}>
+            <LensSwitcher />
+          </Suspense>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat icon={<Waves className="size-4" />} label="Ventures assessed" value={`${assessed.length}/${items.length}`} />
-          <Stat icon={<Network className="size-4" />} label="Investors · funds · partners" value={`${stats.investors}·${stats.funding}·${stats.partners}`} />
-          <Stat icon={<Radar className="size-4" />} label="Warm paths found" value={String(stats.warmPaths)} />
-          <Stat icon={<CalendarClock className="size-4" />} label="Deadlines < 60 days" value={String(stats.deadlines)} accent />
-        </div>
+        <RadarBoard items={items} lens={lens} />
       </section>
-      <RadarBoard items={items} lens={lens} />
-    </div>
+    </>
   );
 }
 
@@ -63,26 +56,16 @@ async function getStats() {
     count(db.from("connections").select("*", { count: "exact", head: true }).eq("kind", "warm_path")),
     count(db.from("funding").select("*", { count: "exact", head: true }).gte("deadline_date", today).lte("deadline_date", soon)),
   ]);
-  return { investors, funding, partners, warmPaths, deadlines };
-}
-
-function Stat({ icon, label, value, accent }: { icon: React.ReactNode; label: string; value: string; accent?: boolean }) {
-  return (
-    <div className="glass rounded-2xl px-4 py-3">
-      <div className={accent ? "text-gold" : "text-tech"}>{icon}</div>
-      <div className="mt-2 text-2xl font-bold tabular">{value}</div>
-      <div className="text-[11px] text-muted-foreground">{label}</div>
-    </div>
-  );
+  return { opportunities: investors + funding + partners, warmPaths, deadlines };
 }
 
 function HomeSkeleton() {
   return (
-    <div className="space-y-6">
-      <Skeleton className="h-28 w-full max-w-2xl rounded-2xl" />
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
-        <Skeleton className="aspect-square w-full rounded-3xl" />
-        <Skeleton className="h-[760px] rounded-3xl" />
+    <div className="mx-auto max-w-7xl space-y-8 px-6 py-20">
+      <Skeleton className="mx-auto h-40 w-full max-w-3xl rounded-2xl" />
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_460px]">
+        <Skeleton className="aspect-square w-full rounded-2xl" />
+        <Skeleton className="h-[720px] rounded-2xl" />
       </div>
     </div>
   );

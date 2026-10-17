@@ -13,22 +13,22 @@ export function IrlRadar({ dimensions }: { dimensions: Dims }) {
     note: dimensions[k]?.note ?? "",
   }));
   return (
-    <div className="h-72 w-full">
+    <div className="h-80 w-full">
       <ResponsiveContainer>
-        <RadarChart data={data} outerRadius="72%">
-          <PolarGrid stroke="#cfdee8" strokeOpacity={0.12} />
-          <PolarAngleAxis dataKey="dim" tick={{ fill: "#8fa6ba", fontSize: 11 }} />
+        <RadarChart data={data} outerRadius="70%">
+          <PolarGrid stroke="#e4e4e7" />
+          <PolarAngleAxis dataKey="dim" tick={{ fill: "#52525b", fontSize: 13 }} />
           <PolarRadiusAxis domain={[0, 5]} tickCount={6} tick={false} axisLine={false} />
-          <Radar dataKey="score" stroke="#dfae32" strokeWidth={2} fill="#dfae32" fillOpacity={0.22} isAnimationActive />
+          <Radar dataKey="score" stroke="#002444" strokeWidth={2} fill="#002444" fillOpacity={0.14} isAnimationActive={false} dot={{ r: 3, fill: "#002444" }} />
           <Tooltip
             cursor={false}
             content={({ payload }) => {
               const p = payload?.[0]?.payload as (typeof data)[number] | undefined;
               if (!p) return null;
               return (
-                <div className="max-w-64 rounded-lg border border-border bg-popover px-3 py-2 text-xs shadow-xl">
-                  <div className="font-semibold">
-                    {p.dim}: <span className="text-gold">{p.unknown ? "no evidence" : `${p.score}/5`}</span>
+                <div className="max-w-72 rounded-xl border bg-white px-4 py-3 text-sm shadow-lg">
+                  <div className="font-medium">
+                    {p.dim}: <span className="text-navy">{p.unknown ? "no evidence" : `${p.score} / 5`}</span>
                   </div>
                   <div className="mt-1 text-muted-foreground">{p.note}</div>
                 </div>

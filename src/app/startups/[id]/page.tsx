@@ -1,22 +1,25 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { ArrowLeft, ExternalLink, GraduationCap, MapPin, ShieldAlert, Users } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, ShieldAlert } from "lucide-react";
 import { ActionPlan } from "@/components/dossier/action-plan";
 import { ConnectionsPanel } from "@/components/dossier/connections-panel";
 import { Constellation } from "@/components/dossier/constellation";
 import { IrlRadar } from "@/components/dossier/irl-radar";
 import { Opportunities } from "@/components/dossier/opportunities";
+import { PromiseScore } from "@/components/dossier/promise-score";
 import { ReadinessCard } from "@/components/dossier/readiness-card";
+import { LensSwitcher } from "@/components/lens-switcher";
 import { RunAssessmentButton } from "@/components/run-assessment-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LENSES, PROGRAMMES, resolveLens } from "@/lib/lens";
 import { getDossier } from "@/lib/queries";
 import { IMPACT_AREAS, SECTORS, STAGE_LABELS, type ImpactArea, type IrlDimension } from "@/lib/taxonomy";
+import { cn } from "@/lib/utils";
 
 export default function StartupPage({ params, searchParams }: PageProps<"/startups/[id]">) {
   return (
-    <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6">
+    <div className="mx-auto max-w-7xl px-6 py-10">
       <Suspense fallback={<DossierSkeleton />}>
         <Dossier params={params} searchParams={searchParams} />
       </Suspense>
@@ -31,80 +34,79 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/startups/[id]"
   if (!d) notFound();
   const { startup: s, assessments: a, score } = d;
   const lensInfo = LENSES.find((l) => l.id === lens)!;
-  const irlDetails = a.irl?.details as { dimensions?: Record<IrlDimension, { score: number | null; note: string }>; strengths?: string[]; risks?: string[]; deal_notes?: string } | undefined;
+  const irl = a.irl?.details as { dimensions?: Record<IrlDimension, { score: number | null; note: string }>; strengths?: string[]; risks?: string[]; deal_notes?: string } | undefined;
   const impact = a.oirl?.details as { impact_areas?: ImpactArea[]; kpis?: { code: string; name: string; estimate: string | null }[]; coupling?: number; intensity?: string; red_flags?: string[] } | undefined;
-  const breakdown = score?.breakdown as { irl?: number; thesis_fit?: number; impact?: number; momentum?: number; team?: number; programme_why?: string; fit_notes?: string[] } | undefined;
+  const breakdown = score?.breakdown as Record<string, number | string | undefined> | undefined;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-16">
       {/* Header */}
-      <section className="space-y-5">
-        <Link href={`/?lens=${lens}`} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="size-3.5" /> Back to radar
-        </Link>
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-          <div className="max-w-3xl">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-4xl font-bold tracking-tight">{s.name}</h1>
-              {s.apelago_alumnus && (
-                <span className="flex items-center gap-1 rounded-full bg-navy-500/40 px-2.5 py-1 text-[11px] font-semibold text-ice">
-                  <GraduationCap className="size-3.5" /> A'Pelago alumni
-                </span>
-              )}
+      <section>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <Link href={`/?lens=${lens}`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="size-4" /> All ventures
+          </Link>
+          <Suspense><LensSwitcher /></Suspense>
+        </div>
+
+        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+          <div>
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-5xl font-semibold tracking-[-0.035em]">{s.name}</h1>
+              {s.apelago_alumnus && <span className="rounded-full bg-navy-soft px-3 py-1 text-sm font-medium text-navy">A'Pelago alumni</span>}
+            </div>
+            <p className="mt-4 max-w-3xl text-lg leading-relaxed text-zinc-600">{s.profile?.summary ?? s.one_liner}</p>
+            <div className="mt-5 flex flex-wrap items-center gap-2 text-sm">
+              {(s.city || s.country) && <Chip>{[s.city, s.country].filter(Boolean).join(", ")}</Chip>}
+              {s.founded && <Chip>Founded {s.founded}</Chip>}
+              {s.stage && <Chip>{STAGE_LABELS[s.stage]}</Chip>}
+              {s.sectors.map((x) => <Chip key={x}>{SECTORS[x]}</Chip>)}
               {s.website && (
-                <a href={s.website} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-xs text-muted-foreground hover:text-gold">
-                  {s.website.replace(/^https?:\/\//, "").replace(/\/$/, "")} <ExternalLink className="size-3" />
+                <a href={s.website} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 px-1 text-navy hover:underline">
+                  {s.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")} <ArrowUpRight className="size-3.5" />
                 </a>
               )}
-            </div>
-            <p className="mt-2 text-lg text-ice/80">{s.profile?.summary ?? s.one_liner}</p>
-            <div className="mt-3 flex flex-wrap gap-2 text-xs">
-              {(s.city || s.country) && (
-                <span className="flex items-center gap-1 rounded-md bg-muted px-2 py-1"><MapPin className="size-3" /> {[s.city, s.country].filter(Boolean).join(", ")}</span>
-              )}
-              {s.founded && <span className="rounded-md bg-muted px-2 py-1">Founded {s.founded}</span>}
-              {s.stage && <span className="rounded-md bg-muted px-2 py-1">{STAGE_LABELS[s.stage]}</span>}
-              {s.sectors.map((x) => <span key={x} className="rounded-md bg-accent px-2 py-1 text-ice">{SECTORS[x]}</span>)}
             </div>
           </div>
 
           {score ? (
-            <div className="glass w-full max-w-sm rounded-3xl p-5">
+            <div className="card-surface p-6">
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Promise · {lensInfo.label}</div>
-                  <div className="mt-1 text-6xl font-bold leading-none text-gradient-gold tabular">{Math.round(score.promise)}</div>
+                  <div className="text-sm text-muted-foreground">Promise for {lensInfo.label}</div>
+                  <PromiseScore value={score.promise} />
                 </div>
                 <RunAssessmentButton startupId={s.id} lens={lens} rerun />
               </div>
-              {score.headline && <p className="mt-3 text-sm leading-snug text-ice/85">{score.headline}</p>}
+              {score.headline && <p className="mt-3 text-[15px] leading-relaxed text-zinc-700">{score.headline}</p>}
               {breakdown && (
-                <div className="mt-4 space-y-1.5">
-                  {(["irl", "thesis_fit", "impact", "momentum", "team"] as const).map((k) => (
-                    <div key={k} className="flex items-center gap-2 text-[11px]">
-                      <span className="w-20 capitalize text-muted-foreground">{k.replace("_", " ")}</span>
-                      <div className="h-1.5 flex-1 rounded-full bg-muted">
-                        <div className="h-1.5 rounded-full bg-gold/80" style={{ width: `${Math.round((breakdown[k] ?? 0) * 100)}%` }} />
+                <div className="mt-5 space-y-2.5">
+                  {(["irl", "thesis_fit", "impact", "momentum", "team"] as const).map((k) => {
+                    const v = Math.round(Number(breakdown[k] ?? 0) * 100);
+                    return (
+                      <div key={k} className="flex items-center gap-3 text-sm">
+                        <span className="w-24 text-muted-foreground">{{ irl: "Readiness", thesis_fit: "Thesis fit", impact: "Impact", momentum: "Momentum", team: "Team" }[k]}</span>
+                        <div className="h-1.5 flex-1 rounded-full bg-muted"><div className="h-1.5 rounded-full bg-navy" style={{ width: `${v}%` }} /></div>
+                        <span className="w-8 text-right tabular">{v}</span>
                       </div>
-                      <span className="w-8 text-right tabular text-ice/80">{Math.round((breakdown[k] ?? 0) * 100)}</span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
               {score.programme && (
-                <div className="mt-4 rounded-xl border border-gold/30 bg-gold/10 p-3 text-xs">
-                  <div className="font-semibold text-gold">Recommended: {PROGRAMMES[score.programme]}</div>
-                  {breakdown?.programme_why && <div className="mt-1 text-ice/80">{breakdown.programme_why}</div>}
+                <div className="mt-5 rounded-xl bg-gold-soft p-4">
+                  <div className="text-sm font-semibold text-gold-ink">Recommended programme: {PROGRAMMES[score.programme]}</div>
+                  {breakdown?.programme_why && <div className="mt-1 text-sm text-zinc-700">{String(breakdown.programme_why)}</div>}
                 </div>
               )}
             </div>
           ) : (
-            <div className="glass w-full max-w-sm rounded-3xl p-5">
-              <div className="text-sm font-semibold">Not assessed yet</div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Run the committee: web research, four readiness assessors, calibrated scoring, matching across investors, grants and partners, and an action plan. Takes about a minute.
+            <div className="card-surface p-6">
+              <div className="text-base font-semibold">Not assessed yet</div>
+              <p className="mt-2 text-[15px] text-muted-foreground">
+                The committee researches the venture, scores four readiness frameworks, matches it across the ecosystem and writes an action plan. About a minute.
               </p>
-              <div className="mt-4"><RunAssessmentButton startupId={s.id} lens={lens} /></div>
+              <div className="mt-5"><RunAssessmentButton startupId={s.id} lens={lens} /></div>
             </div>
           )}
         </div>
@@ -112,8 +114,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/startups/[id]"
 
       {score && (
         <>
-          {/* Readiness */}
-          <Section title="Readiness" sub="Analyst agents per framework, cross-checked by a calibrated model">
+          <Section title="Readiness" sub="Four analyst agents, each cross-checked by a calibrated model.">
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               <ReadinessCard framework="trl" a={a.trl} />
               <ReadinessCard framework="brl" a={a.brl} />
@@ -123,102 +124,100 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/startups/[id]"
           </Section>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <div className="glass rounded-3xl p-5">
-              <h3 className="text-sm font-semibold">Investment readiness · 10 dimensions</h3>
-              {irlDetails?.dimensions && <IrlRadar dimensions={irlDetails.dimensions} />}
-              <div className="grid gap-4 text-xs sm:grid-cols-2">
-                <div>
-                  <div className="mb-1 font-semibold text-impact">Strengths</div>
-                  <ul className="space-y-1 text-ice/80">{irlDetails?.strengths?.slice(0, 4).map((x) => <li key={x}>+ {x}</li>)}</ul>
-                </div>
-                <div>
-                  <div className="mb-1 font-semibold text-risk">Risks</div>
-                  <ul className="space-y-1 text-ice/80">{irlDetails?.risks?.slice(0, 4).map((x) => <li key={x}>− {x}</li>)}</ul>
-                </div>
+            <div className="card-surface p-6">
+              <h3 className="text-lg font-semibold">Investment readiness</h3>
+              <p className="text-sm text-muted-foreground">Ten dimensions, scored 1–5</p>
+              {irl?.dimensions && <IrlRadar dimensions={irl.dimensions} />}
+              <div className="grid gap-6 sm:grid-cols-2">
+                <List title="Strengths" items={irl?.strengths} tone="text-emerald-600" mark="+" />
+                <List title="Risks" items={irl?.risks} tone="text-red-600" mark="−" />
               </div>
-              {irlDetails?.deal_notes && <p className="mt-4 rounded-xl bg-muted/60 p-3 text-xs text-ice/80"><span className="font-semibold text-gold">Check first: </span>{irlDetails.deal_notes}</p>}
+              {irl?.deal_notes && (
+                <p className="mt-5 rounded-xl bg-muted p-4 text-[15px] text-zinc-700"><span className="font-semibold text-foreground">Check first: </span>{irl.deal_notes}</p>
+              )}
             </div>
 
-            <div className="glass rounded-3xl p-5">
-              <h3 className="text-sm font-semibold">Ocean impact · Ocean Impact Navigator</h3>
-              <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-6">
+            <div className="card-surface p-6">
+              <h3 className="text-lg font-semibold">Ocean impact</h3>
+              <p className="text-sm text-muted-foreground">Mapped to the Ocean Impact Navigator</p>
+              <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {(Object.keys(IMPACT_AREAS) as ImpactArea[]).map((k) => {
                   const on = impact?.impact_areas?.includes(k);
                   return (
-                    <div key={k} className={`rounded-xl border p-2 text-center ${on ? "border-impact/50 bg-impact/15" : "border-border opacity-40"}`}>
-                      <div className={`text-lg font-bold ${on ? "text-impact" : ""}`}>{k}</div>
-                      <div className="text-[9px] leading-tight text-muted-foreground">{IMPACT_AREAS[k]}</div>
+                    <div key={k} className={cn("rounded-xl border p-3", on ? "border-emerald-200 bg-emerald-50" : "opacity-50")}>
+                      <div className={cn("text-sm font-semibold", on ? "text-emerald-700" : "text-muted-foreground")}>{k}</div>
+                      <div className="text-sm leading-snug text-zinc-600">{IMPACT_AREAS[k]}</div>
                     </div>
                   );
                 })}
               </div>
-              <div className="mt-4 flex flex-wrap gap-3 text-xs">
-                <span className="rounded-md bg-muted px-2 py-1">Intensity: <b className="capitalize text-impact">{impact?.intensity ?? "–"}</b></span>
-                <span className="rounded-md bg-muted px-2 py-1">Impact–revenue coupling: <b className="text-impact tabular">{impact?.coupling != null ? `${Math.round(impact.coupling * 100)}%` : "–"}</b></span>
+              <div className="mt-5 flex flex-wrap gap-2 text-sm">
+                <Chip>Intensity: <b className="capitalize">{impact?.intensity ?? "–"}</b></Chip>
+                <Chip>Impact grows with revenue: <b className="tabular">{impact?.coupling != null ? `${Math.round(impact.coupling * 100)}%` : "–"}</b></Chip>
               </div>
-              <div className="mt-4 space-y-1.5">
+              <div className="mt-5 space-y-2.5">
                 {impact?.kpis?.slice(0, 5).map((k) => (
-                  <div key={k.code + k.name} className="flex items-start gap-2 text-xs">
-                    <span className="rounded bg-impact/20 px-1.5 py-0.5 font-mono text-[10px] text-impact">{k.code}</span>
-                    <span className="text-ice/85">{k.name}{k.estimate && <span className="text-muted-foreground"> — {k.estimate}</span>}</span>
+                  <div key={k.code + k.name} className="flex items-start gap-3 text-[15px]">
+                    <span className="rounded-md bg-emerald-50 px-2 py-0.5 font-mono text-sm text-emerald-700">{k.code}</span>
+                    <span className="text-zinc-700">{k.name}{k.estimate && <span className="text-muted-foreground"> — {k.estimate}</span>}</span>
                   </div>
                 ))}
               </div>
               {!!impact?.red_flags?.length && (
-                <div className="mt-4 rounded-xl border border-risk/30 bg-risk/10 p-3 text-xs">
-                  <div className="flex items-center gap-1 font-semibold text-risk"><ShieldAlert className="size-3.5" /> Impact-washing checks</div>
-                  <ul className="mt-1 space-y-1 text-ice/80">{impact.red_flags.slice(0, 3).map((x) => <li key={x}>· {x}</li>)}</ul>
+                <div className="mt-5 rounded-xl border border-red-100 bg-red-50/60 p-4">
+                  <div className="flex items-center gap-1.5 text-sm font-semibold text-red-700"><ShieldAlert className="size-4" /> Impact-washing checks</div>
+                  <ul className="mt-1.5 space-y-1 text-sm text-zinc-700">{impact.red_flags.slice(0, 3).map((x) => <li key={x}>· {x}</li>)}</ul>
                 </div>
               )}
             </div>
           </div>
 
-          <Section title="Opportunity constellation" sub="The venture's position in the ecosystem — drag to explore, gold routes are warm intro paths">
+          <Section title="Opportunity map" sub="Where the venture sits in the ecosystem. Gold routes are warm intro paths.">
             <Constellation startupName={s.name} matches={d.matches} connections={d.connections} />
           </Section>
 
-          <Section title="Hidden connections" sub="Warm intro paths, unlocks, consortia and synergies the engine found in the ecosystem graph">
+          <Section title="Hidden connections" sub="Paths and openings found in the ecosystem graph that a manual review would likely miss.">
             <ConnectionsPanel connections={d.connections} />
           </Section>
 
-          <Section title="Next best opportunities" sub={`Ranked for the ${lensInfo.label} lens — every match explains why, and what still blocks it`}>
+          <Section title="Next best opportunities" sub={`Ranked for ${lensInfo.label}. Each match explains why it fits and what still blocks it.`}>
             <Opportunities matches={d.matches} />
           </Section>
 
-          <Section title="Action plan" sub="What the startup and the operator should do next">
+          <Section title="Action plan" sub="What the startup and the operator team should do next.">
             <ActionPlan actions={d.actions} />
           </Section>
 
           {s.profile && (
-            <Section title="Evidence" sub="What the Scout found — every assessment is grounded in these sources">
+            <Section title="Evidence" sub="Everything above is grounded in these findings.">
               <div className="grid gap-6 lg:grid-cols-3">
-                <div className="glass rounded-2xl p-4 text-xs lg:col-span-2">
-                  <ul className="space-y-2">
-                    {s.profile.evidence.slice(0, 12).map((e, i) => (
-                      <li key={i} className="flex gap-2">
-                        <span className="text-tech">•</span>
-                        <span className="text-ice/85">
-                          {e.claim}
-                          {e.source?.startsWith("http") && (
-                            <a href={e.source} target="_blank" rel="noreferrer" className="ml-1 text-muted-foreground hover:text-gold">↗</a>
-                          )}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                <ul className="card-surface space-y-3 p-6 text-[15px] lg:col-span-2">
+                  {s.profile.evidence.slice(0, 12).map((e, i) => (
+                    <li key={i} className="flex gap-3">
+                      <span className="mt-2 size-1.5 shrink-0 rounded-full bg-navy" />
+                      <span className="text-zinc-700">
+                        {e.claim}
+                        {e.source?.startsWith("http") && (
+                          <a href={e.source} target="_blank" rel="noreferrer" className="ml-1.5 text-sm text-navy hover:underline">source</a>
+                        )}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
                 <div className="space-y-4">
                   {!!s.profile.team?.length && (
-                    <div className="glass rounded-2xl p-4 text-xs">
-                      <div className="mb-2 flex items-center gap-1.5 font-semibold"><Users className="size-3.5" /> Team</div>
-                      {s.profile.team.slice(0, 5).map((t) => <div key={t.name} className="text-ice/85">{t.name} <span className="text-muted-foreground">· {t.role}</span></div>)}
+                    <div className="card-surface p-6">
+                      <div className="text-base font-semibold">Team</div>
+                      <ul className="mt-3 space-y-2 text-[15px]">
+                        {s.profile.team.slice(0, 5).map((t) => <li key={t.name}>{t.name} <span className="text-muted-foreground">· {t.role}</span></li>)}
+                      </ul>
                     </div>
                   )}
-                  <div className="glass rounded-2xl p-4 text-xs">
-                    <div className="mb-2 font-semibold">Sources ({s.profile.sources.length})</div>
-                    <ul className="space-y-1">
+                  <div className="card-surface p-6">
+                    <div className="text-base font-semibold">Sources <span className="font-normal text-muted-foreground">{s.profile.sources.length}</span></div>
+                    <ul className="mt-3 space-y-1.5 text-sm">
                       {s.profile.sources.slice(0, 8).map((u) => (
-                        <li key={u} className="truncate"><a href={u} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-gold">{u.replace(/^https?:\/\/(www\.)?/, "")}</a></li>
+                        <li key={u} className="truncate"><a href={u} target="_blank" rel="noreferrer" className="text-navy hover:underline">{u.replace(/^https?:\/\/(www\.)?/, "")}</a></li>
                       ))}
                     </ul>
                   </div>
@@ -232,12 +231,27 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/startups/[id]"
   );
 }
 
+function Chip({ children }: { children: React.ReactNode }) {
+  return <span className="rounded-full border bg-white px-3 py-1 text-zinc-700">{children}</span>;
+}
+
+function List({ title, items, tone, mark }: { title: string; items?: string[]; tone: string; mark: string }) {
+  return (
+    <div>
+      <div className="text-sm font-semibold">{title}</div>
+      <ul className="mt-2 space-y-1.5 text-[15px] text-zinc-700">
+        {items?.slice(0, 4).map((x) => <li key={x} className="flex gap-2"><span className={tone}>{mark}</span>{x}</li>)}
+      </ul>
+    </div>
+  );
+}
+
 function Section({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) {
   return (
-    <section className="space-y-4">
+    <section className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
-        {sub && <p className="text-sm text-muted-foreground">{sub}</p>}
+        <h2 className="text-3xl font-semibold">{title}</h2>
+        {sub && <p className="mt-1.5 text-muted-foreground">{sub}</p>}
       </div>
       {children}
     </section>
@@ -246,10 +260,10 @@ function Section({ title, sub, children }: { title: string; sub?: string; childr
 
 function DossierSkeleton() {
   return (
-    <div className="space-y-6">
-      <Skeleton className="h-32 w-full rounded-3xl" />
-      <div className="grid gap-4 sm:grid-cols-4">{[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-64 rounded-2xl" />)}</div>
-      <Skeleton className="h-96 w-full rounded-3xl" />
+    <div className="space-y-8">
+      <Skeleton className="h-40 w-full rounded-2xl" />
+      <div className="grid gap-4 sm:grid-cols-4">{[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-72 rounded-2xl" />)}</div>
+      <Skeleton className="h-96 w-full rounded-2xl" />
     </div>
   );
 }

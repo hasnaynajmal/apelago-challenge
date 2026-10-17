@@ -1,8 +1,8 @@
 // Thesis "lenses" the operator can view the radar through (ids match the `theses` table).
 export const LENSES = [
-  { id: "redstone-blue", label: "Redstone Blue", kind: "VC lens" },
-  { id: "apelago-accelerator", label: "A'Pelago", kind: "Accelerator lens" },
-  { id: "nordic-climate-generalist", label: "Custom", kind: "Nordic climate thesis" },
+  { id: "redstone-blue", label: "Redstone Blue VC", kind: "VC lens" },
+  { id: "apelago-accelerator", label: "A'Pelago Accelerator", kind: "Accelerator lens" },
+  { id: "nordic-climate-generalist", label: "Custom thesis", kind: "Nordic climate thesis" },
 ] as const;
 
 export type LensId = (typeof LENSES)[number]["id"];
