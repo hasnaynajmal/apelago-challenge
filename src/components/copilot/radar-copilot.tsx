@@ -1,0 +1,223 @@
+"use client";
+
+// Radar Copilot: CopilotKit chat drawer for the dashboard. Shares the page context with the agent, renders the
+// agent's tool calls as cards (agentic UI) and exposes frontend tools to navigate the app.
+import { createContext, Suspense, useContext, useEffect, useState, useSyncExternalStore } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { z } from "zod";
+import {
+  CopilotKit,
+  CopilotSidebar,
+  useAgentContext,
+  useConfigureSuggestions,
+  useFrontendTool,
+  useRenderTool,
+} from "@copilotkit/react-core/v2";
+import "@copilotkit/react-core/v2/styles.css";
+import { LENSES, resolveLens } from "@/lib/lens";
+import {
+  CompareCard,
+  DeadlinesCard,
+  InvestorsCard,
+  OverviewCard,
+  ToolPending,
+  VentureListCard,
+  VentureSnapshotCard,
+} from "./tool-cards";
+
+const OpenContext = createContext<{ open: boolean; setOpen: (v: boolean) => void }>({ open: false, setOpen: () => {} });
+export const useCopilotDrawer = () => useContext(OpenContext);
+const noop = () => () => {};
+
+export function RadarCopilot({ children }: { children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  // ⌘J / Ctrl+J toggles the drawer.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "j") {
+        e.preventDefault();
+        setOpen((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+  // CopilotKit generates ids during render, so it only mounts in the browser, next to (not around) the page.
+  const mounted = useSyncExternalStore(noop, () => true, () => false);
+  return (
+    <OpenContext.Provider value={{ open, setOpen }}>
+      {children}
+      {mounted && (
+        <CopilotKit runtimeUrl="/api/copilotkit" enableInspector={false}>
+          <Suspense>
+            <CopilotBrain />
+          </Suspense>
+          <CopilotSidebar
+          open={open}
+          onOpenChange={setOpen}
+          position="right"
+          width={440}
+          toggleButton={{ className: "hidden" }}
+          labels={{
+            modalHeaderTitle: "Radar Copilot",
+            chatInputPlaceholder: "Ask Radar anything…",
+            welcomeMessageText: "Ask anything about the portfolio, or about the venture you are looking at.",
+            chatDisclaimerText: "Answers come from the radar's data. Check key facts before acting.",
+          }}
+          />
+        </CopilotKit>
+      )}
+    </OpenContext.Provider>
+  );
+}
+
+const parse = <T,>(result: unknown): T | null => {
+  if (result == null) return null;
+  if (typeof result !== "string") return result as T;
+  try {
+    return JSON.parse(result) as T;
+  } catch {
+    return null;
+  }
+};
+
+const anyArgs = z.object({}).passthrough();
+
+/** Context, suggestions, tool renderers and frontend tools. Lives inside the CopilotKit provider. */
+function CopilotBrain() {
+  const pathname = usePathname();
+  const params = useSearchParams();
+  const router = useRouter();
+  const lens = resolveLens(params.get("lens") ?? undefined);
+  const lensLabel = LENSES.find((l) => l.id === lens)!.label;
+  const ventureId = pathname.match(/^\/dashboard\/startups\/([^/]+)/)?.[1] ?? null;
+
+  useAgentContext({
+    description: "App context",
+    value: {
+      lens,
+      evaluatingFor: lensLabel,
+      page: pathname,
+      openVentureId: ventureId,
+      note: ventureId ? `The user is on the venture page of "${ventureId}". "This startup" means this venture.` : "The user is not on a venture page.",
+    },
+  });
+
+  useConfigureSuggestions(
+    {
+      available: "before-first-message",
+      suggestions: ventureId
+        ? [
+            { title: "Summarise this venture", message: "Give me a 3-line summary of this venture and whether we should act now." },
+            { title: "Biggest gaps", message: "What are the biggest gaps holding this venture back, and how can it close them?" },
+            { title: "Who to introduce first", message: "Which investor or partner should we introduce this venture to first, and why?" },
+            { title: "Compare with peers", message: "Compare this venture with the two most similar ventures in the portfolio." },
+          ]
+        : [
+            { title: "Top 5 for our thesis", message: "Which 5 ventures are most promising for our thesis right now?" },
+            { title: "Investment-ready", message: "Which ventures are investment-ready, and what is the next step for each?" },
+            { title: "Deadlines this month", message: "Which funding deadlines close in the next 30 days, and who should apply?" },
+            { title: "Portfolio snapshot", message: "Give me a quick snapshot of the portfolio." },
+          ],
+    },
+    [ventureId],
+  );
+
+  // ---- Agentic UI: backend tool calls rendered as cards ----
+  useRenderTool(
+    {
+      name: "searchVentures",
+      parameters: anyArgs,
+      render: ({ status, result }) => {
+        const r = parse<{ ventures: Parameters<typeof VentureListCard>[0]["ventures"]; total: number; lens: string }>(result);
+        return status !== "complete" || !r ? <ToolPending label="Searching the portfolio…" /> : <VentureListCard title="Ventures" ventures={r.ventures} total={r.total} lens={r.lens} />;
+      },
+    },
+    [],
+  );
+  useRenderTool(
+    {
+      name: "getVenture",
+      parameters: anyArgs,
+      render: ({ status, result }) => {
+        const r = parse<Parameters<typeof VentureSnapshotCard>[0]["v"]>(result);
+        return status !== "complete" || !r ? <ToolPending label="Reading the venture dossier…" /> : <VentureSnapshotCard v={r} />;
+      },
+    },
+    [],
+  );
+  useRenderTool(
+    {
+      name: "compareVentures",
+      parameters: anyArgs,
+      render: ({ status, result }) => {
+        const r = parse<{ ventures: Parameters<typeof CompareCard>[0]["ventures"]; lens: string }>(result);
+        return status !== "complete" || !r ? <ToolPending label="Comparing ventures…" /> : <CompareCard ventures={r.ventures} lens={r.lens} />;
+      },
+    },
+    [],
+  );
+  useRenderTool(
+    {
+      name: "upcomingDeadlines",
+      parameters: anyArgs,
+      render: ({ status, result }) => {
+        const r = parse<{ deadlines: Parameters<typeof DeadlinesCard>[0]["deadlines"]; lens: string }>(result);
+        return status !== "complete" || !r ? <ToolPending label="Checking funding deadlines…" /> : <DeadlinesCard deadlines={r.deadlines} lens={r.lens} />;
+      },
+    },
+    [],
+  );
+  useRenderTool(
+    {
+      name: "findInvestors",
+      parameters: anyArgs,
+      render: ({ status, result }) => {
+        const r = parse<{ investors: Parameters<typeof InvestorsCard>[0]["investors"] }>(result);
+        return status !== "complete" || !r ? <ToolPending label="Searching investors…" /> : <InvestorsCard investors={r.investors} />;
+      },
+    },
+    [],
+  );
+  useRenderTool(
+    {
+      name: "portfolioOverview",
+      parameters: anyArgs,
+      render: ({ status, result }) => {
+        const r = parse<Parameters<typeof OverviewCard>[0]["o"]>(result);
+        return status !== "complete" || !r ? <ToolPending label="Summarising the portfolio…" /> : <OverviewCard o={r} />;
+      },
+    },
+    [],
+  );
+
+  // ---- Frontend tools: the agent can drive the app ----
+  useFrontendTool(
+    {
+      name: "openVenture",
+      description: "Open a venture's page in the app. Use the venture id (e.g. 'kelluu').",
+      parameters: z.object({ ventureId: z.string() }),
+      handler: async ({ ventureId: id }) => {
+        router.push(`/dashboard/startups/${id}?lens=${lens}`);
+        return `Opened ${id}`;
+      },
+    },
+    [lens, router],
+  );
+  useFrontendTool(
+    {
+      name: "switchLens",
+      description: "Switch which thesis the app evaluates for: redstone-blue (VC), apelago-accelerator, or nordic-climate-generalist.",
+      parameters: z.object({ lens: z.enum(["redstone-blue", "apelago-accelerator", "nordic-climate-generalist"]) }),
+      handler: async ({ lens: next }) => {
+        const sp = new URLSearchParams(params.toString());
+        sp.set("lens", next);
+        router.replace(`${pathname}?${sp}`);
+        return `Now evaluating for ${LENSES.find((l) => l.id === next)!.label}`;
+      },
+    },
+    [pathname, params, router],
+  );
+
+  return null;
+}

@@ -266,3 +266,36 @@ User rejected the last polish (commit e9924da):
   underline, navy count badge; `data-active:hover:text-navy` so hover never collides). Verified with puppeteer
   (`scratchpad/pptr/tabs-check.mjs`): computed colours on hover of active/inactive tabs + clipped screenshots.
 - Unused now: `.ring-fill` CSS keyframe (kept; harmless).
+
+## Phase 4 — Radar Copilot (CopilotKit chat drawer) (2026-10-17) — built, chat not yet tested live
+User request: one general chatbot for the whole platform that opens as a drawer, can answer questions about the data,
+knows which venture page you are on, with agentic UI inside.
+Plan:
+- **Backend:** Mastra agent `radarCopilot` (uses `RADAR_MODEL`, Haiku in dev) with read-only Supabase tools:
+  search/filter ventures, venture snapshot, compare ventures, top investors/funding/partners for a venture,
+  upcoming deadlines, portfolio stats. Exposed to CopilotKit v2 through `@ag-ui/mastra` at `/api/copilotkit`.
+- **Frontend:** CopilotKit v2 provider in the dashboard layout; right-side drawer opened from an "Ask Radar" button in
+  the topbar. Page context shared with the agent (current lens, page, and on a venture page that venture's id/name/
+  scores). Context-aware suggestion chips.
+- **Agentic UI:** tool calls render as cards inside the chat (venture list with scores linking to venture pages,
+  readiness snapshot, comparison table, deadline list, investor list) plus frontend tools (open a venture page,
+  switch the "Evaluate for" lens).
+- Cost: each chat message is a paid Haiku call (≈ $0.005–0.02). Building is free; testing needs the user's OK.
+Built:
+- `src/mastra/copilot.ts`: `radarCopilot` agent + 6 read-only tools (searchVentures, getVenture, compareVentures,
+  upcomingDeadlines, findInvestors, portfolioOverview). Tools verified directly against the DB (no LLM).
+  Instructions are dynamic: AG-UI context (`requestContext.get("ag-ui").context`) is appended to the prompt — without
+  this the agent never sees `useAgentContext` values.
+- `src/app/api/copilotkit/[[...slug]]/route.ts`: `CopilotRuntime` + `createCopilotRuntimeHandler` (catch-all; client
+  calls /info, /agent/default/run …). `MastraAgent` from `@ag-ui/mastra` (no Mastra instance or memory needed).
+  Telemetry off (`COPILOTKIT_TELEMETRY_DISABLED`).
+- `package.json` `overrides` dedupe `@ag-ui/client`/`@ag-ui/core` to 1.0.3 (CopilotKit pins 1.0.2 → type clash).
+- `components/copilot/radar-copilot.tsx`: drawer (`CopilotSidebar`, controlled; "Ask Radar" topbar button + Ctrl/⌘J),
+  page context (lens, page, open venture), static per-page suggestion chips (free; dynamic suggestions cost LLM calls),
+  `useRenderTool` cards for every tool, frontend tools `openVenture` / `switchLens`.
+  CopilotKit is mounted client-only (it calls randomUUID during render → Next prerender error otherwise).
+- `components/copilot/tool-cards.tsx`: venture list, venture snapshot, compare table, deadlines, investors, portfolio.
+- `globals.css`: navy theme on `[data-copilotkit]`, smaller welcome text, overlay drawer (body margin neutralised).
+- Also fixed (separate commit): Scout retries when research notes are empty, and never overwrites a profile that has
+  evidence with an empty one. Kelluu's latest re-run hit this (found 9 sources, notes said "searches failed") and
+  lost its good profile — needs one paid re-run to restore.

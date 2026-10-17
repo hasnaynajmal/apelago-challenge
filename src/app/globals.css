@@ -200,3 +200,29 @@
     animation: none;
   }
 }
+
+/* Radar Copilot drawer (CopilotKit v2 ships a prefixed, layered stylesheet; these unlayered rules win). */
+[data-copilotkit] {
+  --primary: #002444;
+  --primary-foreground: #ffffff;
+  --ring: #002444;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+.copilotKitChat h1 {
+  max-width: 19rem;
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--muted-foreground);
+}
+.copilotKitHeader [data-testid="copilot-header-title"] {
+  font-size: 15px;
+  font-weight: 600;
+}
+/* Overlay drawer: don't push the page (CopilotKit sets an inline margin on <body> while open). */
+body {
+  margin-inline-end: 0 !important;
+}
+.copilotKitSidebar[aria-hidden="false"] {
+  box-shadow: -24px 0 48px -12px rgb(0 36 68 / 0.18);
+}
