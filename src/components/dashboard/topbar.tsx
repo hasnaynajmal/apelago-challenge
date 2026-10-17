@@ -13,6 +13,7 @@ const TITLES: [string, string][] = [
   ["/dashboard/investors", "Investors"],
   ["/dashboard/assess", "Assess a startup"],
   ["/dashboard/runs", "Live assessment"],
+  ["/dashboard/guide", "Guide"],
   ["/dashboard", "Overview"],
 ];
 

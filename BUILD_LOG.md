@@ -376,3 +376,12 @@ agents"). Old pipeline events in the DB still say "Committee" (historic rows, no
   assessment run (`after()` on Vercel, maxDuration 300) and a copilot message.
 - Redeploy: `npx vercel deploy --prod` from the repo (or push once the Git integration's production branch is set).
 - Favicon: `src/app/icon.svg` = A'Pelago compass-O (white ring, gold needle, cut from the official logo) on a navy rounded square; `apple-icon.png` 180 px full-bleed for iOS. Default Next favicon.ico removed.
+
+## Guide page (2026-10-17)
+- `/dashboard/guide` (sidebar "Guide", BookOpen icon): shareable plain-language guide — Atlas in one minute (the 5
+  challenge questions, each linked to where it is answered), quick tour cards linking to every page, reading a
+  venture page, the four readiness levels (1–3/4–6/7–9 in plain words), score weights per thesis + the 4 groups,
+  Evaluate for, Deep Panel steps + Second Opinion, hidden connections, Ask Atlas example questions, data & limits,
+  glossary; sticky "On this page" contents. Static page; links keep the current thesis via `LensLink` (client,
+  Suspense fallback to a plain link). Ask Atlas knows about the Guide. Fixed old unescaped-apostrophe lint errors in
+  the sidebar tooltip.

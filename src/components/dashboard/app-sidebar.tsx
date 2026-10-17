@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, CalendarClock, Check, Info, LayoutDashboard, Landmark, Plus, Rows3 } from "lucide-react";
+import { ArrowLeft, BookOpen, CalendarClock, Check, Info, LayoutDashboard, Landmark, Plus, Rows3 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader,
@@ -24,6 +24,7 @@ export function AppSidebar() {
     { href: "/dashboard/ventures", label: "Ventures", icon: Rows3, also: "/dashboard/startups" },
     { href: "/dashboard/deadlines", label: "Deadlines", icon: CalendarClock },
     { href: "/dashboard/investors", label: INVESTOR_FRAMING[lens].ownerId ? "Co-investors" : "Investors", icon: Landmark },
+    { href: "/dashboard/guide", label: "Guide", icon: BookOpen },
   ];
   const active = (n: (typeof NAV)[number]) =>
     n.exact ? pathname === n.href : pathname.startsWith(n.href) || (!!n.also && pathname.startsWith(n.also));
@@ -85,7 +86,7 @@ export function AppSidebar() {
                 </button>
               </TooltipTrigger>
               <TooltipContent side="right" className="max-w-60 text-sm">
-                Whose criteria the ventures are scored against: Redstone's fund thesis, A'Pelago's programme criteria, or a custom thesis.
+                Whose criteria the ventures are scored against: Redstone&apos;s fund thesis, A&apos;Pelago&apos;s programme criteria, or a custom thesis.
               </TooltipContent>
             </Tooltip>
           </SidebarGroupLabel>

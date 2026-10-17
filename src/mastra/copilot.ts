@@ -281,6 +281,7 @@ const PAGES = [
   { page: "Venture page", what: "One startup: score breakdown, readiness levels with reasoning, opportunities (investors, funding, partners), action plan, connections map and deep dive." },
   { page: "Deadlines", what: "Funding calls closing soon and which ventures should apply." },
   { page: "Investors / Co-investors", what: "Which investors are matched most often across the portfolio." },
+  { page: "Guide", what: "A plain-language explanation of the whole platform with links to every page (/dashboard/guide). Share it with new users." },
   { page: "Assess a startup", what: "Add any startup by name or website; the Deep Panel (Atlas's AI agent team) assesses it live in about a minute." },
 ];
 
