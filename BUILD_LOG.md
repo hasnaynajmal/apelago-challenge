@@ -245,3 +245,9 @@ skim for a verdict in ~10–20 s; details are reference material for due diligen
 - Rule: no paid batch/re-run and no switch to Sonnet without the user's explicit OK + cost estimate. Recommend a monthly
   spend limit in the Anthropic Console.
 - 3 runs stuck in `running` since the morning network outage were marked `error` ("Interrupted").
+- Venture page polish: score block re-laid out (ring + "Overall score / for <thesis>" + compact icon Re-run button with
+  tooltip; breakdown bars below with more spacing). Tabs restyled as a prominent segmented bar (white, icons, counts,
+  active tab filled navy; `TAB` class in the page). `RunAssessmentButton` got a `compact` icon variant.
+- Data fix: ventures added via intake now take sectors from the latest research (seed startups keep curated sectors).
+  Clewat's sectors corrected in the DB (pollution_cleanup, water_management); its matches/scores still reflect the old
+  sector until it is re-run (needs the user's OK — costs API).

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { ArrowLeft, CalendarClock, Landmark, ListChecks, ShieldAlert, Target } from "lucide-react";
+import { ArrowLeft, CalendarClock, Landmark, ListChecks, Microscope, Network, Route, ShieldAlert, Target } from "lucide-react";
 import { ActionPlan } from "@/components/dossier/action-plan";
 import { ConnectionsPanel } from "@/components/dossier/connections-panel";
 import { Constellation } from "@/components/dossier/constellation";
@@ -91,23 +91,26 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
         </div>
 
         {score ? (
-          <div className="flex shrink-0 gap-5 lg:w-[400px] lg:border-l lg:pl-6">
-            <div className="flex flex-col items-center gap-2">
+          <div className="shrink-0 space-y-5 lg:w-[340px] lg:border-l lg:pl-8">
+            <div className="flex items-center gap-4">
               <ScoreRing value={score.promise} rank={2} />
-              <span className="text-center text-xs text-muted-foreground">for {lensInfo.label}</span>
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-semibold">Overall score</div>
+                <div className="text-xs text-muted-foreground">for {lensInfo.label}</div>
+              </div>
+              <RunAssessmentButton startupId={s.id} lens={lens} rerun compact />
             </div>
-            <div className="min-w-0 flex-1 space-y-1.5">
+            <div className="space-y-2.5">
               {(["irl", "thesis_fit", "impact", "momentum", "team"] as const).map((k) => {
                 const v = Math.round(Number(breakdown?.[k] ?? 0) * 100);
                 return (
-                  <div key={k} className="flex items-center gap-2 text-xs">
-                    <span className="w-20 text-muted-foreground">{{ irl: "Readiness", thesis_fit: "Thesis fit", impact: "Impact", momentum: "Momentum", team: "Team" }[k]}</span>
+                  <div key={k} className="flex items-center gap-3 text-xs">
+                    <span className="w-20 shrink-0 text-muted-foreground">{{ irl: "Readiness", thesis_fit: "Thesis fit", impact: "Impact", momentum: "Momentum", team: "Team" }[k]}</span>
                     <div className="h-1.5 flex-1 rounded-full bg-muted"><div className="bar-grow h-1.5 rounded-full bg-navy" style={{ width: `${v}%` }} /></div>
-                    <span className="w-7 text-right tabular">{v}</span>
+                    <span className="w-7 text-right font-medium tabular">{v}</span>
                   </div>
                 );
               })}
-              <div className="pt-1.5"><RunAssessmentButton startupId={s.id} lens={lens} rerun /></div>
             </div>
           </div>
         ) : (
@@ -166,11 +169,11 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
 
           {/* Everything else, one tab at a time */}
           <Tabs defaultValue="opportunities" className="w-full">
-            <TabsList variant="line" className="w-full justify-start gap-4 border-b">
-              <TabsTrigger value="opportunities">Opportunities <Count n={counts.investor + counts.funding + counts.partner} /></TabsTrigger>
-              <TabsTrigger value="plan">Action plan <Count n={d.actions.length} /></TabsTrigger>
-              <TabsTrigger value="connections">Connections <Count n={d.connections.length} /></TabsTrigger>
-              <TabsTrigger value="deep">Deep dive</TabsTrigger>
+            <TabsList className="h-auto w-full justify-start gap-1 rounded-xl border bg-white p-1.5 shadow-sm">
+              <TabsTrigger value="opportunities" className={TAB}><Network /> Opportunities <Count n={counts.investor + counts.funding + counts.partner} /></TabsTrigger>
+              <TabsTrigger value="plan" className={TAB}><ListChecks /> Action plan <Count n={d.actions.length} /></TabsTrigger>
+              <TabsTrigger value="connections" className={TAB}><Route /> Connections <Count n={d.connections.length} /></TabsTrigger>
+              <TabsTrigger value="deep" className={TAB}><Microscope /> Deep dive</TabsTrigger>
             </TabsList>
 
             <TabsContent value="opportunities" className="pt-6">
@@ -289,8 +292,11 @@ function Glance({ icon: Icon, label, tone, children }: { icon: React.ComponentTy
   );
 }
 
+// Prominent segmented tabs: active tab is filled navy.
+const TAB = "group/tab h-9 flex-none rounded-lg px-4 text-sm text-zinc-600 hover:bg-muted/60 data-active:bg-navy data-active:text-white data-active:shadow-sm data-active:hover:bg-navy";
+
 function Count({ n }: { n: number }) {
-  return <span className="ml-1 rounded-full bg-muted px-1.5 text-xs text-muted-foreground tabular">{n}</span>;
+  return <span className="ml-0.5 rounded-full bg-muted px-1.5 text-xs text-muted-foreground tabular group-data-active/tab:bg-white/15 group-data-active/tab:text-white">{n}</span>;
 }
 
 function Chip({ children }: { children: React.ReactNode }) {

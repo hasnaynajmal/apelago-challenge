@@ -241,7 +241,8 @@ async function saveProfile(s: Startup, p: ProfileOutput): Promise<Startup> {
     country: s.country ?? p.country,
     city: s.city ?? p.city,
     founded: s.founded ?? p.founded,
-    sectors: s.sectors?.length ? s.sectors : p.sectors,
+    // Seed startups keep their curated sectors; ventures added via intake take the latest research.
+    sectors: s.source === "Live intake" ? (p.sectors.length ? p.sectors : s.sectors) : s.sectors?.length ? s.sectors : p.sectors,
     updated_at: new Date().toISOString(),
   };
   const { data, error } = await supabaseAdmin().from("startups").update(patch).eq("id", s.id).select("*").single();
