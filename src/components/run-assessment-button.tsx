@@ -31,11 +31,11 @@ export function RunAssessmentButton({ startupId, lens, rerun, compact }: { start
     return (
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button onClick={start} disabled={busy} variant="outline" size="icon" className="size-8 shrink-0 rounded-lg" aria-label="Re-run committee">
+          <Button onClick={start} disabled={busy} variant="outline" size="icon" className="size-8 shrink-0 rounded-lg" aria-label="Re-run the Deep Panel">
             {busy ? <Loader2 className="animate-spin" /> : <RotateCw />}
           </Button>
         </TooltipTrigger>
-        <TooltipContent className="text-sm">Re-run the committee (uses the API, ~1 min)</TooltipContent>
+        <TooltipContent className="text-sm">Re-run the Deep Panel (uses the API, ~1 min)</TooltipContent>
       </Tooltip>
     );
   }
@@ -43,7 +43,7 @@ export function RunAssessmentButton({ startupId, lens, rerun, compact }: { start
   return (
     <Button onClick={start} disabled={busy} variant={rerun ? "outline" : "default"} className="rounded-full">
       {busy ? <Loader2 className="animate-spin" /> : rerun ? <RotateCw /> : <Play />}
-      {rerun ? "Re-run committee" : "Run the AI committee"}
+      {rerun ? "Re-run the Deep Panel" : "Run the Deep Panel"}
     </Button>
   );
 }

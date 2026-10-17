@@ -1,4 +1,4 @@
-// Runs the full "investment committee" for one startup and persists results to Supabase.
+// Runs the full Deep Panel (agent team) for one startup and persists results to Supabase.
 // Scout → [TRL, BRL, Ocean Impact, Investment] ∥ Jev calibration → matching → connections → narratives → strategy → scores
 import type { ZodType } from "zod";
 import { supabaseAdmin } from "../supabase/admin";
@@ -87,7 +87,7 @@ export async function runPipeline(startupId: string, opts: PipelineOptions = {})
     const pack = evidencePack(startup, profile);
 
     // 2. Assessors in parallel + calibration
-    await emit({ step: "assess", agent: "Committee", status: "started", message: "TRL, BRL, Ocean Impact and Investment assessors working in parallel" });
+    await emit({ step: "assess", agent: "Deep Panel", status: "started", message: "TRL, BRL, Ocean Impact and Investment assessors working in parallel" });
     const track = <T>(agent: string, p: Promise<T>, msg: (r: T) => string) =>
       p.then(async (r) => { await emit({ step: "assess", agent, status: "progress", message: msg(r) }); return r; });
     const [trl, brl, oirl, inv, jev] = await Promise.all([
@@ -128,7 +128,7 @@ export async function runPipeline(startupId: string, opts: PipelineOptions = {})
     await db.from("assessments").upsert(assessmentRows, { onConflict: "startup_id,framework" });
     const flagged = assessmentRows.filter((r) => r.needs_review).map((r) => r.framework.toUpperCase());
     await emit({
-      step: "assess", agent: "Committee", status: "done",
+      step: "assess", agent: "Deep Panel", status: "done",
       message: `TRL ${trl.level} · BRL ${brl.level} · OIRL ${oirl.level} · IRL ${irl.level}${flagged.length ? ` — ${flagged.join(", ")} flagged for review (Claude vs Jev disagree)` : ""}`,
       payload: { trl: trl.level, brl: brl.level, oirl: oirl.level, irl: irl.level, needs_review: flagged },
     });
@@ -202,7 +202,7 @@ export async function runPipeline(startupId: string, opts: PipelineOptions = {})
     await db.from("pipeline_runs").update({ status: "done", current_step: "done", finished_at: new Date().toISOString() }).eq("id", runId);
     const thesisName = (id: string) => theses.find((t) => t.id === id)?.name ?? id;
     await emit({
-      step: "done", agent: "Committee", status: "done",
+      step: "done", agent: "Deep Panel", status: "done",
       message: `Assessment complete — score ${scoreRows.map((s) => `${Math.round(s.promise)} for ${thesisName(s.thesis_id)}`).join(" · ")}`,
     });
     return { runId, snap, scores: scoreRows };

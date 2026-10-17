@@ -48,7 +48,7 @@ export function Hero({ stats }: { stats: HeroStats }) {
         </h1>
 
         <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-          An AI investment committee scores each venture on technology, business, ocean impact and investment readiness,
+          <span className="font-medium text-foreground">Deep Panel</span>, a team of AI agents, scores each venture on technology, business, ocean impact and investment readiness,
           then maps the warm paths to the funding and partners that move it forward.
         </p>
 

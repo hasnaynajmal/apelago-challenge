@@ -23,7 +23,7 @@ interface EventRow {
 
 const STEPS = [
   { id: "scout", label: "Research", icon: Globe },
-  { id: "assess", label: "Readiness committee", icon: BrainCircuit },
+  { id: "assess", label: "Readiness review", icon: BrainCircuit },
   { id: "match", label: "Matching", icon: Network },
   { id: "connect", label: "Hidden connections", icon: Route },
   { id: "narrate", label: "Match explanations", icon: FileText },
@@ -295,7 +295,7 @@ export function LiveRun({ runId, startupId, startupName, lens }: { runId: string
                 })}
               </AnimatePresence>
               {events.length === 0 && (
-                <li className="flex items-center gap-2 py-2 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" /> Waiting for the committee…</li>
+                <li className="flex items-center gap-2 py-2 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" /> Waiting for the Deep Panel…</li>
               )}
               <div ref={feedEnd} />
             </ul>

@@ -332,3 +332,9 @@ User: the pipeline bar is good, but the page still packs too much data together.
   capped: reasoning 6 lines, top 2 next steps + top 2 missing items, each 2 lines (full text on hover).
 - Prompts shortened for future runs (schemas.ts): rationale max 2 sentences/45 words, gaps & next steps up to 3 short
   items, headline one sentence under 25 words. Existing assessments keep their long text until re-run.
+
+## Agent team name: Deep Panel (2026-10-17)
+User picked **Deep Panel** for the AI agent team (was "AI/agent committee"). Renamed in the landing hero, Assess page,
+live run page ("Readiness committee" step → "Readiness review"; feed agent label "Deep Panel"), run buttons
+("Run the Deep Panel" / "Re-run the Deep Panel"), copilot instructions + platform guide card ("Deep Panel · 6 AI
+agents"). Old pipeline events in the DB still say "Committee" (historic rows, not changed).

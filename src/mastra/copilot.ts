@@ -269,7 +269,7 @@ export const findInvestors = createTool({
 // What the platform is and how it works (for "explain the platform" questions). Counts are live.
 const PIPELINE = [
   { step: "Scout", what: "Researches the startup on the web (site, press, funding, customers) and builds an evidence-backed profile." },
-  { step: "Readiness committee", what: "Four AI assessors score TRL, BRL, Ocean Impact (OIRL) and Investment readiness (IRL) in parallel; a second model (Jev) calibrates each level and flags disagreements for review." },
+  { step: "Readiness review", what: "Four AI assessors score TRL, BRL, Ocean Impact (OIRL) and Investment readiness (IRL) in parallel; a second model (Jev) calibrates each level and flags disagreements for review." },
   { step: "Matchmaker", what: "Ranks every investor, funding programme and partner/client by sector, stage, geography, ticket size and readiness gates." },
   { step: "Connector", what: "Searches the relationship graph for hidden connections: warm intro paths, grant consortia, synergies between ventures and milestones that unlock new matches." },
   { step: "Match Narrator", what: "Writes a short reason for each top match." },
@@ -281,13 +281,13 @@ const PAGES = [
   { page: "Venture page", what: "One startup: score breakdown, readiness levels with reasoning, opportunities (investors, funding, partners), action plan, connections map and deep dive." },
   { page: "Deadlines", what: "Funding calls closing soon and which ventures should apply." },
   { page: "Investors / Co-investors", what: "Which investors are matched most often across the portfolio." },
-  { page: "Assess a startup", what: "Add any startup by name or website; the AI committee assesses it live in about a minute." },
+  { page: "Assess a startup", what: "Add any startup by name or website; the Deep Panel (Atlas's AI agent team) assesses it live in about a minute." },
 ];
 
 export const explainPlatform = createTool({
   id: "explainPlatform",
   description:
-    "Explains A'Pelago Atlas itself (the platform the user is in): what it is for, the questions it answers, how the AI committee works, " +
+    "Explains A'Pelago Atlas itself (the platform the user is in): what it is for, the questions it answers, how the Deep Panel (the AI agent team) works, " +
     "the readiness scales, how scores and groups are calculated, the theses and what each page does. " +
     "Use for 'what is this', 'explain the platform', 'how does it work', 'how is the score calculated'.",
   inputSchema: z.object({ lens: lensInput }),
@@ -377,6 +377,9 @@ How to work:
   2–4 sentences or up to 4 bullets: the insight, why, and one concrete next step. Plain words.
 - If a tool returns nothing, say so in one sentence and suggest the closest useful question. Never speculate.
 - To open a venture page or switch the thesis, call the frontend tools openVenture / switchLens when the user asks.
+
+The team of AI agents that assesses each venture is called the Deep Panel (Scout, readiness assessors with Jev
+calibration, Matchmaker, Connector, Match Narrator, Strategist). Always call it the Deep Panel, never a committee.
 
 Scales: TRL = technology readiness, BRL = business readiness, OIRL = ocean impact readiness, IRL = investment readiness
 (all 1–9). Score = overall promise 0–100 for the chosen thesis. Groups: Investment-ready (fits thesis, mature),

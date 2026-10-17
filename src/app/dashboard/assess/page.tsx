@@ -21,7 +21,7 @@ export default function AssessPage({ searchParams }: PageProps<"/dashboard/asses
       <div>
         <h1 className="text-2xl font-semibold">Assess a startup</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Add a venture by name. The agent committee researches it and scores it for every thesis — about a minute.
+          Add a venture by name. The Deep Panel researches it and scores it for every thesis — about a minute.
         </p>
       </div>
 

@@ -30,7 +30,7 @@ async function Run({ params, searchParams }: Pick<PageProps<"/dashboard/runs/[ru
       <div>
         <h1 className="text-2xl font-semibold">Assessing {name}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          The agent committee researches the venture, scores its readiness, matches it across the ecosystem and writes a plan.
+          The Deep Panel researches the venture, scores its readiness, matches it across the ecosystem and writes a plan.
         </p>
       </div>
       <LiveRun runId={runId} startupId={startupId} startupName={name} lens={lens} />

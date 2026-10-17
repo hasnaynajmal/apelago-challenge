@@ -442,6 +442,7 @@ export function PlatformCard({ g }: { g: PlatformGuide }) {
             </div>
           ))}
         </div>
+        <div className="text-[11px] font-medium text-muted-foreground">Deep Panel · {g.pipeline.length} AI agents</div>
         <ol className="space-y-2">
           {g.pipeline.map((p, i) => (
             <li key={p.step} className="flex gap-2.5">

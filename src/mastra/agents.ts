@@ -1,4 +1,4 @@
-// The A'Pelago Atlas agent team ("investment committee").
+// The A'Pelago Atlas agent team, shown in the app as the "Deep Panel".
 import { Agent } from "@mastra/core/agent";
 import { anthropic } from "@ai-sdk/anthropic";
 import { BRL_LEVELS, IRL_DIMENSION_RUBRIC, OCEAN_KPIS, OIRL_LEVELS, TRL_LEVELS } from "@/lib/frameworks";
