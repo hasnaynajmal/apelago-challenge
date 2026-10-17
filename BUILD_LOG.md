@@ -179,3 +179,6 @@ User: keep the landing page, move pipeline/list into a dashboard with a proper s
 - Redirects in `next.config.ts`: `/startups/:id`, `/runs/:runId`, `/intake` → dashboard routes. Dev badge moved bottom-right.
 - Removed: `lens-switcher.tsx` (replaced by the sidebar), unused Urbanist font.
 - Moving route folders on Windows fails while `next dev` is running (file locks) — stop the server first.
+- Sidebar refinement: "Viewing as" → **"Evaluate for"** with an ⓘ tooltip explaining the thesis; topbar shows
+  "Evaluating for …". Compact, minimal sidebar: 15rem wide, 32px rows, 13px text, 15px icons, plain radio list.
+  (The challenge explicitly asks for fit with an "investment or accelerator thesis".)

@@ -23,8 +23,8 @@ export function DashboardTopbar() {
       <SidebarTrigger className="-ml-1" />
       <span className="h-4 w-px bg-border" />
       <span className="text-[15px] font-medium">{title}</span>
-      <span className="ml-auto rounded-full border bg-white px-3 py-1 text-sm text-muted-foreground">
-        Viewing as <span className="font-medium text-foreground">{lens.label}</span>
+      <span className="ml-auto rounded-full border bg-white px-3 py-1 text-[13px] text-muted-foreground">
+        Evaluating for <span className="font-medium text-foreground">{lens.label}</span>
       </span>
     </header>
   );

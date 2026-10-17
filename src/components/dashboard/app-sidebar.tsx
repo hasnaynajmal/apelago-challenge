@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, CalendarClock, Check, LayoutDashboard, Landmark, Plus, Rows3 } from "lucide-react";
+import { ArrowLeft, CalendarClock, Check, Info, LayoutDashboard, Landmark, Plus, Rows3 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail,
@@ -35,9 +36,9 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b px-3 py-4">
+      <SidebarHeader className="border-b px-3 py-3.5">
         <Link href={withLens("/dashboard")} className="flex items-center gap-2 overflow-hidden px-1">
-          <Image src="/brand/apelago-logo-navy.svg" alt="A'Pelago" width={96} height={15} className="shrink-0 group-data-[collapsible=icon]:hidden" priority />
+          <Image src="/brand/apelago-logo-navy.svg" alt="A'Pelago" width={88} height={14} className="shrink-0 group-data-[collapsible=icon]:hidden" priority />
           <span className="truncate text-sm font-medium text-muted-foreground group-data-[collapsible=icon]:hidden">Radar</span>
         </Link>
       </SidebarHeader>
@@ -47,7 +48,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Assess a startup" className="h-10 bg-navy font-medium text-white hover:bg-navy/90 hover:text-white active:bg-navy active:text-white">
+                <SidebarMenuButton asChild tooltip="Assess a startup" className="h-8 bg-navy text-[13px] font-medium text-white hover:bg-navy/90 hover:text-white active:bg-navy active:text-white">
                   <Link href={withLens("/dashboard/assess")}>
                     <Plus /> <span>Assess a startup</span>
                   </Link>
@@ -63,7 +64,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {NAV.map((n) => (
                 <SidebarMenuItem key={n.href}>
-                  <SidebarMenuButton asChild isActive={active(n)} tooltip={n.label} className="h-10 text-[15px]">
+                  <SidebarMenuButton asChild isActive={active(n)} tooltip={n.label} className="h-8 text-[13px] text-zinc-600 data-[active=true]:font-medium data-[active=true]:text-foreground [&>svg]:size-[15px]">
                     <Link href={withLens(n.href)}>
                       <n.icon /> <span>{n.label}</span>
                     </Link>
@@ -75,23 +76,35 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-          <SidebarGroupLabel>Viewing as</SidebarGroupLabel>
+          <SidebarGroupLabel className="gap-1.5">
+            Evaluate for
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button type="button" aria-label="What does this mean?" className="text-muted-foreground hover:text-foreground">
+                  <Info className="size-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="max-w-60 text-sm">
+                Whose criteria the ventures are scored against: Redstone's fund thesis, A'Pelago's programme criteria, or a custom thesis.
+              </TooltipContent>
+            </Tooltip>
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {LENSES.map((l) => (
                 <button
                   key={l.id}
                   onClick={() => setLens(l.id)}
                   className={cn(
-                    "flex w-full items-center gap-2.5 rounded-lg border px-3 py-2 text-left transition-colors",
-                    lens === l.id ? "border-navy/30 bg-navy-soft" : "border-transparent hover:bg-sidebar-accent",
+                    "flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left transition-colors",
+                    lens === l.id ? "bg-sidebar-accent" : "hover:bg-sidebar-accent/60",
                   )}
                 >
-                  <span className={cn("flex size-4 shrink-0 items-center justify-center rounded-full border", lens === l.id ? "border-navy bg-navy text-white" : "border-zinc-300")}>
-                    {lens === l.id && <Check className="size-2.5" />}
+                  <span className={cn("flex size-3.5 shrink-0 items-center justify-center rounded-full border", lens === l.id ? "border-navy bg-navy text-white" : "border-zinc-300")}>
+                    {lens === l.id && <Check className="size-2" />}
                   </span>
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-medium">{l.label}</span>
+                    <span className={cn("block truncate text-[13px]", lens === l.id ? "font-medium text-foreground" : "text-zinc-600")}>{l.label}</span>
                     <span className="block truncate text-xs text-muted-foreground">{l.kind}</span>
                   </span>
                 </button>
@@ -104,7 +117,7 @@ export function AppSidebar() {
       <SidebarFooter className="border-t">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Back to site">
+            <SidebarMenuButton asChild tooltip="Back to site" className="h-8 text-[13px] text-zinc-600 [&>svg]:size-[15px]">
               <Link href="/">
                 <ArrowLeft /> <span>Back to site</span>
               </Link>
