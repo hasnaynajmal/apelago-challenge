@@ -36,22 +36,22 @@ async function Content({ searchParams }: { searchParams: PageProps<"/dashboard">
     ...deadlines.filter((d) => d.days <= 45).slice(0, 2).map((d) => ({
       kind: "deadline" as const,
       title: `Prepare ${d.name.split(" – ")[0]} applications`,
-      detail: `${d.eligible.length} ventures fit — start with ${d.eligible.slice(0, 2).map((e) => e.name).join(" and ")}`,
+      detail: `${d.eligible.length} ventures fit · start with ${d.eligible[0]?.name ?? "the top match"}`,
       href: `/dashboard/deadlines?lens=${lens}`,
       tag: `${d.days} days left`,
       urgent: d.days <= 21,
     })),
-    ...warm.map((w) => ({
+    ...warm.slice(0, 1).map((w) => ({
       kind: "intro" as const,
       title: `Warm intro for ${w.startupName}`,
       detail: w.hops.join(" → "),
       href: at(w.startupId),
       tag: "Intro",
     })),
-    ...rows.filter((r) => r.nextStep).slice(0, 4).map((r) => ({
+    ...rows.filter((r) => r.nextStep).slice(0, 2).map((r) => ({
       kind: "action" as const,
-      title: `${r.name}: ${r.nextStep!.title}`,
-      detail: r.topInvestor ? `${framing.column}: ${r.topInvestor.name.replace(/\s*\(.*\)$/, "")}` : "Open the venture for details",
+      title: r.nextStep!.title,
+      detail: r.name,
       href: at(r.id),
       tag: r.nextStep!.owner === "operator" ? "Your team" : "Startup",
     })),
@@ -86,8 +86,8 @@ async function Content({ searchParams }: { searchParams: PageProps<"/dashboard">
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         <WeeklyMoves moves={moves} />
         <div className="space-y-6">
-          <DeadlinesPanel deadlines={deadlines.slice(0, 3)} lens={lens} />
-          <InvestorDemandPanel investors={demand} lens={lens} title={framing.demand} sub={framing.demandSub} />
+          <DeadlinesPanel deadlines={deadlines.slice(0, 3)} lens={lens} max={0} />
+          <InvestorDemandPanel investors={demand.slice(0, 4)} lens={lens} title={framing.demand} sub={framing.demandSub} max={0} />
         </div>
       </div>
     </div>

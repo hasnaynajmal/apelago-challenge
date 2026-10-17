@@ -30,7 +30,7 @@ export function DeadlinesPanel({ deadlines, lens, title = "Upcoming deadlines", 
           const date = new Date(d.date);
           const urgent = d.days <= 30;
           return (
-            <li key={d.id} className="flex items-start gap-4 px-5 py-4">
+            <li key={d.id} className={cn("flex items-start gap-4 px-5", max > 0 ? "py-4" : "py-3")}>
               <div className={cn("flex size-12 shrink-0 flex-col items-center justify-center rounded-lg border", urgent && "border-amber-300 bg-amber-50")}>
                 <span className="text-base font-semibold leading-none tabular">{date.getUTCDate()}</span>
                 <span className="mt-0.5 text-[11px] font-medium uppercase text-muted-foreground">{date.toLocaleString("en-GB", { month: "short", timeZone: "UTC" })}</span>
@@ -40,7 +40,7 @@ export function DeadlinesPanel({ deadlines, lens, title = "Upcoming deadlines", 
                 <div className={cn("mt-0.5 text-sm", urgent ? "text-amber-700" : "text-muted-foreground")}>
                   {d.days} days left{d.amount ? ` · up to ${eur(d.amount)}` : ""} · {d.eligible.length} ventures fit
                 </div>
-                {d.eligible.length > 0 && <VentureLinks items={d.eligible} lens={lens} max={max} />}
+                {max > 0 && d.eligible.length > 0 && <VentureLinks items={d.eligible} lens={lens} max={max} />}
               </div>
             </li>
           );
@@ -60,7 +60,7 @@ export function InvestorDemandPanel({ investors, lens, title = "Investors to act
       </div>
       <ul className="divide-y">
         {investors.map((i) => (
-          <li key={i.id} className="px-5 py-3.5">
+          <li key={i.id} className={cn("px-5", max > 0 ? "py-3.5" : "py-3")}>
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-2">
                 <Flag code={i.hq} />
@@ -69,7 +69,7 @@ export function InvestorDemandPanel({ investors, lens, title = "Investors to act
               </div>
               <span className="shrink-0 text-sm text-muted-foreground tabular">{i.ventures.length} ventures</span>
             </div>
-            <VentureLinks items={i.ventures} lens={lens} max={max} />
+            {max > 0 && <VentureLinks items={i.ventures} lens={lens} max={max} />}
           </li>
         ))}
       </ul>

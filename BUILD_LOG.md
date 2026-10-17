@@ -315,3 +315,12 @@ User picked **A'Pelago Atlas** (maps the whole archipelago ecosystem) instead of
 Renamed every user-facing mention: landing header ("A'Pelago | Atlas"), footer, browser title, sidebar, copilot
 ("Ask Atlas" button/drawer, "How does Atlas work?" chip, agent persona "Atlas"), card titles. Internal identifiers
 (`getRadar`, `RadarItem`, `radarCopilot`, the IRL radar chart, the package name) are unchanged on purpose.
+
+## Phase 4b — Overview declutter (2026-10-17) ✅
+User: the pipeline bar is good, but the page still packs too much data together. Plan:
+- Pipeline card: group descriptions shortened to one short line.
+- Top picks: drop the 4 level bars (→ one quiet "TRL 7 · BRL 6 · OIRL 6 · IRL 5" line), headline 2 lines max,
+  remove the next-step line (it is already in "This week's moves"), co-investor as a plain line instead of a grey box.
+- This week's moves: 5 items max (2 deadlines, 1 intro, 2 venture steps), one-line details.
+- Deadlines + investors side panels on the Overview: no venture chips, just counts (chips stay on their own pages).
+- Done as planned; verified with a full-page screenshot. Deadlines/Investors pages keep their venture chips (`max` prop; 0 hides).

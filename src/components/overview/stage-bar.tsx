@@ -4,6 +4,12 @@ import { QUADRANTS } from "@/components/pipeline/quadrants";
 import type { Quadrant } from "@/lib/quadrant";
 
 const ORDER: Quadrant[] = ["invest", "accelerate", "refer", "monitor"];
+const SHORT: Record<Quadrant, string> = {
+  invest: "Fits the thesis, ready for a round",
+  accelerate: "Fits the thesis, still early",
+  refer: "Mature, but outside this thesis",
+  monitor: "Early and off-thesis",
+};
 const PLAIN: Record<Quadrant, string> = {
   invest: "ready for investment",
   accelerate: "to accelerate",
@@ -44,7 +50,7 @@ export function StageBar({ counts, total, lens }: { counts: Record<Quadrant, num
                 <span className="tabular">{counts[q]}</span> {PLAIN[q]}
                 <ChevronRight className="size-3.5 text-zinc-300 transition group-hover:translate-x-0.5 group-hover:text-zinc-500" />
               </span>
-              <span className="block text-xs leading-snug text-muted-foreground">{QUADRANTS[q].hint}</span>
+              <span className="block truncate text-xs text-muted-foreground" title={QUADRANTS[q].hint}>{SHORT[q]}</span>
             </span>
           </Link>
         ))}

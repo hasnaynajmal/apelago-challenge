@@ -38,7 +38,7 @@ export function TopPicks({ rows, lens, investorLabel }: { rows: PipelineRow[]; l
       {rows.map((r, i) => (
         <motion.div key={r.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
           <SpotlightCard theme="light" spotlightColor="rgba(0, 36, 68, 0.35)" style={{ padding: 20, borderRadius: 16, height: "100%" }}>
-            <Link href={`/dashboard/startups/${r.id}?lens=${lens}`} className="flex h-full flex-col">
+            <Link href={`/dashboard/startups/${r.id}?lens=${lens}`} className="group flex h-full flex-col">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
@@ -56,39 +56,26 @@ export function TopPicks({ rows, lens, investorLabel }: { rows: PipelineRow[]; l
                 {r.promise != null && <Score value={r.promise} top={i === 0} />}
               </div>
 
-              <div className="mt-4 grid grid-cols-4 gap-2">
-                {LEVELS.map((l) => {
-                  const v = r.levels[l.k] ?? 0;
-                  return (
-                    <div key={l.k}>
-                      <div className="flex items-baseline justify-between">
-                        <span className="text-[11px] text-muted-foreground">{l.label}</span>
-                        <span className="text-xs font-semibold tabular" style={{ color: l.color }}>{v}</span>
-                      </div>
-                      <div className="mt-1 h-1.5 rounded-full bg-muted">
-                        <div className="bar-grow h-1.5 rounded-full" style={{ background: l.color, width: `${(v / 9) * 100}%`, animationDelay: `${0.2 + i * 0.08}s` }} />
-                      </div>
-                    </div>
-                  );
-                })}
+              {/* Readiness at a glance: one quiet line (full detail lives on the venture page). */}
+              <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                {LEVELS.map((l) => (
+                  <span key={l.k}>
+                    {l.label} <span className="font-semibold tabular" style={{ color: l.color }}>{r.levels[l.k] ?? "–"}</span>
+                  </span>
+                ))}
               </div>
 
-              {r.headline && <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-zinc-600">{r.headline}</p>}
+              {r.headline && <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-zinc-600">{r.headline}</p>}
 
-              <div className="mt-auto space-y-2 pt-4 text-sm">
-                {r.topInvestor && (
-                  <div className="flex items-center justify-between gap-2 rounded-lg bg-muted/70 px-3 py-2">
-                    <span className="text-xs text-muted-foreground">{investorLabel}</span>
-                    <span className="truncate font-medium">{r.topInvestor.name.replace(/\s*\(.*\)$/, "")}</span>
-                  </div>
-                )}
-                {r.nextStep && (
-                  <div className="flex items-start gap-2 text-zinc-700">
-                    <ArrowRight className="mt-0.5 size-3.5 shrink-0 text-navy" />
-                    <span className="line-clamp-2">{r.nextStep.title}</span>
-                  </div>
-                )}
-              </div>
+              {r.topInvestor && (
+                <div className="mt-auto flex items-center justify-between gap-2 pt-4 text-sm">
+                  <span className="text-xs text-muted-foreground">{investorLabel}</span>
+                  <span className="flex items-center gap-1 truncate font-medium">
+                    {r.topInvestor.name.replace(/\s*\(.*\)$/, "")}
+                    <ArrowRight className="size-3.5 shrink-0 text-zinc-300 transition group-hover:translate-x-0.5 group-hover:text-navy" />
+                  </span>
+                </div>
+              )}
             </Link>
           </SpotlightCard>
         </motion.div>
