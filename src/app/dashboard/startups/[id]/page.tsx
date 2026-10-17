@@ -7,7 +7,7 @@ import { ConnectionsPanel } from "@/components/dossier/connections-panel";
 import { Constellation } from "@/components/dossier/constellation";
 import { IrlRadar } from "@/components/dossier/irl-radar";
 import { Opportunities } from "@/components/dossier/opportunities";
-import { ReadinessCard } from "@/components/dossier/readiness-card";
+import { ReadinessGrid } from "@/components/dossier/readiness-card";
 import { CountryLabel } from "@/components/country";
 import { FitText } from "@/components/fit-text";
 import { WebsiteButton } from "@/components/website-button";
@@ -165,12 +165,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
               <h2 className="text-base font-semibold">Readiness</h2>
               <span className="text-xs text-muted-foreground">Each level checked by a calibrated model · open a card for the reasoning</span>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <ReadinessCard framework="trl" a={a.trl} />
-              <ReadinessCard framework="brl" a={a.brl} />
-              <ReadinessCard framework="oirl" a={a.oirl} />
-              <ReadinessCard framework="irl" a={a.irl} />
-            </div>
+            <ReadinessGrid assessments={a} />
           </section>
 
           {/* Everything else, one tab at a time */}

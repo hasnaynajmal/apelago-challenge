@@ -15,8 +15,19 @@ const TONE: Record<Framework, { text: string; hex: string }> = {
   irl: { text: "text-invest", hex: "#a87c12" },
 };
 
-export function ReadinessCard({ framework, a }: { framework: Framework; a?: Assessment }) {
+/** The four readiness cards; "Why this level" opens and closes all of them together so the row stays even. */
+export function ReadinessGrid({ assessments }: { assessments: Partial<Record<Framework, Assessment>> }) {
   const [open, setOpen] = useState(false);
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {(["trl", "brl", "oirl", "irl"] as const).map((f) => (
+        <ReadinessCard key={f} framework={f} a={assessments[f]} open={open} onToggle={() => setOpen(!open)} />
+      ))}
+    </div>
+  );
+}
+
+function ReadinessCard({ framework, a, open, onToggle }: { framework: Framework; a?: Assessment; open: boolean; onToggle: () => void }) {
   const meta = FRAMEWORKS[framework];
   const tone = TONE[framework];
   if (!a) return <div className="card-surface p-5 text-muted-foreground">{meta.label}: not assessed</div>;
@@ -82,7 +93,7 @@ export function ReadinessCard({ framework, a }: { framework: Framework; a?: Asse
         </div>
       </div>
 
-      <p className={cn("mt-4 text-sm leading-relaxed text-zinc-600", !open && "line-clamp-2")}>{a.rationale}</p>
+      <p title={a.rationale ?? undefined} className={cn("mt-4 text-sm leading-relaxed text-zinc-600", open ? "line-clamp-6" : "line-clamp-2")}>{a.rationale}</p>
 
       {open && (
         <div className="mt-4 space-y-4">
@@ -90,8 +101,8 @@ export function ReadinessCard({ framework, a }: { framework: Framework; a?: Asse
             <div>
               <div className="text-sm font-medium">To reach {meta.short} {Math.min(meta.max, a.level + 1)}</div>
               <ul className="mt-1.5 space-y-1.5 text-sm text-zinc-600">
-                {a.next_requirements.slice(0, 4).map((r) => (
-                  <li key={r} className="flex gap-2"><span className={tone.text}>→</span>{r}</li>
+                {a.next_requirements.slice(0, 2).map((r) => (
+                  <li key={r} className="flex gap-2" title={r}><span className={tone.text}>→</span><span className="line-clamp-2">{r}</span></li>
                 ))}
               </ul>
             </div>
@@ -100,13 +111,13 @@ export function ReadinessCard({ framework, a }: { framework: Framework; a?: Asse
             <div>
               <div className="text-sm font-medium">Missing evidence</div>
               <ul className="mt-1.5 space-y-1 text-sm text-muted-foreground">
-                {a.gaps.slice(0, 4).map((g) => <li key={g}>· {g}</li>)}
+                {a.gaps.slice(0, 2).map((g) => <li key={g} title={g} className="line-clamp-2">· {g}</li>)}
               </ul>
             </div>
           )}
         </div>
       )}
-      <button onClick={() => setOpen(!open)} className="mt-auto flex items-center gap-1 pt-4 text-sm font-medium text-navy hover:underline">
+      <button onClick={onToggle} className="mt-auto flex items-center gap-1 pt-4 text-sm font-medium text-navy hover:underline">
         {open ? "Show less" : "Why this level"} <ChevronDown className={cn("size-4 transition", open && "rotate-180")} />
       </button>
     </div>

@@ -40,10 +40,10 @@ export type ProfileOutput = z.infer<typeof profileSchema>;
 const assessmentBase = {
   level: z.number().int().min(1).max(9),
   confidence: z.number().min(0).max(1).describe("How well the evidence supports this level"),
-  rationale: z.string().describe("2-4 sentences: why this level and not the next one"),
+  rationale: z.string().describe("Max 2 short sentences (under 45 words): why this level and not the next one. Plain words, no level definitions."),
   evidence: z.array(evidenceSchema).describe("Facts that determined the level"),
-  gaps: z.array(z.string()).describe("Missing information that would change the assessment"),
-  next_requirements: z.array(z.string()).describe("Concrete things needed to reach the next level"),
+  gaps: z.array(z.string()).describe("Up to 3 short items (under 12 words each): missing information that would change the assessment"),
+  next_requirements: z.array(z.string()).describe("Up to 3 short items (under 15 words each): concrete things needed to reach the next level"),
 };
 
 export const levelAssessmentSchema = z.object(assessmentBase);
@@ -68,7 +68,7 @@ export const investmentAssessmentSchema = z.object({
   strengths: z.array(z.string()).describe("Up to 4"),
   risks: z.array(z.string()).describe("Up to 4"),
   deal_notes: z.string().describe("What an investor should check first"),
-  headline: z.string().describe("One-line investment thesis for this startup"),
+  headline: z.string().describe("One sentence, under 25 words: the investment thesis for this startup"),
 });
 export type InvestmentAssessment = z.infer<typeof investmentAssessmentSchema>;
 

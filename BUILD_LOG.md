@@ -327,3 +327,8 @@ User: the pipeline bar is good, but the page still packs too much data together.
 - Venture header description: replaced "Read more / Show less" (`ExpandableText`, deleted) with `FitText` — the
   summary uses the full left column (no max-width) and as many lines as fit the header's height (set by the score
   column), ending in "…"; full text on hover. Min 3 lines; 4-line fallback on mobile. Checked at 1440/1100/390 px.
+- Venture readiness cards: `ReadinessGrid` owns one open state, so "Why this level" opens/closes all four cards
+  together (previously one card expanded and the row stretched the others into empty boxes). Expanded view is
+  capped: reasoning 6 lines, top 2 next steps + top 2 missing items, each 2 lines (full text on hover).
+- Prompts shortened for future runs (schemas.ts): rationale max 2 sentences/45 words, gaps & next steps up to 3 short
+  items, headline one sentence under 25 words. Existing assessments keep their long text until re-run.
