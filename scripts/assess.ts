@@ -22,15 +22,26 @@ async function main() {
   const worker = async () => {
     for (let id = queue.shift(); id; id = queue.shift()) {
       const t = Date.now();
-      try {
-        await runPipeline(id, {
-          research,
-          onEvent: (e) => console.log(`[${id}] ${e.status.padEnd(8)} ${(e.agent ?? e.step).padEnd(22)} ${e.message}`),
-        });
-        console.log(`[${id}] ✔ ${((Date.now() - t) / 1000).toFixed(0)} s`);
-      } catch (e) {
-        failures.push(id);
-        console.error(`[${id}] ✖ ${(e as Error).message}`);
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          await runPipeline(id, {
+            research,
+            onEvent: (e) => console.log(`[${id}] ${e.status.padEnd(8)} ${(e.agent ?? e.step).padEnd(22)} ${e.message}`),
+          });
+          console.log(`[${id}] ✔ ${((Date.now() - t) / 1000).toFixed(0)} s`);
+          break;
+        } catch (e) {
+          const msg = (e as Error).message;
+          const network = /fetch failed|ENOTFOUND|ECONNRESET|ETIMEDOUT|Cannot connect|overloaded|529|429/i.test(msg);
+          if (network && attempt < 3) {
+            console.warn(`[${id}] network error (attempt ${attempt}), retrying in 15 s: ${msg}`);
+            await new Promise((r) => setTimeout(r, 15_000));
+            continue;
+          }
+          failures.push(id);
+          console.error(`[${id}] ✖ ${msg}`);
+          break;
+        }
       }
     }
   };
