@@ -1,0 +1,59 @@
+[
+  {
+    "id": "redstone-blue",
+    "name": "Redstone Blue",
+    "kind": "vc",
+    "description": "Early-stage blue economy VC (pre-seed to Series A, ~€0.2–2M tickets). Verticals: sustainable maritime & ports, ocean infrastructure & clean energy, marine intelligence, blue biotech & water tech.",
+    "config": {
+      "sectors": ["shipping_ports", "blue_energy", "ocean_observation", "blue_biotech", "water_management"],
+      "adjacent_sectors": ["pollution_cleanup", "aquaculture_fisheries", "circular_materials", "restoration_blue_carbon"],
+      "stages": ["pre_seed", "seed", "series_a"],
+      "geographies": ["FI", "SE", "NO", "DK", "EE", "LV", "LT", "IS", "DE", "PL", "europe"],
+      "ticket_eur": [200000, 2000000],
+      "impact_required": true,
+      "tech_required": true,
+      "weights": { "team": 1.5, "market": 1.25, "product": 1.0, "business_model": 1.0, "tech": 1.0, "impact": 1.25, "competition": 0.75, "go_to_market": 0.75, "financials": 0.75, "deal_dynamics": 0.75 },
+      "promise_weights": { "irl": 0.35, "thesis_fit": 0.25, "impact": 0.2, "momentum": 0.1, "team": 0.1 }
+    }
+  },
+  {
+    "id": "apelago-accelerator",
+    "name": "A'Pelago Accelerator",
+    "kind": "accelerator",
+    "description": "Baltic Sea blue economy accelerator: science-based ventures from research to scale-up, matched to Lab2Impact, Helsinki Blue Economy Studio, NOCA or Northern Blue.",
+    "config": {
+      "sectors": ["aquaculture_fisheries", "blue_biotech", "blue_energy", "ocean_observation", "shipping_ports", "water_management", "pollution_cleanup", "restoration_blue_carbon", "coastal_tourism", "circular_materials", "seafood_alt_protein", "climate_software"],
+      "adjacent_sectors": [],
+      "stages": ["research", "pre_seed", "seed", "series_a", "series_b_plus"],
+      "geographies": ["FI", "SE", "NO", "DK", "EE", "LV", "LT", "DE", "PL", "baltic_sea", "nordics", "europe"],
+      "ticket_eur": null,
+      "impact_required": true,
+      "tech_required": false,
+      "weights": { "team": 1.5, "market": 1.0, "product": 1.0, "business_model": 0.75, "tech": 1.0, "impact": 1.5, "competition": 0.5, "go_to_market": 1.0, "financials": 0.5, "deal_dynamics": 0.25 },
+      "promise_weights": { "irl": 0.2, "thesis_fit": 0.25, "impact": 0.3, "momentum": 0.1, "team": 0.15 },
+      "programmes": {
+        "lab2impact": { "name": "Lab2Impact", "fit": "research-based teams, TRL ≤ 4 or BRL ≤ 2" },
+        "helsinki-studio": { "name": "Helsinki Blue Economy Studio", "fit": "Helsinki-based startups and growth companies seeking corporate partners" },
+        "noca": { "name": "NOCA – Nordic Ocean Accelerator", "fit": "startups/SMEs ready to enter Nordic markets, BRL 4–7" },
+        "northern-blue": { "name": "Northern Blue", "fit": "international scaleups, BRL ≥ 7" }
+      }
+    }
+  },
+  {
+    "id": "nordic-climate-generalist",
+    "name": "Nordic Climate Generalist (custom)",
+    "kind": "custom",
+    "description": "Example custom thesis showing the engine is not blue-economy specific: Nordic climate tech seed fund, software-leaning, no ocean-impact requirement.",
+    "config": {
+      "sectors": ["climate_software", "blue_energy", "circular_materials", "water_management"],
+      "adjacent_sectors": ["shipping_ports"],
+      "stages": ["seed", "series_a"],
+      "geographies": ["FI", "SE", "NO", "DK", "nordics", "europe"],
+      "ticket_eur": [500000, 3000000],
+      "impact_required": false,
+      "tech_required": true,
+      "weights": { "team": 1.5, "market": 1.5, "product": 1.0, "business_model": 1.25, "tech": 0.75, "impact": 0.5, "competition": 1.0, "go_to_market": 1.0, "financials": 1.0, "deal_dynamics": 1.0 },
+      "promise_weights": { "irl": 0.45, "thesis_fit": 0.3, "impact": 0.05, "momentum": 0.1, "team": 0.1 }
+    }
+  }
+]

@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:migrate": "tsx scripts/db-migrate.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "smoke": "tsx scripts/smoke-mastra.ts"
   },
   "dependencies": {
     "@ag-ui/client": "^1.0.3",
