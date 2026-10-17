@@ -67,7 +67,12 @@ export async function runPipeline(startupId: string, opts: PipelineOptions = {})
       await emit({ step: "scout", agent: "Scout", status: "started", message: `Researching ${startup.name} on the web` });
       profile = await scout(startup);
       startup = await saveProfile(startup, profile as ProfileOutput);
-      await emit({ step: "scout", agent: "Scout", status: "done", message: `Profile built from ${profile.sources.length} sources`, payload: { sources: profile.sources.slice(0, 6) } });
+      const found = profile.sources.length;
+      await emit({
+        step: "scout", agent: "Scout", status: "done",
+        message: found ? `Profile built from ${found} sources` : "No public sources found — scores will be conservative. Add the website for a better result.",
+        payload: { sources: profile.sources.slice(0, 6), warning: found ? null : "no_sources" },
+      });
     } else {
       await emit({ step: "scout", agent: "Scout", status: "done", message: "Using stored profile" });
     }
@@ -205,8 +210,17 @@ async function scout(s: Startup): Promise<StartupProfile> {
     s.one_liner && `Known description: ${s.one_liner}`, s.source && `Listed in: ${s.source}`,
     s.known_funding_eur && `Known total funding: €${s.known_funding_eur}`,
   ].filter(Boolean).join("\n");
-  const research = await scoutResearcher.generate(`Research this startup:\n${seed}`);
-  const sources = [...new Set((research.sources ?? []).map((x) => x.payload.url).filter((u): u is string => !!u))];
+  const urlsOf = (r: Awaited<ReturnType<typeof scoutResearcher.generate>>) =>
+    [...new Set((r.sources ?? []).map((x) => x.payload.url).filter((u): u is string => !!u))];
+  let research = await scoutResearcher.generate(`Research this startup:\n${seed}`);
+  let sources = urlsOf(research);
+  if (sources.length === 0) {
+    // The model sometimes answers from memory; insist on searching once more.
+    research = await scoutResearcher.generate(
+      `Use the web_search tool now — search for "${s.name}"${s.country ? ` ${s.country}` : ""} startup, then its website, funding and customers. Do not answer without searching.\n${seed}`,
+    );
+    sources = urlsOf(research);
+  }
   const profile = await structured<ProfileOutput>(
     scoutStructurer,
     `Seed facts:\n${seed}\n\nResearch notes:\n${research.text}\n\nSource URLs found: ${sources.join(", ")}`,

@@ -25,9 +25,10 @@ export const scoutResearcher = new Agent({
   instructions: `You are a venture scout for an ocean/blue-economy fund. Research the given startup on the web.
 Find: what they do, technology, location, founding year, team, customers/pilots, traction, funding rounds and investors,
 current fundraising, impact claims and any measured impact. Prefer the company website, reputable press, EU/Business Finland
-pages and LinkedIn/Crunchbase snippets. Write dense factual notes with a source URL for every fact. Note when a fact is old.`,
+pages and LinkedIn/Crunchbase snippets. Write dense factual notes with a source URL for every fact. Note when a fact is old.
+ALWAYS call web_search at least twice before writing (company name + country, then funding/customers). Never answer from memory.`,
   model: main,
-  defaultOptions: effort(),
+  defaultOptions: effort(EFFORT === "low" ? "medium" : EFFORT), // research needs enough effort to actually use web search
   tools: { web_search: anthropic.tools.webSearch_20260209({ maxUses: 3 }) },
 });
 
