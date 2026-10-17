@@ -299,3 +299,10 @@ Built:
 - Also fixed (separate commit): Scout retries when research notes are empty, and never overwrites a profile that has
   evidence with an empty one. Kelluu's latest re-run hit this (found 9 sources, notes said "searches failed") and
   lost its good profile — needs one paid re-run to restore.
+- Feedback round (user tested "what's the warm path to Redstone Blue" on Oxyle): the agent had no tool for warm paths
+  and searched investors (lens owner is excluded there) → wrong "no warm path" answer. Added `findConnections`
+  (by venture and/or target investor; returns hop paths) + `ConnectionsCard`; `getVenture` now returns connection
+  paths; `findInvestors` explains when the query is the lens owner; instructions route intro/warm-path questions to
+  `findConnections` and keep answers to 2–4 sentences. "Ask Radar" button is now a quiet white pill (no navy/gold).
+  Custom drawer header with **New chat** (remounts the CopilotKit tree) + close. Hidden: the "+" attachment menu
+  (not wired) and CopilotKit's floating bubble.

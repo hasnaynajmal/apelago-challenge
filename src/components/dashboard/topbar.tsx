@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useSearchParams } from "next/navigation";
-import { Sparkles } from "lucide-react";
+import { MessageSquareText } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useCopilotDrawer } from "@/components/copilot/radar-copilot";
 import { LENSES, resolveLens } from "@/lib/lens";
@@ -34,11 +34,11 @@ export function DashboardTopbar() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="ml-auto inline-flex h-8 items-center gap-1.5 rounded-full bg-navy px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-navy/90 sm:ml-0"
+        className="ml-auto inline-flex h-8 items-center gap-2 rounded-full border bg-white px-3 text-[13px] font-medium text-foreground transition-colors hover:border-zinc-300 hover:bg-zinc-50 sm:ml-0"
       >
-        <Sparkles className="size-3.5 text-gold" />
+        <MessageSquareText className="size-3.5 text-navy" />
         Ask Radar
-        <kbd className="ml-1 hidden rounded bg-white/15 px-1 font-sans text-[11px] text-white/80 md:inline">Ctrl J</kbd>
+        <kbd className="hidden rounded border bg-zinc-50 px-1 font-sans text-[11px] text-muted-foreground md:inline">Ctrl J</kbd>
       </button>
     </header>
   );

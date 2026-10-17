@@ -123,7 +123,7 @@ export const getVenture = createTool({
       investors: top("investor"),
       funding: top("funding"),
       partners: top("partner"),
-      connections: d.connections.slice(0, 4).map((c) => ({ kind: c.kind, title: c.title })),
+      connections: d.connections.slice(0, 6).map(connectionRow),
       actions: d.actions.slice(0, 4).map((a) => ({ when: a.horizon, title: a.title, owner: a.owner })),
     };
   },
@@ -145,6 +145,58 @@ export const compareVentures = createTool({
         const r = f && rows.find((x) => x.id === f.id);
         return r ? [ventureRow(r)] : [];
       }),
+    };
+  },
+});
+
+type ConnRow = { startup_id?: string; kind: string; title: string; narrative: string | null; score: number | null; payload: Record<string, unknown> };
+function connectionRow(c: ConnRow) {
+  const hops = (c.payload.hops as { name: string }[] | undefined)?.map((h) => cleanName(h.name)) ?? null;
+  return { kind: c.kind, title: c.title, path: hops, detail: c.narrative?.slice(0, 220) ?? null, strength: c.score == null ? null : round1(c.score) };
+}
+
+export const findConnections = createTool({
+  id: "findConnections",
+  description:
+    "Hidden connections from the relationship graph: warm intro paths to investors, consortia for grant calls, " +
+    "synergies between ventures and milestones that unlock new opportunities. Use for any question about warm paths, " +
+    "intros, 'who can introduce us', 'how do we reach <investor>', consortia or partners. " +
+    "Give a venture for its connections, and/or an investor name to find warm paths into that investor across the portfolio.",
+  inputSchema: z.object({
+    venture: z.string().optional().describe("Venture id or name"),
+    investor: z.string().optional().describe("Investor name, e.g. 'Redstone Blue', 'Katapult'"),
+    kind: z.enum(["warm_path", "consortium", "synergy", "unlock", "deadline"]).optional(),
+  }),
+  execute: async ({ venture, investor, kind }) => {
+    const db = supabaseAdmin();
+    let q = db.from("connections").select("startup_id,kind,title,narrative,score,payload").order("score", { ascending: false });
+    let ventureName: string | null = null;
+    if (venture) {
+      const hit = await resolveVenture(venture);
+      if (!hit) return { error: `No venture called "${venture}" in the radar.`, connections: [] };
+      q = q.eq("startup_id", hit.id);
+      ventureName = hit.name;
+    }
+    if (investor) q = q.eq("kind", "warm_path");
+    else if (kind) q = q.eq("kind", kind);
+    const [{ data }, { data: names }] = await Promise.all([q.limit(200), db.from("startups").select("id,name")]);
+    let rows = (data ?? []) as ConnRow[];
+    if (investor) {
+      const t = investor.toLowerCase();
+      rows = rows.filter((c) => {
+        const hops = (c.payload.hops as { name: string }[] | undefined) ?? [];
+        return hops.at(-1)?.name.toLowerCase().includes(t) || String(c.payload.investor_id ?? "").includes(t.replace(/\s+/g, "-"));
+      });
+    }
+    return {
+      venture: ventureName,
+      investor: investor ?? null,
+      total: rows.length,
+      connections: rows.slice(0, 8).map((c) => ({
+        ...connectionRow(c),
+        ventureId: c.startup_id,
+        ventureName: names?.find((n) => n.id === c.startup_id)?.name ?? c.startup_id,
+      })),
     };
   },
 });
@@ -186,6 +238,8 @@ export const findInvestors = createTool({
     const lens = resolveLens(input.lens);
     const [{ data }, demand] = await Promise.all([supabaseAdmin().from("investors").select("*"), getInvestorDemand(lens, 50)]);
     const owner = INVESTOR_FRAMING[lens].ownerId;
+    const ownerRow = data?.find((i) => i.id === owner);
+    const ownerHit = !!(input.query && ownerRow && ownerRow.name.toLowerCase().includes(input.query.toLowerCase()));
     let rows = (data ?? []).filter((i) => i.id !== owner);
     if (input.query) {
       const q = input.query.toLowerCase();
@@ -197,6 +251,7 @@ export const findInvestors = createTool({
     rows.sort((a, b) => matched(b.id).length - matched(a.id).length);
     return {
       lens,
+      note: ownerHit ? `${cleanName(ownerRow!.name)} is the fund the user evaluates for, so it is not listed as an investor match. Use findConnections for warm paths into it.` : undefined,
       total: rows.length,
       investors: rows.slice(0, input.limit ?? 6).map((i) => ({
         name: cleanName(i.name),
@@ -243,10 +298,12 @@ professionals. Answer questions about the startups, readiness levels, investors,
 
 How to work:
 - Always get facts from the tools; never invent startups, numbers, investors or deadlines.
+- Warm paths, intros, "who can introduce", consortia, synergies → findConnections (pass the venture and/or investor).
 - Use the "lens" (thesis) from the app context in every tool call. Scores and matches depend on it.
 - If the user is on a venture page ("this startup", "it", "here"), use the venture from the app context.
-- The tool results are shown to the user as cards, so do not repeat every number. Give a short answer:
-  1–4 sentences or a few bullets with the insight, the reason and a concrete next step. Use plain words, no jargon dumps.
+- The tool results are shown to the user as cards, so do not repeat what the card shows. Keep answers short:
+  2–4 sentences or up to 4 bullets: the insight, why, and one concrete next step. Plain words.
+- If a tool returns nothing, say so in one sentence and suggest the closest useful question. Never speculate.
 - To open a venture page or switch the thesis, call the frontend tools openVenture / switchLens when the user asks.
 
 Scales: TRL = technology readiness, BRL = business readiness, OIRL = ocean impact readiness, IRL = investment readiness
@@ -262,5 +319,5 @@ export const radarCopilot = new Agent({
     return COPILOT_INSTRUCTIONS + ctx.map((c) => `\n\n## ${c.description}\n${c.value}`).join("");
   },
   model: () => anthropic(MAIN_MODEL),
-  tools: { searchVentures, getVenture, compareVentures, upcomingDeadlines, findInvestors, portfolioOverview },
+  tools: { searchVentures, getVenture, compareVentures, findConnections, upcomingDeadlines, findInvestors, portfolioOverview },
 });

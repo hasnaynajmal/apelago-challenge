@@ -2,7 +2,7 @@
 
 // Agentic UI: how the copilot's tool results look inside the chat. Each card takes the tool's JSON result.
 import Link from "next/link";
-import { ArrowUpRight, CalendarClock, Landmark, Loader2, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowUpRight, CalendarClock, Landmark, Loader2, Route, Sparkles } from "lucide-react";
 import { Flag } from "@/components/country";
 import { cn } from "@/lib/utils";
 
@@ -283,6 +283,7 @@ export interface InvestorItem {
 }
 
 export function InvestorsCard({ investors }: { investors: InvestorItem[] }) {
+  if (!investors.length) return null; // the agent explains why in text
   return (
     <Shell icon={Landmark} title="Investors">
       <ul className="divide-y">
@@ -361,5 +362,60 @@ function VentureListInline({ ventures, lens }: { ventures: VentureRow[]; lens?: 
         </li>
       ))}
     </ul>
+  );
+}
+
+export interface ConnectionItem {
+  kind: string;
+  title: string;
+  path: string[] | null;
+  detail: string | null;
+  ventureId: string;
+  ventureName: string;
+}
+
+const KIND_LABEL: Record<string, string> = {
+  warm_path: "Warm intro path",
+  consortium: "Consortium",
+  synergy: "Synergy",
+  unlock: "Unlock",
+  deadline: "Deadline",
+};
+
+export function ConnectionsCard({ connections, total, lens }: { connections: ConnectionItem[]; total: number; lens?: string }) {
+  if (!connections.length) return null;
+  return (
+    <Shell icon={Route} title={total > connections.length ? `Connections · top ${connections.length} of ${total}` : "Connections"}>
+      <ul className="divide-y">
+        {connections.map((c, i) => (
+          <li key={i} className="space-y-1.5 px-3 py-2.5">
+            <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
+              <span className="font-medium text-gold-ink">{KIND_LABEL[c.kind] ?? c.kind}</span>
+              <Link href={href(c.ventureId, lens)} className="truncate hover:text-navy hover:underline">{c.ventureName}</Link>
+            </div>
+            {c.path ? (
+              <div className="flex flex-wrap items-center gap-1">
+                {c.path.map((h, j) => (
+                  <span key={j} className="flex items-center gap-1">
+                    {j > 0 && <ArrowRight className="size-3 text-muted-foreground" />}
+                    <span
+                      className={cn(
+                        "rounded-md border px-1.5 py-0.5 text-xs",
+                        j === c.path!.length - 1 ? "border-navy/20 bg-navy-soft font-medium text-navy" : "bg-white",
+                      )}
+                    >
+                      {h}
+                    </span>
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm font-medium">{c.title}</div>
+            )}
+            {c.detail && !c.path && <p className="line-clamp-2 text-xs text-muted-foreground">{c.detail}</p>}
+          </li>
+        ))}
+      </ul>
+    </Shell>
   );
 }

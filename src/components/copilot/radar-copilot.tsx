@@ -7,6 +7,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { z } from "zod";
 import {
   CopilotKit,
+  CopilotModalHeader,
   CopilotSidebar,
   useAgentContext,
   useConfigureSuggestions,
@@ -15,8 +16,10 @@ import {
 } from "@copilotkit/react-core/v2";
 import "@copilotkit/react-core/v2/styles.css";
 import { LENSES, resolveLens } from "@/lib/lens";
+import { Plus, X } from "lucide-react";
 import {
   CompareCard,
+  ConnectionsCard,
   DeadlinesCard,
   InvestorsCard,
   OverviewCard,
@@ -25,12 +28,19 @@ import {
   VentureSnapshotCard,
 } from "./tool-cards";
 
-const OpenContext = createContext<{ open: boolean; setOpen: (v: boolean) => void }>({ open: false, setOpen: () => {} });
+const OpenContext = createContext<{ open: boolean; setOpen: (v: boolean) => void; newChat: () => void }>({
+  open: false,
+  setOpen: () => {},
+  newChat: () => {},
+});
 export const useCopilotDrawer = () => useContext(OpenContext);
 const noop = () => () => {};
 
 export function RadarCopilot({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  // Remounting the CopilotKit tree with a new key starts a fresh conversation.
+  const [session, setSession] = useState(0);
+  const newChat = () => setSession((n) => n + 1);
   // ⌘J / Ctrl+J toggles the drawer.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -45,10 +55,10 @@ export function RadarCopilot({ children }: { children: React.ReactNode }) {
   // CopilotKit generates ids during render, so it only mounts in the browser, next to (not around) the page.
   const mounted = useSyncExternalStore(noop, () => true, () => false);
   return (
-    <OpenContext.Provider value={{ open, setOpen }}>
+    <OpenContext.Provider value={{ open, setOpen, newChat }}>
       {children}
       {mounted && (
-        <CopilotKit runtimeUrl="/api/copilotkit" enableInspector={false}>
+        <CopilotKit key={session} runtimeUrl="/api/copilotkit" enableInspector={false}>
           <Suspense>
             <CopilotBrain />
           </Suspense>
@@ -58,6 +68,7 @@ export function RadarCopilot({ children }: { children: React.ReactNode }) {
           position="right"
           width={440}
           toggleButton={{ className: "hidden" }}
+          header={DrawerHeaderSlot}
           labels={{
             modalHeaderTitle: "Radar Copilot",
             chatInputPlaceholder: "Ask Radar anything…",
@@ -70,6 +81,39 @@ export function RadarCopilot({ children }: { children: React.ReactNode }) {
     </OpenContext.Provider>
   );
 }
+
+function DrawerHeader() {
+  const { setOpen, newChat } = useCopilotDrawer();
+  return (
+    <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
+      <span className="text-[15px] font-semibold">Radar Copilot</span>
+      <button
+        type="button"
+        onClick={newChat}
+        className="ml-auto inline-flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-[13px] font-medium text-zinc-700 transition-colors hover:bg-zinc-50 hover:text-foreground"
+      >
+        <Plus className="size-3.5" />
+        New chat
+      </button>
+      <button
+        type="button"
+        onClick={() => setOpen(false)}
+        aria-label="Close"
+        className="inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-zinc-100 hover:text-foreground"
+      >
+        <X className="size-4" />
+      </button>
+    </header>
+  );
+}
+
+// The header slot expects CopilotModalHeader's shape (component + static parts).
+const DrawerHeaderSlot = Object.assign(DrawerHeader, {
+  displayName: "DrawerHeader",
+  Title: CopilotModalHeader.Title,
+  CloseButton: CopilotModalHeader.CloseButton,
+  DrawerLauncher: CopilotModalHeader.DrawerLauncher,
+});
 
 const parse = <T,>(result: unknown): T | null => {
   if (result == null) return null;
@@ -156,6 +200,17 @@ function CopilotBrain() {
       },
     },
     [],
+  );
+  useRenderTool(
+    {
+      name: "findConnections",
+      parameters: anyArgs,
+      render: ({ status, result }) => {
+        const r = parse<{ connections: Parameters<typeof ConnectionsCard>[0]["connections"]; total: number }>(result);
+        return status !== "complete" || !r ? <ToolPending label="Tracing the relationship graph…" /> : <ConnectionsCard connections={r.connections} total={r.total} lens={lens} />;
+      },
+    },
+    [lens],
   );
   useRenderTool(
     {

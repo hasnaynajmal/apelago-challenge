@@ -226,3 +226,8 @@ body {
 .copilotKitSidebar[aria-hidden="false"] {
   box-shadow: -24px 0 48px -12px rgb(0 36 68 / 0.18);
 }
+/* Attachments are not wired up: hide CopilotKit's "+" menu. The drawer opens from the topbar, so hide its bubble. */
+[data-testid="copilot-add-menu-button"],
+.copilotKitButton {
+  display: none !important;
+}
