@@ -269,7 +269,7 @@ export const findInvestors = createTool({
 // What the platform is and how it works (for "explain the platform" questions). Counts are live.
 const PIPELINE = [
   { step: "Scout", what: "Researches the startup on the web (site, press, funding, customers) and builds an evidence-backed profile." },
-  { step: "Readiness review", what: "Four AI assessors score TRL, BRL, Ocean Impact (OIRL) and Investment readiness (IRL) in parallel; a second model (Jev) calibrates each level and flags disagreements for review." },
+  { step: "Readiness review", what: "Four AI assessors score TRL, BRL, Ocean Impact (OIRL) and Investment readiness (IRL) in parallel; a separate Second Opinion model double-checks each level and flags disagreements for human review." },
   { step: "Matchmaker", what: "Ranks every investor, funding programme and partner/client by sector, stage, geography, ticket size and readiness gates." },
   { step: "Connector", what: "Searches the relationship graph for hidden connections: warm intro paths, grant consortia, synergies between ventures and milestones that unlock new matches." },
   { step: "Match Narrator", what: "Writes a short reason for each top match." },
@@ -378,8 +378,8 @@ How to work:
 - If a tool returns nothing, say so in one sentence and suggest the closest useful question. Never speculate.
 - To open a venture page or switch the thesis, call the frontend tools openVenture / switchLens when the user asks.
 
-The team of AI agents that assesses each venture is called the Deep Panel (Scout, readiness assessors with Jev
-calibration, Matchmaker, Connector, Match Narrator, Strategist). Always call it the Deep Panel, never a committee.
+The team of AI agents that assesses each venture is called the Deep Panel (Scout, readiness assessors with a Second Opinion
+model, Matchmaker, Connector, Match Narrator, Strategist). Always call it the Deep Panel, never a committee.
 
 Scales: TRL = technology readiness, BRL = business readiness, OIRL = ocean impact readiness, IRL = investment readiness
 (all 1–9). Score = overall promise 0–100 for the chosen thesis. Groups: Investment-ready (fits thesis, mature),

@@ -95,7 +95,7 @@ export async function runPipeline(startupId: string, opts: PipelineOptions = {})
       track("BRL Assessor", structured<LevelAssessment>(brlAssessor, `Assess BRL.\n${pack}`, levelAssessmentSchema), (r) => `BRL ${r.level} (confidence ${r.confidence.toFixed(2)})`),
       track("Ocean Impact Assessor", structured<ImpactAssessment>(impactAssessor, `Assess Ocean Impact Readiness.\n${pack}`, impactAssessmentSchema), (r) => `OIRL ${r.level} · areas ${r.impact_areas.join(", ")}`),
       track("Investment Analyst", structured<InvestmentAssessment>(investmentAnalyst, `Score investment readiness.\n${pack}`, investmentAssessmentSchema), (r) => r.headline),
-      track("Calibrator (Jev)", calibrateReadiness(pack), (r) => (r ? `Calibrated distributions from ${r.model}` : "Jev unavailable — using Claude confidence")),
+      track("Second Opinion", calibrateReadiness(pack), (r) => (r ? "Double-checked every level independently" : "Unavailable — using the assessors' own confidence")),
     ]);
 
     const dims: DimensionScores = Object.fromEntries(Object.entries(inv.dimensions).map(([k, v]) => [k, v.score]));
@@ -129,7 +129,7 @@ export async function runPipeline(startupId: string, opts: PipelineOptions = {})
     const flagged = assessmentRows.filter((r) => r.needs_review).map((r) => r.framework.toUpperCase());
     await emit({
       step: "assess", agent: "Deep Panel", status: "done",
-      message: `TRL ${trl.level} · BRL ${brl.level} · OIRL ${oirl.level} · IRL ${irl.level}${flagged.length ? ` — ${flagged.join(", ")} flagged for review (Claude vs Jev disagree)` : ""}`,
+      message: `TRL ${trl.level} · BRL ${brl.level} · OIRL ${oirl.level} · IRL ${irl.level}${flagged.length ? ` — ${flagged.join(", ")} flagged for review (Second Opinion disagrees)` : ""}`,
       payload: { trl: trl.level, brl: brl.level, oirl: oirl.level, irl: irl.level, needs_review: flagged },
     });
 

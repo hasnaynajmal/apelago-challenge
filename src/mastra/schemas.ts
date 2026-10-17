@@ -80,7 +80,7 @@ export const actionsSchema = z.object({
   actions: z.array(z.object({
     horizon: z.enum(["now", "30d", "90d"]),
     title: z.string().describe("Imperative, max 10 words"),
-    detail: z.string().describe("Concrete how-to with names of investors/programmes/partners"),
+    detail: z.string().describe("One sentence: concrete how-to naming the investor/programme/partner"),
     owner: z.enum(["startup", "operator"]),
     unlocks: z.array(z.string()).describe("Opportunities this unlocks"),
     deadline_date: z.string().nullable().describe("YYYY-MM-DD if tied to a deadline"),

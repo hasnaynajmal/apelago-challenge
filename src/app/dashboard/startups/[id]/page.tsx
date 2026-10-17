@@ -163,7 +163,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
           <section className="space-y-4">
             <div className="flex items-baseline justify-between">
               <h2 className="text-base font-semibold">Readiness</h2>
-              <span className="text-xs text-muted-foreground">Each level checked by a calibrated model · open a card for the reasoning</span>
+              <span className="text-xs text-muted-foreground">Every level double-checked by the Second Opinion model · open a card for the reasoning</span>
             </div>
             <ReadinessGrid assessments={a} />
           </section>

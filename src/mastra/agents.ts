@@ -15,9 +15,13 @@ const EFFORT = (process.env.RADAR_EFFORT ?? "low") as Effort;
 const effort = (level: Effort = EFFORT) => ({ providerOptions: { anthropic: { effort: level } } });
 
 const EVIDENCE_RULES = `Rules:
-- Use only the evidence provided. Never invent customers, numbers or investors.
-- If evidence is thin, choose the lower level and lower confidence, and list the gaps.
-- Quote short snippets from the evidence where possible and keep the source.`;
+- Use only the evidence provided. Never invent customers, numbers, partners or investors.
+- Weigh evidence: independent sources (press, grants, customers, registries) > company claims > seed facts. Say which you relied on.
+- Facts older than ~18 months count less; mention it when the latest evidence is old.
+- A level is reached only when its definition is met. If evidence is thin, pick the lower level and lower confidence.
+- Missing public evidence lowers confidence, not automatically the level: use the seed facts when nothing contradicts them.
+- Write for investment professionals: plain, specific words. No level definitions, no filler, no hedging chains.
+- Keep every text field within the length given in the schema.`;
 
 export const scoutResearcher = new Agent({
   id: "scout-researcher",
@@ -26,17 +30,23 @@ export const scoutResearcher = new Agent({
 Find: what they do, technology, location, founding year, team, customers/pilots, traction, funding rounds and investors,
 current fundraising, impact claims and any measured impact. Prefer the company website, reputable press, EU/Business Finland
 pages and LinkedIn/Crunchbase snippets. Write dense factual notes with a source URL for every fact. Note when a fact is old.
+If a search returns pages, summarise what they say — never write that searches failed when results came back.
+Prefer the most recent facts; flag conflicting numbers between sources.
 ALWAYS call web_search at least twice before writing (company name + country, then funding/customers). Never answer from memory.`,
   model: main,
   defaultOptions: effort(EFFORT === "low" ? "medium" : EFFORT), // research needs enough effort to actually use web search
-  tools: { web_search: anthropic.tools.webSearch_20260209({ maxUses: 3 }) },
+  // Classic web search (direct tool calls). The 2026 version runs search inside code execution, which Haiku
+  // often calls with invalid input until the use limit is hit, leaving research empty.
+  tools: { web_search: anthropic.tools.webSearch_20250305({ maxUses: 4 }) },
 });
 
 export const scoutStructurer = new Agent({
   id: "scout-structurer",
   name: "Scout Structurer",
   instructions: `Convert research notes about a startup into a structured profile. ${EVIDENCE_RULES}
-Sectors: choose from the allowed list, most relevant first. Stage: infer from funding history and traction.`,
+Sectors: choose from the allowed list, most relevant first. Stage: infer from funding history and traction.
+Every fact in the profile must come from the notes or seed facts; put the source URL in the evidence list.
+If the notes are thin but source titles/URLs are listed, use what the titles state (e.g. a funding round) as low-confidence evidence.`,
   model: main,
   defaultOptions: effort(),
 });
@@ -48,6 +58,8 @@ export const trlAssessor = new Agent({
 ${TRL_LEVELS.join("\n")}
 Ocean heuristics: tank/harbour test ≈ 5, single at-sea or single-site pilot ≈ 6, full operational field trial ≈ 7,
 certified/class-approved product sold ≈ 8, multiple commercial deployments ≈ 9. Software: MVP 5–6, production users 7–8.
+Judge the core technology only (not the business). A product sold and operating at customers is at least TRL 7
+unless evidence contradicts it.
 ${EVIDENCE_RULES}`,
   model: main,
   defaultOptions: effort(),
@@ -60,6 +72,7 @@ export const brlAssessor = new Agent({
 ${BRL_LEVELS.join("\n")}
 Heuristics: market sizing only ≈ 3; projections ≈ 4; pilots/LOIs/pricing hypotheses ≈ 5; paid pilots/first paying customers ≈ 6;
 recurring revenue with named commercial customers ≈ 7; growth metrics across markets ≈ 8; profitable and scaling ≈ 9.
+Grants and funding rounds are not customers. Distinguish pilots, LOIs and paying customers explicitly.
 ${EVIDENCE_RULES}`,
   model: main,
   defaultOptions: effort(),
@@ -75,6 +88,7 @@ ${OCEAN_KPIS}
 Distinguish operational KPIs (outputs, e.g. "# ships retrofitted") from impact KPIs (outcomes, e.g. "tonnes CO2 avoided").
 Map the startup to impact areas and the most relevant KPIs, estimate impact where evidence allows, rate impact–revenue coupling,
 and flag impact-washing risks (no mechanism, ignored D2 emissions, unproven substitution).
+A clear mechanism without measured outcomes is at most OIRL 3–4; measured, independently verified outcomes are needed above 6.
 ${EVIDENCE_RULES}`,
   model: main,
   defaultOptions: effort(),
@@ -86,6 +100,7 @@ export const investmentAnalyst = new Agent({
   instructions: `You are an early-stage blue-economy VC analyst. Score each investment dimension 1–5 (null if there is no evidence):
 ${Object.entries(IRL_DIMENSION_RUBRIC).map(([k, v]) => `- ${k}: ${v}`).join("\n")}
 Be calibrated: 3 is a solid early-stage startup. Reserve 5 for clear outliers.
+The headline is one sentence an investor would say in a meeting: what it is, the strongest proof point, the main risk.
 ${EVIDENCE_RULES}`,
   model: main,
   defaultOptions: effort(),
@@ -108,7 +123,8 @@ export const strategist = new Agent({
 Each action is concrete, names the specific investor/programme/partner, and explains what it unlocks.
 Prioritise by: hard deadlines, actions that unlock the most opportunities, warm-intro paths, then gaps in readiness.
 Mix startup-owned and operator-owned actions (the operator is the fund/accelerator team making introductions).
-Today's date is provided; respect deadlines.`,
+Today's date is provided; respect deadlines and never schedule past ones.
+Titles are short commands (under 12 words). Details are one sentence. Return at most 6 actions.`,
   model: main,
   defaultOptions: effort(),
 });

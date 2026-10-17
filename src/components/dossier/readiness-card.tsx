@@ -48,7 +48,7 @@ function ReadinessCard({ framework, a, open, onToggle }: { framework: Framework;
               </span>
             </TooltipTrigger>
             <TooltipContent className="max-w-64 text-sm">
-              The calibrated model (Jev) confidently disagrees with the analyst agent{jevLevel ? ` — it estimates ${meta.short} ${jevLevel}` : ""}. A human should confirm.
+              The Second Opinion model disagrees with the assessor{jevLevel ? ` — it estimates ${meta.short} ${jevLevel}` : ""}. A human should confirm.
             </TooltipContent>
           </Tooltip>
         ) : (
@@ -84,7 +84,7 @@ function ReadinessCard({ framework, a, open, onToggle }: { framework: Framework;
                 </TooltipTrigger>
                 <TooltipContent className="text-sm">
                   {meta.short} {lvl}
-                  {dist ? ` · ${Math.round(p * 100)}% calibrated probability` : ""}
+                  {dist ? ` · ${Math.round(p * 100)}% likely (Second Opinion)` : ""}
                   {isLevel ? " · analyst level" : ""}
                 </TooltipContent>
               </Tooltip>

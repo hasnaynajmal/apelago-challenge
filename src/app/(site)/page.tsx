@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 const FEATURES = [
-  { icon: Gauge, title: "Four readiness levels", text: "Technology, business, ocean impact and investment readiness — with evidence and calibrated confidence." },
+  { icon: Gauge, title: "Four readiness levels", text: "Technology, business, ocean impact and investment readiness — with evidence, and a Second Opinion model that double-checks every level." },
   { icon: Network, title: "Ranked opportunities", text: "Co-investors, grants and pilot partners for every venture, each with reasons and blockers." },
   { icon: Route, title: "Hidden connections", text: "Warm intro paths, consortium partners and the one milestone that unlocks the most funding." },
   { icon: CalendarClock, title: "Deadlines that matter", text: "Upcoming calls across the portfolio and exactly which ventures should apply." },

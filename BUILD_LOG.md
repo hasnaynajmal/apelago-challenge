@@ -338,3 +338,17 @@ User picked **Deep Panel** for the AI agent team (was "AI/agent committee"). Ren
 live run page ("Readiness committee" step → "Readiness review"; feed agent label "Deep Panel"), run buttons
 ("Run the Deep Panel" / "Re-run the Deep Panel"), copilot instructions + platform guide card ("Deep Panel · 6 AI
 agents"). Old pipeline events in the DB still say "Committee" (historic rows, not changed).
+
+## Phase 4c — Better prompts, "Second Opinion", research fix, re-assessment (2026-10-17)
+- Prompts (agents.ts/schemas.ts): shared evidence rules (source weighting, staleness, "missing evidence lowers
+  confidence not the level", plain language, stay within schema lengths); TRL judges core tech (sold+operating ≥ 7);
+  BRL separates grants/pilots/LOIs/paying customers; OIRL caps mechanism-only at 3–4; IRL headline = one meeting
+  sentence; Strategist ≤ 6 actions with short titles. Result: rationale ~40 words (was ~80), 3 gaps/steps (was 4–7).
+- **Jev → "Second Opinion"** in all user-facing text (feed agent, review tooltip, readiness subtitle, opportunity
+  likelihood tooltip, landing feature card, copilot guide). Code/DB still use `jev`/`calibrator` internally.
+- **Root cause of empty research (Kelluu/Sulapac/Clewat):** `webSearch_20260209` runs searches via code execution;
+  Haiku sent "Invalid tool input" until "Server tool use limit exceeded" → no results, notes said "searches failed".
+  Scout now uses classic `webSearch_20250305` (direct calls), maxUses 4. Sulapac diagnostic: 0 → 27 sources.
+- Audit: all 25 startups assessed; 22 seed ones have solid Sonnet profiles (4–14 evidence) and were left as is.
+  Re-assessed on Haiku with fresh research: Kelluu (TRL 7 · BRL 6 · score 53), Sulapac (TRL 7 · BRL 5 · 50),
+  Clewat (TRL 6 · BRL 2 · 36). Spend ≈ $0.45 (5 runs + 2 diagnostic research calls).

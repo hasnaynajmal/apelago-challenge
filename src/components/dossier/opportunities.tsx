@@ -92,7 +92,7 @@ function MatchCard({ m, i, roleTags }: { m: MatchView; i: number; roleTags?: boo
                   {Math.round(m.calibratedFit * 100)}% likely
                 </div>
               </TooltipTrigger>
-              <TooltipContent className="text-sm">Calibrated probability (Jev) that this investor would invest in the next 12 months</TooltipContent>
+              <TooltipContent className="text-sm">Second Opinion estimate: how likely this investor is to invest in the next 12 months</TooltipContent>
             </Tooltip>
           )}
         </div>
