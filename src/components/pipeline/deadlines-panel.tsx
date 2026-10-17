@@ -51,12 +51,12 @@ export function DeadlinesPanel({ deadlines, lens }: { deadlines: DeadlineRow[]; 
   );
 }
 
-export function InvestorDemandPanel({ investors, lens }: { investors: InvestorDemand[]; lens: string }) {
+export function InvestorDemandPanel({ investors, lens, title = "Investors to activate", sub = "Most frequent top-3 match across the portfolio" }: { investors: InvestorDemand[]; lens: string; title?: string; sub?: string }) {
   return (
     <div className="card-surface">
       <div className="border-b px-5 py-4">
-        <h3 className="text-base font-semibold">Investors to activate</h3>
-        <p className="text-sm text-muted-foreground">Most frequent top-3 match across the portfolio</p>
+        <h3 className="text-base font-semibold">{title}</h3>
+        <p className="text-sm text-muted-foreground">{sub}</p>
       </div>
       <ul className="divide-y">
         {investors.map((i) => (

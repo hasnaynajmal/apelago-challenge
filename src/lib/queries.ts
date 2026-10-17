@@ -1,6 +1,10 @@
 // Read models for the UI (server-side). Uncached: results change whenever the pipeline runs.
 import { quadrantOf, type Quadrant } from "./quadrant";
 import { supabaseAdmin } from "./supabase/admin";
+import { INVESTOR_FRAMING, type LensId } from "./lens";
+
+// The lens owner (e.g. Redstone under its own VC lens) is never shown as an investor match.
+const ownerOf = (lens: string) => INVESTOR_FRAMING[lens as LensId]?.ownerId ?? null;
 import type { Framework, Sector, Stage } from "./taxonomy";
 import type { Assessment, Funding, Investor, Partner, Startup } from "./types";
 
@@ -131,7 +135,7 @@ export async function getDossier(id: string, lens: string): Promise<Dossier | nu
         reasons: m.reasons, blockers: m.blockers, rationale: m.rationale, calibratedFit: m.calibrated_fit,
         target: lookup[m.target_type as "investor" | "funding" | "partner"].get(m.target_id),
       }))
-      .filter((m) => m.target) as MatchView[],
+      .filter((m) => m.target && !(m.targetType === "investor" && m.targetId === ownerOf(lens))) as MatchView[],
     connections: (connections.data ?? []) as ConnectionView[],
     actions: (actions.data ?? []) as ActionView[],
   };
@@ -154,7 +158,7 @@ export async function getPipeline(lens: string): Promise<PipelineRow[]> {
   const db = supabaseAdmin();
   const [base, matches, actions, investors, funding, partners] = await Promise.all([
     getRadar(lens),
-    db.from("matches").select("startup_id,target_type,target_id,fit").eq("thesis_id", lens).eq("rank", 1),
+    db.from("matches").select("startup_id,target_type,target_id,fit,rank").eq("thesis_id", lens).lte("rank", 2).order("rank"),
     db.from("actions").select("startup_id,title,owner,rank").eq("rank", 1),
     db.from("investors").select("id,name"),
     db.from("funding").select("id,name,deadline_date"),
@@ -164,7 +168,8 @@ export async function getPipeline(lens: string): Promise<PipelineRow[]> {
   return base.map((r) => {
     const levels = [r.levels.trl, r.levels.brl, r.levels.irl].filter((x): x is number => x != null);
     const readiness = levels.length ? levels.reduce((a, b) => a + b, 0) / levels.length : null;
-    const m = (t: string) => matches.data?.find((x) => x.startup_id === r.id && x.target_type === t);
+    const owner = ownerOf(lens);
+    const m = (t: string) => matches.data?.find((x) => x.startup_id === r.id && x.target_type === t && !(t === "investor" && x.target_id === owner));
     const inv = m("investor");
     const fun = m("funding");
     const par = m("partner");
@@ -236,7 +241,7 @@ export async function getInvestorDemand(lens: string, limit = 5): Promise<Invest
     db.from("startups").select("id,name"),
   ]);
   const by = new Map<string, string[]>();
-  for (const r of m ?? []) by.set(r.target_id, [...(by.get(r.target_id) ?? []), r.startup_id]);
+  for (const r of m ?? []) if (r.target_id !== ownerOf(lens)) by.set(r.target_id, [...(by.get(r.target_id) ?? []), r.startup_id]);
   return [...by.entries()]
     .sort((a, b) => b[1].length - a[1].length)
     .slice(0, limit)

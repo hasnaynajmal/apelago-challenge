@@ -12,7 +12,7 @@ import { ReadinessCard } from "@/components/dossier/readiness-card";
 import { LensSwitcher } from "@/components/lens-switcher";
 import { RunAssessmentButton } from "@/components/run-assessment-button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LENSES, PROGRAMMES, resolveLens } from "@/lib/lens";
+import { INVESTOR_FRAMING, LENSES, PROGRAMMES, resolveLens } from "@/lib/lens";
 import { getDossier } from "@/lib/queries";
 import { IMPACT_AREAS, SECTORS, STAGE_LABELS, type ImpactArea, type IrlDimension } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
@@ -35,6 +35,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/startups/[id]"
   if (!d) notFound();
   const { startup: s, assessments: a, score } = d;
   const lensInfo = LENSES.find((l) => l.id === lens)!;
+  const framing = INVESTOR_FRAMING[lens];
   const irl = a.irl?.details as { dimensions?: Record<IrlDimension, { score: number | null; note: string }>; strengths?: string[]; risks?: string[]; deal_notes?: string } | undefined;
   const impact = a.oirl?.details as { impact_areas?: ImpactArea[]; kpis?: { code: string; name: string; estimate: string | null }[]; coupling?: number; intensity?: string; red_flags?: string[] } | undefined;
   const breakdown = score?.breakdown as Record<string, number | string | undefined> | undefined;
@@ -182,7 +183,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/startups/[id]"
           </Section>
 
           <Section title="Next best opportunities" sub={`Ranked for ${lensInfo.label}. Each match explains why it fits and what still blocks it.`}>
-            <Opportunities matches={d.matches} />
+            <Opportunities matches={d.matches} investorLabel={framing.tab} investorSub={framing.sub} roleTags={!!framing.ownerId} />
           </Section>
 
           <Section title="Action plan" sub="What the startup and the operator team should do next.">

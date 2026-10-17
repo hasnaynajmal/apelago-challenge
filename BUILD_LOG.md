@@ -149,3 +149,11 @@ Commits 991eba3, 3ab59ce.
   Realtime feed (costs ~1–2 cents on Haiku — ask user first), (3) Phase 4: CopilotKit copilot sidebar (Mastra radar agent
   with tools over the data + generative UI cards; see `knowledge-base/tech/mastra-copilotkit.md`), (4) `next build` check,
   (5) demo script. Dev server: `npm run dev`; visual QA via headless Chrome screenshots (command in Phase 3b).
+
+## Phase 3e — Lens-aware investor framing (2026-10-17) ✅
+User: "why investment opportunities for Redstone VC — Redstone itself is a VC?" → `INVESTOR_FRAMING` in `src/lib/lens.ts`:
+- Redstone lens: lens owner (`redstone-blue`) is excluded from all investor lists (dossier, pipeline best match,
+  demand panel); investors are framed as **Co-investors & follow-on** with tags *Co-invest now* (same stage, status ready)
+  / *Next round* (later-stage funds). Table column "Best co-investor", panel "Co-investors to activate".
+- A'Pelago lens: "Investors to introduce" / "Best investor intro". Custom lens: generic "Investors".
+- Dev server was restarted with a clean `.next` to fix the user's stale intake form (old "FI" text input).

@@ -7,7 +7,7 @@ import { PipelineTable } from "@/components/pipeline/pipeline-table";
 import { PortfolioMatrix } from "@/components/pipeline/portfolio-matrix";
 import { QUADRANTS } from "@/components/pipeline/quadrants";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LENSES, resolveLens } from "@/lib/lens";
+import { INVESTOR_FRAMING, LENSES, resolveLens } from "@/lib/lens";
 import type { Quadrant } from "@/lib/quadrant";
 import { getDeadlines, getInvestorDemand, getPipeline } from "@/lib/queries";
 import { supabaseAdmin } from "@/lib/supabase/admin";
@@ -64,13 +64,13 @@ async function HomeContent({ searchParams }: { searchParams: PageProps<"/">["sea
           </div>
           <div id="deadlines" className="scroll-mt-20 space-y-6">
             <DeadlinesPanel deadlines={deadlines} lens={lens} />
-            <InvestorDemandPanel investors={demand} lens={lens} />
+            <InvestorDemandPanel investors={demand} lens={lens} title={INVESTOR_FRAMING[lens].demand} sub={INVESTOR_FRAMING[lens].demandSub} />
           </div>
         </div>
 
         <div className="mt-12">
           <h3 className="mb-4 text-xl font-semibold">All ventures</h3>
-          <PipelineTable rows={rows} lens={lens} />
+          <PipelineTable rows={rows} lens={lens} investorColumn={INVESTOR_FRAMING[lens].column} />
         </div>
       </section>
     </>

@@ -18,7 +18,7 @@ const LEVELS = [
   { k: "irl", label: "Invest", cls: "text-invest" },
 ] as const;
 
-export function PipelineTable({ rows, lens }: { rows: PipelineRow[]; lens: string }) {
+export function PipelineTable({ rows, lens, investorColumn = "Best investor match" }: { rows: PipelineRow[]; lens: string; investorColumn?: string }) {
   const router = useRouter();
   const [filter, setFilter] = useState<Quadrant | "all">("all");
   const [query, setQuery] = useState("");
@@ -63,7 +63,7 @@ export function PipelineTable({ rows, lens }: { rows: PipelineRow[]; lens: strin
               <th className="px-4 py-3 font-medium">Venture</th>
               <th className="px-4 py-3 font-medium">Readiness</th>
               <th className="px-4 py-3 text-right font-medium">Score</th>
-              <th className="px-4 py-3 font-medium">Best investor match</th>
+              <th className="px-4 py-3 font-medium">{investorColumn}</th>
               <th className="px-4 py-3 font-medium">Recommended next step</th>
               <th className="w-8" />
             </tr>

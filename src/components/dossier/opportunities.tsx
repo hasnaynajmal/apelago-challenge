@@ -42,7 +42,7 @@ function meta(m: MatchView): { icon: React.ReactNode; line: string; link?: strin
   };
 }
 
-function MatchCard({ m, i }: { m: MatchView; i: number }) {
+function MatchCard({ m, i, roleTags }: { m: MatchView; i: number; roleTags?: boolean }) {
   const info = meta(m);
   const name = (m.target as { name: string }).name;
   const est = (m.target as { confidence?: string | null }).confidence === "est";
@@ -60,7 +60,13 @@ function MatchCard({ m, i }: { m: MatchView; i: number }) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-base font-semibold">{name}</span>
-            <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", STATUS[m.status].cls)}>{STATUS[m.status].label}</span>
+            {roleTags && m.targetType === "investor" ? (
+              <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", m.status === "ready" ? "bg-emerald-50 text-emerald-700" : "bg-sky-50 text-sky-700")}>
+                {m.status === "ready" ? "Co-invest now" : "Next round"}
+              </span>
+            ) : (
+              <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", STATUS[m.status].cls)}>{STATUS[m.status].label}</span>
+            )}
             {(m.target as { is_challenge_partner?: boolean }).is_challenge_partner && (
               <span className="rounded-full bg-gold-soft px-2.5 py-0.5 text-xs font-medium text-gold-ink">Challenge partner</span>
             )}
@@ -107,13 +113,13 @@ function MatchCard({ m, i }: { m: MatchView; i: number }) {
   );
 }
 
-export function Opportunities({ matches }: { matches: MatchView[] }) {
+export function Opportunities({ matches, investorLabel = "Investors", investorSub, roleTags }: { matches: MatchView[]; investorLabel?: string; investorSub?: string; roleTags?: boolean }) {
   const groups = {
     investor: matches.filter((m) => m.targetType === "investor"),
     funding: matches.filter((m) => m.targetType === "funding"),
     partner: matches.filter((m) => m.targetType === "partner"),
   };
-  const labels = { investor: "Investors", funding: "Grants & funding", partner: "Partners & clients" };
+  const labels = { investor: investorLabel, funding: "Grants & funding", partner: "Partners & clients" };
   return (
     <Tabs defaultValue="investor" className="w-full">
       <TabsList className="mb-4 h-11 rounded-full p-1">
@@ -125,7 +131,8 @@ export function Opportunities({ matches }: { matches: MatchView[] }) {
       </TabsList>
       {(Object.keys(groups) as (keyof typeof groups)[]).map((k) => (
         <TabsContent key={k} value={k} className="space-y-3">
-          {groups[k].slice(0, 8).map((m, i) => <MatchCard key={m.targetId} m={m} i={i} />)}
+          {k === "investor" && investorSub && <p className="text-[15px] text-muted-foreground">{investorSub}</p>}
+          {groups[k].slice(0, 8).map((m, i) => <MatchCard key={m.targetId} m={m} i={i} roleTags={roleTags} />)}
           {groups[k].length === 0 && <p className="text-muted-foreground">No matches.</p>}
         </TabsContent>
       ))}
