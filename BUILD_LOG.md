@@ -410,3 +410,4 @@ venture page 656 px wide, Ventures table cut off. Fixes:
   for … · Scores, groups, rankings and matches updated." Ask Atlas's switchLens tool uses the same path.
   Dashboard content padding is smaller on phones (px-4 py-6).
 - README.md written for judges + developers (live links, the 5 questions → where answered, highlights, pipeline diagram, score weights, stack, structure, local setup, env vars, cost, data, limits). .env.example comments updated (Second Opinion, Haiku default).
+- Pushed to GitHub (hasnaynajmal/apelago-challenge): `dev` and `main` both at 11f6ad1 (main fast-forwarded). History checked first: only .env.example tracked, no keys. Vercel Git integration now auto-deploys: push to `main` → production, `dev` → preview.
