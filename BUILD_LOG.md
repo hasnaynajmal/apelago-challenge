@@ -360,3 +360,18 @@ agents"). Old pipeline events in the DB still say "Committee" (historic rows, no
 - Speed: Match Narrator and Strategist now run in parallel (independent); Scout capped at 3 searches and told to stop
   once it has website/funding/customers/traction. Kelluu re-run on stored profile: post-research part 19 s
   (was ~40 s). Expected full fresh run ≈ 40–50 s on Haiku.
+
+## Phase 5 — Production build + Vercel deploy (2026-10-17) ✅
+- `next build` passes (compile, TypeScript, 12 pages + 2 API routes). First attempt failed only on a full E: drive
+  (dev cache `.next/dev` was 2.7 GB); after freeing space it built cleanly. `next start` smoke test: all pages 200.
+- Vercel: CLI login (device flow), project **apelago-atlas** (team "Hasnain Ajmal's projects", Hobby), linked
+  GitHub repo hasnaynajmal/apelago-challenge. **Production URL: https://apelago-atlas.vercel.app**
+- Env vars (production + preview) copied from .env.local without printing: Supabase URL/publishable/secret keys,
+  ANTHROPIC_API_KEY, AI_GATEWAY_API_KEY; models forced to Haiku (RADAR_MODEL/RADAR_FAST_MODEL, RADAR_EFFORT=low),
+  COPILOTKIT_TELEMETRY_DISABLED. SUPABASE_DB_URL stays local (scripts only). Code default model is now Haiku too.
+- `.vercelignore` excludes knowledge-base/, .env*, .mastra/. `vercel link` tried to append `.vercel`/`.env*` to
+  .gitignore (would re-ignore .env.example) → reverted; it also added VERCEL_OIDC_TOKEN to .env.local (harmless).
+- User chose no in-app limits on paid features (Haiku only). Recommended: monthly spend limit in Anthropic Console.
+- Live check: all pages 200 (~1–3 s), real Supabase data, copilot drawer opens. Not yet tested live: a paid
+  assessment run (`after()` on Vercel, maxDuration 300) and a copilot message.
+- Redeploy: `npx vercel deploy --prod` from the repo (or push once the Git integration's production branch is set).
