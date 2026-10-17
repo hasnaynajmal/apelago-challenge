@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, BrainCircuit, Check, CircleAlert, FileText, Globe, Loader2, Network, Route, Sparkles, TriangleAlert } from "lucide-react";
 import { supabaseBrowser } from "@/lib/supabase/browser";
@@ -41,7 +42,10 @@ export function LiveRun({ runId, startupId, startupName, lens }: { runId: string
   const [status, setStatus] = useState<"running" | "done" | "error">("running");
   const [elapsed, setElapsed] = useState(0);
   const [score, setScore] = useState<{ promise: number; fit: number } | null>(null);
+  const [redirectIn, setRedirectIn] = useState<number | null>(null);
+  const router = useRouter();
   const started = useRef<number | null>(null);
+  const sawRunning = useRef(false);
   const feedEnd = useRef<HTMLDivElement>(null);
 
   // Live events: Realtime subscription + polling backfill.
@@ -58,6 +62,7 @@ export function LiveRun({ runId, startupId, startupName, lens }: { runId: string
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "pipeline_events", filter: `run_id=eq.${runId}` }, (p) => add([p.new as EventRow]))
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "pipeline_runs", filter: `id=eq.${runId}` }, (p) => {
         const s = (p.new as { status: string }).status;
+        if (s === "running") sawRunning.current = true;
         if (s === "done" || s === "error") setStatus(s);
       })
       .subscribe();
@@ -69,6 +74,7 @@ export function LiveRun({ runId, startupId, startupName, lens }: { runId: string
       if (!alive) return;
       if (ev) add(ev as EventRow[]);
       if (run?.started_at && started.current == null) started.current = new Date(run.started_at).getTime();
+      if (run?.status === "running") sawRunning.current = true;
       if (run?.status === "done" || run?.status === "error") setStatus(run.status);
     };
     poll();
@@ -86,6 +92,21 @@ export function LiveRun({ runId, startupId, startupName, lens }: { runId: string
     const iv = setInterval(() => started.current && setElapsed(Math.round((Date.now() - started.current) / 1000)), 500);
     return () => clearInterval(iv);
   }, [status]);
+
+  // Run finished while we watched: open the venture page after a short countdown.
+  const venturePath = `/dashboard/startups/${startupId}?lens=${lens}`;
+  useEffect(() => {
+    if (status === "done" && sawRunning.current) setRedirectIn(4);
+  }, [status]);
+  useEffect(() => {
+    if (redirectIn == null) return;
+    if (redirectIn <= 0) {
+      router.push(venturePath);
+      return;
+    }
+    const t = setTimeout(() => setRedirectIn((n) => (n == null ? n : n - 1)), 1000);
+    return () => clearTimeout(t);
+  }, [redirectIn, router, venturePath]);
 
   // Final score once done.
   useEffect(() => {
@@ -138,7 +159,20 @@ export function LiveRun({ runId, startupId, startupName, lens }: { runId: string
               {status === "done" ? `Assessment complete in ${finalSeconds}s` : status === "error" ? "Assessment failed" : current ? `${current.label}…` : "Starting…"}
             </div>
             <div className="text-xs text-muted-foreground">
-              {status === "running" ? `${elapsed}s elapsed · ${doneCount} of ${STEPS.length} steps done` : status === "error" ? error?.message : "All agents have reported back"}
+              {status === "running" ? (
+                `${elapsed}s elapsed · ${doneCount} of ${STEPS.length} steps done`
+              ) : status === "error" ? (
+                error?.message
+              ) : redirectIn != null ? (
+                <>
+                  Opening the venture page in {Math.max(redirectIn, 0)}s ·{" "}
+                  <button type="button" onClick={() => setRedirectIn(null)} className="underline underline-offset-2 hover:text-foreground">
+                    Stay here
+                  </button>
+                </>
+              ) : (
+                "All agents have reported back"
+              )}
             </div>
           </div>
           {status === "done" && (
@@ -153,7 +187,7 @@ export function LiveRun({ runId, startupId, startupName, lens }: { runId: string
                 <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset", QUADRANTS[quadrant].badge)}>{QUADRANTS[quadrant].label}</span>
               )}
               <Button asChild className="rounded-lg">
-                <Link href={`/dashboard/startups/${startupId}?lens=${lens}`}>Open {startupName} <ArrowRight /></Link>
+                <Link href={venturePath}>Open {startupName} <ArrowRight /></Link>
               </Button>
             </div>
           )}
