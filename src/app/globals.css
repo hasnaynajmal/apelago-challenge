@@ -256,3 +256,43 @@ body {
 .lens-progress {
   animation: lens-progress 0.9s ease-in-out infinite;
 }
+/* Ask Atlas chat messages (CopilotKit markup: .copilotKitUserMessage / .copilotKitAssistantMessage). */
+.copilotKitUserMessage {
+  padding-top: 1.25rem !important;
+}
+.copilotKitUserMessage [class*="cpk:bg-muted"] {
+  background: #002444;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.5;
+  border-radius: 16px 16px 4px 16px;
+  padding: 8px 14px;
+}
+.copilotKitAssistantMessage [class*="cpk:prose"] {
+  font-size: 14px;
+  line-height: 1.65;
+  color: #1d2939;
+}
+.copilotKitAssistantMessage [class*="cpk:prose"] p {
+  margin: 0.45em 0;
+}
+.copilotKitAssistantMessage [class*="cpk:prose"] strong {
+  color: #101828;
+  font-weight: 600;
+}
+.copilotKitAssistantMessage [class*="cpk:prose"] ul,
+.copilotKitAssistantMessage [class*="cpk:prose"] ol {
+  margin: 0.4em 0;
+  padding-left: 1.15em;
+}
+.copilotKitAssistantMessage [class*="cpk:prose"] li {
+  margin: 0.2em 0;
+}
+.copilotKitAssistantMessage [class*="cpk:prose"] li::marker {
+  color: #98a2b3;
+}
+.copilotKitAssistantMessage [class*="cpk:prose"] a {
+  color: #002444;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

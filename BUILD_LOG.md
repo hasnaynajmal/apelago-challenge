@@ -452,3 +452,9 @@ Done (all on `ui-v2`; main/dev untouched):
   secondary columns on small screens. Production build passes.
 - Fixes after review: segmented TabsList kept the base `group-data-horizontal/tabs:h-8` (32px) while triggers are 36px → active pill poked out of the track; override with `group-data-horizontal/tabs:h-auto` (main tabs + opportunity sub-tabs). Bell is now a popover (calls closing in 60 days, days left, amount, View all) instead of a plain link; venture page got the search/bell/Ask Atlas row (`PageActions`).
 - Bell → real notifications feed (`components/v2/notifications.tsx`): deadlines ≤60 days, ventures flagged by the Second Opinion (grouped per venture, levels named), assessments finished/failed in the last 7 days; All/Deadlines/Activity tabs; red dots for new; badge = urgent deadlines + activity since last opened (per-browser localStorage). Items link to the venture (or deadlines page for calls).
+- Copilot + component polish: chat cards restyled to v2 (white rounded cards, icon-tile header, initial avatars,
+  dotted group pills, short labels in compare); chat CSS: navy user bubbles, 14px assistant prose with tidy
+  bullets/bold/links; model "Thought for N seconds" rows hidden (`messageView={{ reasoningMessage: "hidden" }}`);
+  answer format: bold one-line answer + ≤3 bullets, <90 words. Readiness tab rebuilt: 2-column cards with icon tile,
+  question, big level, confidence pill, Second Opinion distribution, reasoning, next steps + missing evidence all
+  visible (no toggle).

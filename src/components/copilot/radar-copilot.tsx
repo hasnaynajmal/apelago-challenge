@@ -71,6 +71,8 @@ export function RadarCopilot({ children }: { children: React.ReactNode }) {
           width={440}
           toggleButton={{ className: "hidden" }}
           header={DrawerHeaderSlot}
+          // Hide the model's "Thought for N seconds" rows; answers and cards are what matter here.
+          messageView={{ reasoningMessage: "hidden" }}
           labels={{
             modalHeaderTitle: "Ask Atlas",
             chatInputPlaceholder: "Ask Atlas anything…",

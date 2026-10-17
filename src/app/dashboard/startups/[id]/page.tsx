@@ -202,7 +202,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
           </TabsContent>
 
           <TabsContent value="readiness" className="space-y-3">
-            <p className="text-[13px] text-muted-foreground">Every level is double-checked by the Second Opinion model. Open a card for the reasoning, what is needed next and what evidence is missing.</p>
+            <p className="text-[13px] text-muted-foreground">Every level is double-checked by the Second Opinion model. Hover a bar to see how likely each level is.</p>
             <ReadinessGrid assessments={a} />
           </TabsContent>
 
