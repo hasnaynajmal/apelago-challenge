@@ -112,3 +112,15 @@ User feedback: the dark "glassy" UI was rejected (too stylised, fonts too small)
 - **Visual QA loop:** headless Chrome screenshots →
   `chrome --headless=new --window-size=1440,2400 --virtual-time-budget=8000 --screenshot=out.png http://localhost:3000/...`
 - Recharts radar: `isAnimationActive={false}` (animation didn't render reliably).
+
+## Phase 3c — Pipeline view replaces the radar (2026-10-17) ✅
+User feedback: the polar radar was over-designed and hard to read; the site should be simple to navigate and speak to what
+A'Pelago / Redstone operators need. Commit e1cc694.
+- **Home (`/`)** = hero + **Pipeline**: `components/pipeline/portfolio-matrix.tsx` (2×2: x = readiness = mean(TRL, BRL, IRL),
+  y = thesis fit; thresholds in `src/lib/quadrant.ts`: READY_AT 4.5, FIT_AT 0.75 → Investment-ready / Accelerate /
+  Refer onwards / Monitor, copy in `components/pipeline/quadrants.ts`), quadrant explainer cards, `deadlines-panel.tsx`
+  (funding calls within 120 days + which ventures match), `pipeline-table.tsx` (filters, search, readiness, score,
+  best investor match, recommended next step; row → dossier).
+- Queries: `getPipeline(lens)`, `getDeadlines(lens)` in `src/lib/queries.ts`. `quadrant.ts` is client-safe (no Supabase import).
+- Header nav: Pipeline, Deadlines, "Assess a startup". Old `radar-board.tsx` removed.
+- Intake page compacted to fit a 1440×900 screen.
