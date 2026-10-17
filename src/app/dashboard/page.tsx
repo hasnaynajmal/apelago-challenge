@@ -108,13 +108,13 @@ async function Content({ searchParams }: { searchParams: PageProps<"/dashboard">
       <div className="grid gap-4 xl:grid-cols-3">
         <Panel title="Top ventures" sub="Most promising for this thesis right now" action={<PanelLink href={`/dashboard/ventures?lens=${lens}`} />} className="xl:col-span-2" flush>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] text-left text-[13px]">
+            <table className="w-full text-left text-[13px] sm:min-w-[640px]">
               <thead>
                 <tr className="border-y bg-zinc-50/70 text-xs text-muted-foreground">
                   <th className="px-5 py-2.5 font-medium">Venture</th>
-                  <th className="px-3 py-2.5 font-medium">Group</th>
-                  <th className="px-3 py-2.5 font-medium">Readiness</th>
-                  <th className="px-3 py-2.5 font-medium">{framing.column}</th>
+                  <th className="hidden px-3 py-2.5 font-medium sm:table-cell">Group</th>
+                  <th className="hidden px-3 py-2.5 font-medium md:table-cell">Readiness</th>
+                  <th className="hidden px-3 py-2.5 font-medium lg:table-cell">{framing.column}</th>
                   <th className="px-5 py-2.5 text-right font-medium">Score</th>
                 </tr>
               </thead>
@@ -136,9 +136,9 @@ async function Content({ searchParams }: { searchParams: PageProps<"/dashboard">
                         </span>
                       </Link>
                     </td>
-                    <td className="px-3 py-3"><GroupPill quadrant={r.quadrant} /></td>
-                    <td className="px-3 py-3"><LevelDashes levels={r.levels} /></td>
-                    <td className="max-w-44 truncate px-3 py-3 text-zinc-700">{r.topInvestor ? cleanName(r.topInvestor.name) : "—"}</td>
+                    <td className="hidden px-3 py-3 sm:table-cell"><GroupPill quadrant={r.quadrant} /></td>
+                    <td className="hidden px-3 py-3 md:table-cell"><LevelDashes levels={r.levels} /></td>
+                    <td className="hidden max-w-44 truncate px-3 py-3 text-zinc-700 lg:table-cell">{r.topInvestor ? cleanName(r.topInvestor.name) : "—"}</td>
                     <td className="px-5 py-3 text-right">
                       <span className="text-[15px] font-semibold tabular">{Math.round(r.promise ?? 0)}</span>
                     </td>

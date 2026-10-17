@@ -412,7 +412,7 @@ venture page 656 px wide, Ventures table cut off. Fixes:
 - README.md written for judges + developers (live links, the 5 questions → where answered, highlights, pipeline diagram, score weights, stack, structure, local setup, env vars, cost, data, limits). .env.example comments updated (Second Opinion, Haiku default).
 - Pushed to GitHub (hasnaynajmal/apelago-challenge): `dev` and `main` both at 11f6ad1 (main fast-forwarded). History checked first: only .env.example tracked, no keys. Vercel Git integration now auto-deploys: push to `main` → production, `dev` → preview.
 
-## Phase 6 — UI v2 redesign (branch `ui-v2`, 2026-10-18) — in progress
+## Phase 6 — UI v2 redesign (branch `ui-v2`, 2026-10-18) ✅
 User: one last full UI push on a separate branch (not main/dev), inspired by five reference dashboards (Talab Edu,
 restaurant, "Rp" projects, Nike AI-visibility): fit lots of content but stay clean, clear, never stuffed.
 Plan (design system first, then pages):
@@ -427,3 +427,26 @@ Plan (design system first, then pages):
   plan · Connections · Deep dive) so one section shows at a time.
 - Deadlines (timeline/schedule cards), Investors (leaderboard), Assess + live run, Guide restyled to the system.
 - Keep every feature working: lens transition, Ask Atlas, mobile, auto-open after a run.
+Done (all on `ui-v2`; main/dev untouched):
+- Tokens (globals.css): `--color-app` #f3f5f8 canvas, cooler greys (#101828 text, #667085 muted, #e7eaef borders),
+  `.card-surface` 18px radius, `.icon-tile`. New `components/v2/primitives.tsx` (Panel, PanelLink, StatCard, TINTS,
+  VentureAvatar initials tile, GroupPill, LevelDashes, ScoreGauge SVG, BarRow) and `components/v2/charts.tsx`
+  (PipelineDonut, ScoreHistogram; Recharts, client-only).
+- Shell: sidebar rewritten (logo, **thesis switcher card** with popover, navy "Assess a startup", Workspace + Help
+  groups incl. Ask Atlas, Deep Panel note, Back to site). Desktop topbar removed; `PageHeader` (title/sub + venture
+  search ⌘K palette, deadlines bell with 30-day count, Ask Atlas) on every page; slim topbar only on phones. Lens
+  progress bar now fixed at the window top.
+- Overview: 4 KPI cards → Pipeline donut · Score distribution · Portfolio readiness (avg levels + computed biggest
+  gap + review count) → Top ventures table + schedule-style deadlines (with biggest grant / eligible ventures) →
+  This week's moves + investors leaderboard.
+- Ventures: segmented group filter + search, spacious table (avatar, group pill, readiness dashes + review flag,
+  score bar, investor fit, next step); phone list kept.
+- Venture page: header card (avatar, meta line, FitText summary, score gauge panel with thesis fit / programme and
+  re-run), segmented pill tabs Overview · Readiness · Opportunities · Action plan · Connections · Deep dive;
+  Overview tab = investment view quote, 4 glance cards, "Why this score" bars, readiness tiles. Opportunity cards:
+  "86% fit" + bar, pill sub-tabs, rationale 3 lines; action-plan details 4 lines (full text on hover).
+- Deadlines: KPI cards + month-grouped timeline with tinted urgency cards. Investors: top-3 podium + leaderboard
+  table. Assess: "What happens when you press Run" 6-step panel. Run page + Guide use the new header/canvas.
+- Fixes found while testing: CommandDialog needs a `<Command>` root inside (crashed on open); popover width used v3
+  arbitrary syntax (`w-[--x]` → `w-(--x)`). Phone pass: every page 390/390; Overview/Investors tables drop
+  secondary columns on small screens. Production build passes.

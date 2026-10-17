@@ -55,13 +55,13 @@ async function Content({ searchParams }: { searchParams: PageProps<"/dashboard/i
           <p className="mt-0.5 text-[13px] text-muted-foreground">{framing.demandSub}</p>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] text-left text-[13px]">
+          <table className="w-full text-left text-[13px] md:min-w-[720px]">
             <thead>
               <tr className="border-y bg-zinc-50/70 text-xs text-muted-foreground">
                 <th className="w-14 py-2.5 pl-5 font-medium">#</th>
                 <th className="py-2.5 pr-3 font-medium">Investor</th>
                 <th className="px-3 py-2.5 font-medium">Matched ventures</th>
-                <th className="px-5 py-2.5 font-medium">Top matches</th>
+                <th className="hidden px-5 py-2.5 font-medium md:table-cell">Top matches</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -78,12 +78,12 @@ async function Content({ searchParams }: { searchParams: PageProps<"/dashboard/i
                   <td className="px-3 py-3.5">
                     <div className="flex items-center gap-2.5">
                       <span className="w-5 font-semibold tabular">{inv.ventures.length}</span>
-                      <span className="h-1.5 w-28 overflow-hidden rounded-full bg-zinc-100">
+                      <span className="hidden h-1.5 w-28 overflow-hidden rounded-full bg-zinc-100 sm:block">
                         <span className="block h-full rounded-full bg-navy" style={{ width: `${(inv.ventures.length / max) * 100}%` }} />
                       </span>
                     </div>
                   </td>
-                  <td className="px-5 py-3.5">
+                  <td className="hidden px-5 py-3.5 md:table-cell">
                     <div className="flex flex-wrap gap-1">
                       {inv.ventures.slice(0, 3).map((v) => (
                         <Link key={v.id} href={at(v.id)} className="rounded-md border bg-white px-1.5 py-0.5 text-xs text-zinc-700 hover:border-navy hover:text-navy">{v.name}</Link>
