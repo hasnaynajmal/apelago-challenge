@@ -450,3 +450,4 @@ Done (all on `ui-v2`; main/dev untouched):
 - Fixes found while testing: CommandDialog needs a `<Command>` root inside (crashed on open); popover width used v3
   arbitrary syntax (`w-[--x]` → `w-(--x)`). Phone pass: every page 390/390; Overview/Investors tables drop
   secondary columns on small screens. Production build passes.
+- Fixes after review: segmented TabsList kept the base `group-data-horizontal/tabs:h-8` (32px) while triggers are 36px → active pill poked out of the track; override with `group-data-horizontal/tabs:h-auto` (main tabs + opportunity sub-tabs). Bell is now a popover (calls closing in 60 days, days left, amount, View all) instead of a plain link; venture page got the search/bell/Ask Atlas row (`PageActions`).

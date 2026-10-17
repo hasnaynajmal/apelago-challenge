@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ArrowLeft, CalendarClock, Gauge, Landmark, LayoutGrid, ListChecks, Microscope, Network, Quote, Route, ShieldAlert, Target, TriangleAlert } from "lucide-react";
+import { PageActions } from "@/components/v2/page-header";
 import { BarRow, GroupPill, LEVEL_META, Panel, ScoreGauge, TINTS, VentureAvatar, type Tint } from "@/components/v2/primitives";
 import { ActionPlan } from "@/components/dossier/action-plan";
 import { ConnectionsPanel } from "@/components/dossier/connections-panel";
@@ -67,9 +68,12 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
 
   return (
     <div className="space-y-5">
-      <Link href={`/dashboard/ventures?lens=${lens}`} className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="size-4" /> All ventures
-      </Link>
+      <div className="flex items-center justify-between gap-3">
+        <Link href={`/dashboard/ventures?lens=${lens}`} className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="size-4" /> All ventures
+        </Link>
+        <div className="flex items-center gap-2"><PageActions /></div>
+      </div>
 
       {/* Header */}
       <section className="card-surface flex flex-col gap-6 p-6 lg:flex-row lg:items-stretch">
@@ -119,7 +123,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
       {score && (
         <Tabs defaultValue="overview" className="w-full gap-5">
           <div className="no-scrollbar -mx-1 overflow-x-auto px-1">
-            <TabsList className="h-auto gap-0.5 rounded-xl bg-zinc-200/60 p-1">
+            <TabsList className="h-auto gap-0.5 rounded-xl bg-zinc-200/60 p-1 group-data-horizontal/tabs:h-auto">
               <TabsTrigger value="overview" className={SEG}><LayoutGrid /> Overview</TabsTrigger>
               <TabsTrigger value="readiness" className={SEG}><Gauge /> Readiness</TabsTrigger>
               <TabsTrigger value="opportunities" className={SEG}><Network /> Opportunities <Count n={counts.investor + counts.funding + counts.partner} /></TabsTrigger>

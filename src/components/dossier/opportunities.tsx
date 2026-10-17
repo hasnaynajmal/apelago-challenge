@@ -124,7 +124,7 @@ export function Opportunities({ matches, investorLabel = "Investors", investorSu
   const [showAll, setShowAll] = useState<Record<string, boolean>>({});
   return (
     <Tabs defaultValue="investor" className="w-full">
-      <TabsList className="no-scrollbar mb-3 h-auto max-w-full justify-start gap-1 overflow-x-auto rounded-none bg-transparent p-0">
+      <TabsList className="no-scrollbar mb-3 h-auto max-w-full justify-start gap-1 overflow-x-auto rounded-none bg-transparent p-0 group-data-horizontal/tabs:h-auto">
         {(Object.keys(groups) as (keyof typeof groups)[]).map((k) => (
           <TabsTrigger key={k} value={k} className="h-8 flex-none rounded-lg border border-transparent px-3 text-[13px] text-zinc-600 hover:text-foreground focus-visible:ring-2 focus-visible:ring-navy/20 data-active:border-zinc-200 data-active:bg-white data-active:text-foreground data-active:shadow-[0_1px_2px_rgb(16_24_40/0.06)]">
             {labels[k]} <span className="ml-1 text-muted-foreground tabular">{groups[k].length}</span>
