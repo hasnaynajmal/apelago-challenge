@@ -69,3 +69,31 @@ Commits 4882a39 → 8969cc4 (no Claude co-author trailers from here on, per user
   Mastra `res.sources` items are chunks: URL at `x.payload.url`.
 - **Next:** Phase 3 — UI: theme (A'Pelago tokens, Urbanist), shadcn + Aceternity/React Bits, Radar home, startup dossier,
   opportunity constellation (React Flow), action plan, live intake with Realtime feed.
+
+## Phase 2b — Cost controls (2026-10-17) ✅
+- All 22 seed startups are assessed and stored (batch hit a network outage; retry loop added to `scripts/assess.ts`).
+- `RADAR_EFFORT` (default `low`) → every agent via `defaultOptions.providerOptions.anthropic.effort`. Verified on the wire
+  with `scripts/smoke-effort.ts`. Dev model now Haiku 5.5 (`RADAR_MODEL=anthropic/claude-haiku-5-5`); switch to
+  `anthropic/claude-sonnet-5-5` + `RADAR_EFFORT=medium` for the demo. Scout capped at 3 web searches.
+- Rule: no paid batch/test runs without the user's OK. Sonnet 5.5 at default (high) effort ≈ $0.25–0.40 per startup with research.
+- `npx tsx scripts/status.ts` shows assessment coverage per startup.
+
+## Phase 3 — UI (2026-10-17) ✅
+Commits ae849ea → b1e34f1.
+- **Theme** `src/app/globals.css`: single dark "deep ocean" theme from A'Pelago tokens (navy #001835/#002444, gold #DFAE32
+  as the only accent, ice #CFDEE8 text), data colours TRL cyan / BRL teal / OIRL green / IRL gold, `.glass`, `.tabular`,
+  `.text-gradient-gold`, radar sweep + blip pulse keyframes. Urbanist via `next/font/local`. shadcn style `radix-nova`;
+  `components.json` registries `@aceternity`, `@react-bits` (none installed yet). Sonner forced to dark (no next-themes).
+- **Shell**: `site-header.tsx` (logo, nav, `lens-switcher.tsx` with motion pill; lens lives in `?lens=` — ids in `src/lib/lens.ts`).
+- **/** Radar home (`components/radar/radar-board.tsx`): polar SVG — angle = primary sector, radius = promise (closer = hotter),
+  size = OIRL, gold pulsing top 3, dashed = not assessed, amber ring = needs review; hover card; linked ranked list; hero stats.
+- **/startups/[id]** dossier: promise + breakdown + programme, 4 readiness cards with Jev probability bars, IRL radar (Recharts),
+  Ocean Impact Navigator panel, React Flow constellation (`dossier/constellation.tsx`), hidden connections, opportunities tabs
+  with reasons/blockers/Jev fit, 3-horizon action plan, evidence & sources, run/re-run button.
+- **/runs/[runId]** live run: Supabase Realtime on `pipeline_events` + `pipeline_runs` with 4 s polling backfill.
+- **/intake**: new venture form → `POST /api/assess` → live run page.
+- **Data access**: `src/lib/queries.ts` (getRadar, getDossier). Pages read `searchParams`/`params` inside `<Suspense>` (Cache
+  Components); call `await connection()` before `Date.now()` in server code.
+- **Not yet verified**: Realtime streaming end-to-end (needs one live paid run), visual QA in a browser.
+- **Next:** Phase 4 — CopilotKit copilot (Mastra radar agent with tools over the data; generative UI cards), polish
+  (Aceternity/React Bits accents, loading states), production build check, demo script.
