@@ -16,7 +16,9 @@ const TITLES: [string, string][] = [
 
 export function DashboardTopbar() {
   const pathname = usePathname();
-  const lens = LENSES.find((l) => l.id === resolveLens(useSearchParams().get("lens") ?? undefined))!;
+  const params = useSearchParams(); // hooks must run unconditionally, never inside callbacks
+  const lensId = resolveLens(params.get("lens") ?? undefined);
+  const lens = LENSES.find((l) => l.id === lensId)!;
   const title = TITLES.find(([p]) => pathname.startsWith(p))?.[1] ?? "Dashboard";
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-white/90 px-4 backdrop-blur-md lg:px-6">

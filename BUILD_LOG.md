@@ -182,3 +182,7 @@ User: keep the landing page, move pipeline/list into a dashboard with a proper s
 - Sidebar refinement: "Viewing as" → **"Evaluate for"** with an ⓘ tooltip explaining the thesis; topbar shows
   "Evaluating for …". Compact, minimal sidebar: 15rem wide, 32px rows, 13px text, 15px icons, plain radio list.
   (The challenge explicitly asks for fit with an "investment or accelerator thesis".)
+- **Bug fixed (thesis switch crashed):** `topbar.tsx` called `useSearchParams()` inside a `.find()` callback → hook count
+  changed per lens ("Rendered more hooks than during the previous render"). Hooks now run at the top level.
+  Regression check: puppeteer-core script (scratchpad) clicks each thesis in headless Chrome and asserts the URL,
+  topbar and table column update — worth turning into a repo test if time allows.
