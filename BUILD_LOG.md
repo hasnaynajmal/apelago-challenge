@@ -124,3 +124,28 @@ A'Pelago / Redstone operators need. Commit e1cc694.
 - Queries: `getPipeline(lens)`, `getDeadlines(lens)` in `src/lib/queries.ts`. `quadrant.ts` is client-safe (no Supabase import).
 - Header nav: Pipeline, Deadlines, "Assess a startup". Old `radar-board.tsx` removed.
 - Intake page compacted to fit a 1440×900 screen.
+
+## Phase 3d — Polish: deadlines, investor demand, flags, intake (2026-10-17) ✅
+Commits 991eba3, 3ab59ce.
+- Deadlines panel: compact 48px date chips (top-aligned), venture chips, natural height.
+- New **Investors to activate** panel (`getInvestorDemand(lens)`): investors most often in ventures' top-3 matches.
+- Matrix: collision-free label placement for the top-3 labelled ventures (tries right/left/below/above).
+- **Countries**: `src/components/country.tsx` (≈45 countries, SVG flags via `country-flag-icons` — Windows can't render
+  flag emoji; `Flag`, `CountryLabel`, `countryName`), `src/components/country-select.tsx` (searchable combobox: shadcn
+  Popover + Command, Nordics & Baltics first). Flags + names used in pipeline table, dossier header, match cards.
+- **Intake** (`/intake`): centred form (name, website, country picker, one-liner), example chips, compact 4-step row
+  ABOVE the form (user: nobody scrolls). `intake-form.tsx` is a controlled client component posting to `/api/assess`.
+- Known issue (open): user's browser showed the OLD intake form (plain "FI" text input) after a transient compile error
+  ("Module not found: promise-score") broke HMR. Fresh headless Chrome renders the new form. Fix = hard refresh /
+  restart dev server (`.next` cache) — see Phase 3e.
+
+## State of the app (end of 2026-10-17 session)
+- Pages: `/` (hero + pipeline matrix + deadlines + investors to activate + pipeline table), `/startups/[id]` (dossier),
+  `/intake` (new venture), `/runs/[runId]` (live committee feed via Supabase Realtime).
+- Data: all 22 seed startups assessed (Haiku/Sonnet mix) and stored in Supabase.
+- Dev model: Haiku 5.5, effort low. Demo: set `RADAR_MODEL=anthropic/claude-sonnet-5-5`, `RADAR_EFFORT=medium`.
+- Branch `dev`, nothing pushed. Commits have NO Claude co-author trailers (user rule).
+- **Not yet done / next:** (1) verify country picker in the user's browser, (2) one live end-to-end run to verify the
+  Realtime feed (costs ~1–2 cents on Haiku — ask user first), (3) Phase 4: CopilotKit copilot sidebar (Mastra radar agent
+  with tools over the data + generative UI cards; see `knowledge-base/tech/mastra-copilotkit.md`), (4) `next build` check,
+  (5) demo script. Dev server: `npm run dev`; visual QA via headless Chrome screenshots (command in Phase 3b).
