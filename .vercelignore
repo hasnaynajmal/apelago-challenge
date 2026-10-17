@@ -1,0 +1,8 @@
+# Never upload private notes or local secrets to Vercel (env vars are set in the Vercel project instead).
+knowledge-base/
+.env
+.env.*
+!.env.example
+.mastra/
+*.db
+*.log

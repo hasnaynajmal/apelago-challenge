@@ -4,7 +4,7 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { BRL_LEVELS, IRL_DIMENSION_RUBRIC, OCEAN_KPIS, OIRL_LEVELS, TRL_LEVELS } from "@/lib/frameworks";
 
 const modelId = (env: string | undefined, fallback: string) => (env ?? fallback).replace(/^anthropic\//, "");
-export const MAIN_MODEL = modelId(process.env.RADAR_MODEL, "claude-sonnet-5-5");
+export const MAIN_MODEL = modelId(process.env.RADAR_MODEL, "claude-haiku-5-5"); // Haiku by default (cost); Sonnet only via env
 export const FAST_MODEL = modelId(process.env.RADAR_FAST_MODEL, "claude-haiku-5-5");
 const main = () => anthropic(MAIN_MODEL);
 const fast = () => anthropic(FAST_MODEL);
