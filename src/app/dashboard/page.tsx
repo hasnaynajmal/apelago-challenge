@@ -71,19 +71,19 @@ async function Content({ searchParams }: { searchParams: PageProps<"/dashboard">
       <StageBar counts={counts} total={rows.length} lens={lens} />
 
       <section className="space-y-3">
-        <div className="flex items-end justify-between">
-          <div>
+        <div className="flex items-end justify-between gap-4">
+          <div className="min-w-0">
             <h2 className="text-sm font-semibold">Top picks</h2>
             <p className="text-sm text-muted-foreground">The most promising ventures for this thesis right now</p>
           </div>
-          <Link href={`/dashboard/ventures?lens=${lens}`} className="inline-flex items-center gap-1 text-sm font-medium text-navy hover:underline">
+          <Link href={`/dashboard/ventures?lens=${lens}`} className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-sm font-medium text-navy hover:underline">
             All ventures <ArrowRight className="size-3.5" />
           </Link>
         </div>
         <TopPicks rows={top} lens={lens} investorLabel={framing.column} />
       </section>
 
-      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_380px] [&>*]:min-w-0">
         <WeeklyMoves moves={moves} />
         <div className="space-y-6">
           <DeadlinesPanel deadlines={deadlines.slice(0, 3)} lens={lens} max={0} />

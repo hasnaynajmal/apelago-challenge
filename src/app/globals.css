@@ -231,3 +231,10 @@ body {
 .copilotKitButton {
   display: none !important;
 }
+/* Horizontally scrollable rows (tab bars on phones) without a visible scrollbar. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

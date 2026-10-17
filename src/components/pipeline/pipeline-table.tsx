@@ -55,7 +55,45 @@ export function PipelineTable({ rows, lens, investorColumn = "Best investor matc
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Phones: a compact list (the full table needs ~960px). */}
+      <ul className="divide-y md:hidden">
+        {shown.map((r) => (
+          <li key={r.id}>
+            <button
+              type="button"
+              onClick={() => router.push(`/dashboard/startups/${r.id}?lens=${lens}`)}
+              className="flex w-full items-start gap-3 px-4 py-3.5 text-left active:bg-muted/60"
+            >
+              <span className="mt-0.5 w-5 shrink-0 text-xs text-muted-foreground tabular">{rows.indexOf(r) + 1}</span>
+              <span className="min-w-0 flex-1">
+                <span className="flex items-center gap-1.5">
+                  <span className="truncate text-sm font-semibold">{r.name}</span>
+                  {r.alumnus && <span className="shrink-0 rounded-full bg-navy-soft px-1.5 py-px text-[10px] font-medium text-navy">Alumni</span>}
+                </span>
+                <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
+                  {r.sectors[0] && <span>{SECTORS[r.sectors[0]]}</span>}
+                  {r.country && <CountryLabel code={r.country} />}
+                </span>
+                <span className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-muted-foreground">
+                  {r.quadrant && (
+                    <span className={cn("rounded-full px-2 py-px text-[11px] font-medium ring-1 ring-inset", QUADRANTS[r.quadrant].badge)}>{QUADRANTS[r.quadrant].label}</span>
+                  )}
+                  {LEVELS.map((l) => (
+                    <span key={l.k}>{l.label} <b className={cn("font-semibold tabular", l.cls)}>{r.levels[l.k] ?? "–"}</b></span>
+                  ))}
+                </span>
+              </span>
+              <span className="shrink-0 text-right">
+                <span className="block text-lg font-semibold leading-none tabular">{r.promise != null ? Math.round(r.promise) : "–"}</span>
+                <span className="text-[10px] text-muted-foreground">score</span>
+              </span>
+            </button>
+          </li>
+        ))}
+        {shown.length === 0 && <li className="px-4 py-10 text-center text-sm text-muted-foreground">No ventures match.</li>}
+      </ul>
+
+      <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[960px] text-left">
           <thead>
             <tr className="border-b text-sm text-muted-foreground">

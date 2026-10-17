@@ -389,3 +389,17 @@ agents"). Old pipeline events in the DB still say "Committee" (historic rows, no
   context). Instructions: "this page" questions are answered from that context in text; tools only for live data;
   on the Guide and for conceptual questions no tools (cards would repeat the guide). Guide page has its own chips
   (Summarise this guide · Where do I start? · Explain the score · What is a warm intro path?).
+
+## Phase 5b — Mobile pass (2026-10-17) ✅
+Audited every page at 390 px (puppeteer, isMobile) with an overflow detector; before: landing 425 px, Overview 608 px,
+venture page 656 px wide, Ventures table cut off. Fixes:
+- Landing header: smaller gaps, "Assess a startup" hidden below sm (hero has it).
+- Overview: grid children `min-w-0` (truncating text was forcing the width); moves wrap to 2 lines on phones and
+  hide the icon tile; "All ventures" never wraps.
+- Ventures: compact phone list (rank, name, sector/flag, group, levels, score); the full table from md up.
+- Venture page: main tabs and Opportunities sub-tabs scroll horizontally (`.no-scrollbar`), Readiness header stacks,
+  "at a glance" cards are a 2×2 grid on phones (icons hidden).
+- Mobile sidebar sheet: no auto-focus (it popped the "Evaluate for" tooltip) and closes after choosing a page or a
+  thesis. Ask Atlas opens full-screen on phones (CopilotKit default) — verified.
+- After: every page 390/390 wide, no console errors; production build passes. Old lint errors fixed in the venture
+  page; remaining lint errors are inside vendored React Bits components (pre-existing, not built into lint).

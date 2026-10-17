@@ -54,6 +54,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
     .sort((x, y) => ((x.target as Funding).deadline_date! < (y.target as Funding).deadline_date! ? -1 : 1))[0];
   const topFunding = d.matches.find((m) => m.targetType === "funding");
   const nextAction = d.actions[0];
+  // eslint-disable-next-line react-hooks/purity -- server component rendered per request (after connection()), not re-rendered
   const daysTo = (date: string) => Math.round((new Date(date).getTime() - Date.now()) / 86_400_000);
   const counts = {
     investor: d.matches.filter((m) => m.targetType === "investor").length,
@@ -72,7 +73,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex flex-wrap items-center gap-2.5">
             <h1 className="text-3xl font-semibold tracking-[-0.03em]">{s.name}</h1>
-            {s.apelago_alumnus && <span className="rounded-full bg-navy-soft px-2.5 py-0.5 text-xs font-medium text-navy">A'Pelago alumni</span>}
+            {s.apelago_alumnus && <span className="rounded-full bg-navy-soft px-2.5 py-0.5 text-xs font-medium text-navy">A&apos;Pelago alumni</span>}
             {quadrant && (
               <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset", QUADRANTS[quadrant].badge)}>{QUADRANTS[quadrant].label}</span>
             )}
@@ -131,7 +132,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
       {score && (
         <>
           {/* At a glance — the decision in one row */}
-          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
             <Glance icon={Target} label="Verdict" tone={quadrant ? QUADRANTS[quadrant].dot : undefined}>
               <div className="text-sm font-semibold">{quadrant ? QUADRANTS[quadrant].label : "—"}</div>
               <div className="text-xs leading-snug text-muted-foreground">
@@ -161,7 +162,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
 
           {/* Readiness */}
           <section className="space-y-4">
-            <div className="flex items-baseline justify-between">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
               <h2 className="text-base font-semibold">Readiness</h2>
               <span className="text-xs text-muted-foreground">Every level double-checked by the Second Opinion model · open a card for the reasoning</span>
             </div>
@@ -170,7 +171,7 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
 
           {/* Everything else, one tab at a time */}
           <Tabs defaultValue="opportunities" className="w-full">
-            <TabsList variant="line" className="h-12 w-full justify-start gap-8 rounded-none border-b bg-transparent p-0">
+            <TabsList variant="line" className="no-scrollbar h-12 w-full justify-start gap-5 overflow-x-auto overflow-y-hidden rounded-none border-b bg-transparent p-0 sm:gap-8">
               <TabsTrigger value="opportunities" className={TAB}><Network /> Opportunities <Count n={counts.investor + counts.funding + counts.partner} /></TabsTrigger>
               <TabsTrigger value="plan" className={TAB}><ListChecks /> Action plan <Count n={d.actions.length} /></TabsTrigger>
               <TabsTrigger value="connections" className={TAB}><Route /> Connections <Count n={d.connections.length} /></TabsTrigger>
@@ -281,8 +282,8 @@ async function Dossier({ params, searchParams }: Pick<PageProps<"/dashboard/star
 
 function Glance({ icon: Icon, label, tone, children }: { icon: React.ComponentType<{ className?: string }>; label: string; tone?: string; children: React.ReactNode }) {
   return (
-    <div className="card-surface flex gap-3.5 p-5">
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted" style={tone ? { color: tone } : undefined}>
+    <div className="card-surface flex gap-3.5 p-4 sm:p-5">
+      <span className="hidden size-9 shrink-0 items-center justify-center rounded-lg bg-muted sm:flex" style={tone ? { color: tone } : undefined}>
         <Icon className="size-4" />
       </span>
       <div className="min-w-0 space-y-0.5">

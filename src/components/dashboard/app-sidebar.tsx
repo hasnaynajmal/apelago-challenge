@@ -7,7 +7,7 @@ import { ArrowLeft, BookOpen, CalendarClock, Check, Info, LayoutDashboard, Landm
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader,
-  SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail,
+  SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail, useSidebar,
 } from "@/components/ui/sidebar";
 import { INVESTOR_FRAMING, LENSES, resolveLens } from "@/lib/lens";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,8 @@ export function AppSidebar() {
   const params = useSearchParams();
   const lens = resolveLens(params.get("lens") ?? undefined);
   const withLens = (href: string) => `${href}?lens=${lens}`;
+  const { setOpenMobile } = useSidebar();
+  const close = () => setOpenMobile(false); // on phones the sidebar is a sheet: close it after navigating
 
   const NAV = [
     { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
@@ -38,7 +40,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b px-3 py-3.5">
-        <Link href={withLens("/dashboard")} className="flex items-center gap-2 overflow-hidden px-1">
+        <Link href={withLens("/dashboard")} onClick={close} className="flex items-center gap-2 overflow-hidden px-1">
           <Image src="/brand/apelago-logo-navy.svg" alt="A'Pelago" width={88} height={14} className="shrink-0 group-data-[collapsible=icon]:hidden" priority />
           <span className="truncate text-sm font-medium text-muted-foreground group-data-[collapsible=icon]:hidden">Atlas</span>
         </Link>
@@ -50,7 +52,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Assess a startup" className="h-8 bg-navy text-[13px] font-medium text-white hover:bg-navy/90 hover:text-white active:bg-navy active:text-white">
-                  <Link href={withLens("/dashboard/assess")}>
+                  <Link href={withLens("/dashboard/assess")} onClick={close}>
                     <Plus /> <span>Assess a startup</span>
                   </Link>
                 </SidebarMenuButton>
@@ -66,7 +68,7 @@ export function AppSidebar() {
               {NAV.map((n) => (
                 <SidebarMenuItem key={n.href}>
                   <SidebarMenuButton asChild isActive={active(n)} tooltip={n.label} className="h-8 text-[13px] text-zinc-600 data-[active=true]:font-medium data-[active=true]:text-foreground [&>svg]:size-[15px]">
-                    <Link href={withLens(n.href)}>
+                    <Link href={withLens(n.href)} onClick={close}>
                       <n.icon /> <span>{n.label}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -95,7 +97,7 @@ export function AppSidebar() {
               {LENSES.map((l) => (
                 <button
                   key={l.id}
-                  onClick={() => setLens(l.id)}
+                  onClick={() => { setLens(l.id); close(); }}
                   className={cn(
                     "flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left transition-colors",
                     lens === l.id ? "bg-sidebar-accent" : "hover:bg-sidebar-accent/60",

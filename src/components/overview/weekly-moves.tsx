@@ -30,14 +30,14 @@ export function WeeklyMoves({ moves }: { moves: Move[] }) {
           const k = KIND[m.kind];
           return (
             <li key={i}>
-              <Link href={m.href} className="group flex items-center gap-3 px-5 py-3 transition-colors hover:bg-muted/50">
+              <Link href={m.href} className="group flex items-center gap-3 px-4 py-3 sm:px-5 transition-colors hover:bg-muted/50">
                 <span className="w-4 text-right text-xs text-muted-foreground tabular">{i + 1}</span>
-                <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-lg", k.cls)}>
+                <span className={cn("hidden size-8 shrink-0 items-center justify-center rounded-lg sm:flex", k.cls)}>
                   <k.icon className="size-4" />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium leading-snug">{m.title}</span>
-                  <span className="mt-0.5 block truncate text-sm text-muted-foreground">{m.detail}</span>
+                  <span className="line-clamp-2 block text-sm font-medium leading-snug sm:line-clamp-1">{m.title}</span>
+                  <span className="mt-0.5 line-clamp-1 block text-sm text-muted-foreground">{m.detail}</span>
                 </span>
                 <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-xs font-medium", m.urgent ? "bg-amber-50 text-amber-700" : "bg-muted text-zinc-600")}>
                   {m.tag}
