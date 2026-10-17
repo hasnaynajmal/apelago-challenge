@@ -411,3 +411,19 @@ venture page 656 px wide, Ventures table cut off. Fixes:
   Dashboard content padding is smaller on phones (px-4 py-6).
 - README.md written for judges + developers (live links, the 5 questions → where answered, highlights, pipeline diagram, score weights, stack, structure, local setup, env vars, cost, data, limits). .env.example comments updated (Second Opinion, Haiku default).
 - Pushed to GitHub (hasnaynajmal/apelago-challenge): `dev` and `main` both at 11f6ad1 (main fast-forwarded). History checked first: only .env.example tracked, no keys. Vercel Git integration now auto-deploys: push to `main` → production, `dev` → preview.
+
+## Phase 6 — UI v2 redesign (branch `ui-v2`, 2026-10-18) — in progress
+User: one last full UI push on a separate branch (not main/dev), inspired by five reference dashboards (Talab Edu,
+restaurant, "Rp" projects, Nike AI-visibility): fit lots of content but stay clean, clear, never stuffed.
+Plan (design system first, then pages):
+- Tokens: cool grey app background, white rounded panels (≈18px radius, hairline border, faint shadow), one idea per
+  panel, generous padding; navy primary, gold accent only, soft pastel tints for categories.
+- Shell: white sidebar with grouped nav + a thesis switcher card at the top (dropdown); page header inside the
+  content ("Welcome back" + date, right side: venture search, Ask Atlas); slim mobile top bar.
+- Overview: KPI cards (tinted icon tiles, big numbers), pipeline donut + score distribution chart, top-picks
+  leaderboard, clean ventures table preview, deadlines as schedule cards, this week's moves.
+- Ventures: spacious table (initial avatars, group pills, readiness dashes, score) with segmented filter + search.
+- Venture page: header card with score gauge; segmented pill tabs (Overview · Readiness · Opportunities · Action
+  plan · Connections · Deep dive) so one section shows at a time.
+- Deadlines (timeline/schedule cards), Investors (leaderboard), Assess + live run, Guide restyled to the system.
+- Keep every feature working: lens transition, Ask Atlas, mobile, auto-open after a run.
