@@ -236,3 +236,12 @@ skim for a verdict in ~10–20 s; details are reference material for due diligen
   duration, score, group badge, "Open venture"), pipeline steps with each step's latest result, **Readiness tiles**
   as soon as the committee reports, live feed with status dots, amber warnings, auto-scroll and "Live" indicator.
 - Final pipeline event now reads "score 58 for Redstone Blue VC · …" (thesis names, not ids).
+
+## Cost note (2026-10-17)
+- Total API spend reached ~$8: ~25 Sonnet 5.5 runs (first batch + the 20-startup retry batch, 11:38–12:33 Finnish time,
+  web search + high-effort thinking ≈ $0.20–0.40/run). The retry batch kept running in the background after the user's
+  $3 check. Since the Haiku switch (12:31) only 3 UI runs on Haiku (cents).
+- `assessments.model` records which model produced each assessment (22 Sonnet, 2 Haiku at time of writing).
+- Rule: no paid batch/re-run and no switch to Sonnet without the user's explicit OK + cost estimate. Recommend a monthly
+  spend limit in the Anthropic Console.
+- 3 runs stuck in `running` since the morning network outage were marked `error` ("Interrupted").
