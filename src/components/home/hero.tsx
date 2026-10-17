@@ -27,7 +27,7 @@ export function Hero({ stats }: { stats: HeroStats }) {
         <DotGrid dotSize={2} gap={26} baseColor="#e4e4e7" activeColor="#002444" proximity={110} />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-6 pb-16 pt-20 text-center">
+      <div className="relative mx-auto max-w-7xl px-6 pb-14 pt-16 text-center">
         <div className="inline-flex items-center gap-2 rounded-full border bg-white px-3.5 py-1.5 text-sm shadow-sm">
           <span className="size-1.5 rounded-full bg-gold" />
           <ShinyText text="A'Pelago × Redstone Blue · venture intelligence for the blue economy" speed={3} color="#6b6b74" shineColor="#002444" />
@@ -57,11 +57,11 @@ export function Hero({ stats }: { stats: HeroStats }) {
             <Link href="/intake">Assess a startup <ArrowRight /></Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="h-11 rounded-full bg-white px-6 text-[15px]">
-            <Link href="#ranking">See the ranking</Link>
+            <Link href="#pipeline">View the pipeline</Link>
           </Button>
         </div>
 
-        <dl className="mx-auto mt-16 grid max-w-4xl grid-cols-2 divide-x divide-y rounded-2xl border bg-white text-left shadow-sm sm:grid-cols-4 sm:divide-y-0">
+        <dl className="mx-auto mt-12 grid max-w-4xl grid-cols-2 divide-x divide-y rounded-2xl border bg-white text-left shadow-sm sm:grid-cols-4 sm:divide-y-0">
           <Stat label="Ventures assessed" value={stats.assessed} suffix={`/${stats.total}`} />
           <Stat label="Investors, grants & partners" value={stats.opportunities} />
           <Stat label="Warm intro paths" value={stats.warmPaths} />

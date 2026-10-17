@@ -12,8 +12,8 @@ export function SiteHeader() {
           <span className="text-[15px] font-medium text-foreground">Opportunity Radar</span>
         </Link>
         <nav className="hidden items-center gap-6 text-[15px] text-muted-foreground md:flex">
-          <Link href="/" className="transition-colors hover:text-foreground">Radar</Link>
-          <Link href="/#ranking" className="transition-colors hover:text-foreground">Ranking</Link>
+          <Link href="/#pipeline" className="transition-colors hover:text-foreground">Pipeline</Link>
+          <Link href="/#deadlines" className="transition-colors hover:text-foreground">Deadlines</Link>
         </nav>
         <div className="ml-auto">
           <Button asChild size="lg" className="rounded-full px-5">

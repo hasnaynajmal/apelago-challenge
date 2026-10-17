@@ -36,7 +36,7 @@ export function IntakeForm({ lens }: { lens: string }) {
 
   const field = "h-12 rounded-xl bg-white text-[15px]";
   return (
-    <form onSubmit={submit} className="card-surface space-y-5 p-8 shadow-lg shadow-zinc-200/60">
+    <form onSubmit={submit} className="card-surface space-y-5 p-7 shadow-lg shadow-zinc-200/60">
       <div className="grid gap-4 sm:grid-cols-[1fr_110px]">
         <label className="space-y-2">
           <span className="text-sm font-medium">Startup name</span>
@@ -53,7 +53,7 @@ export function IntakeForm({ lens }: { lens: string }) {
       </label>
       <label className="block space-y-2">
         <span className="text-sm font-medium">What do they do? <span className="font-normal text-muted-foreground">Optional</span></span>
-        <Textarea name="oneLiner" rows={3} placeholder="One line about the venture" className="rounded-xl bg-white text-[15px]" />
+        <Textarea name="oneLiner" rows={2} placeholder="One line about the venture" className="rounded-xl bg-white text-[15px]" />
       </label>
       <Button type="submit" size="lg" disabled={busy} className="h-12 w-full rounded-full text-[15px]">
         {busy ? <Loader2 className="animate-spin" /> : null} Run the assessment <ArrowRight />

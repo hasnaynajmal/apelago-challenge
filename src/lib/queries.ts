@@ -1,4 +1,5 @@
 // Read models for the UI (server-side). Uncached: results change whenever the pipeline runs.
+import { quadrantOf, type Quadrant } from "./quadrant";
 import { supabaseAdmin } from "./supabase/admin";
 import type { Framework, Sector, Stage } from "./taxonomy";
 import type { Assessment, Funding, Investor, Partner, Startup } from "./types";
@@ -134,6 +135,88 @@ export async function getDossier(id: string, lens: string): Promise<Dossier | nu
     connections: (connections.data ?? []) as ConnectionView[],
     actions: (actions.data ?? []) as ActionView[],
   };
+}
+
+// ---------- Pipeline (home) ----------
+
+export type { Quadrant } from "./quadrant";
+
+export interface PipelineRow extends RadarItem {
+  readiness: number | null; // mean of TRL, BRL, IRL
+  quadrant: Quadrant | null;
+  topInvestor: { name: string; fit: number } | null;
+  topFunding: { name: string; deadline: string | null } | null;
+  topPartner: { name: string } | null;
+  nextStep: { title: string; owner: string } | null;
+}
+
+export async function getPipeline(lens: string): Promise<PipelineRow[]> {
+  const db = supabaseAdmin();
+  const [base, matches, actions, investors, funding, partners] = await Promise.all([
+    getRadar(lens),
+    db.from("matches").select("startup_id,target_type,target_id,fit").eq("thesis_id", lens).eq("rank", 1),
+    db.from("actions").select("startup_id,title,owner,rank").eq("rank", 1),
+    db.from("investors").select("id,name"),
+    db.from("funding").select("id,name,deadline_date"),
+    db.from("partners").select("id,name"),
+  ]);
+  const name = (list: { id: string; name: string }[] | null, id?: string) => list?.find((x) => x.id === id)?.name ?? null;
+  return base.map((r) => {
+    const levels = [r.levels.trl, r.levels.brl, r.levels.irl].filter((x): x is number => x != null);
+    const readiness = levels.length ? levels.reduce((a, b) => a + b, 0) / levels.length : null;
+    const m = (t: string) => matches.data?.find((x) => x.startup_id === r.id && x.target_type === t);
+    const inv = m("investor");
+    const fun = m("funding");
+    const par = m("partner");
+    const act = actions.data?.find((x) => x.startup_id === r.id);
+    const fundRow = funding.data?.find((x) => x.id === fun?.target_id);
+    return {
+      ...r,
+      readiness,
+      quadrant: readiness != null && r.thesisFit != null ? quadrantOf(readiness, r.thesisFit) : null,
+      topInvestor: inv ? { name: name(investors.data, inv.target_id) ?? inv.target_id, fit: inv.fit } : null,
+      topFunding: fundRow ? { name: fundRow.name, deadline: fundRow.deadline_date } : null,
+      topPartner: par ? { name: name(partners.data, par.target_id) ?? par.target_id } : null,
+      nextStep: act ? { title: act.title, owner: act.owner } : null,
+    };
+  });
+}
+
+export interface DeadlineRow {
+  id: string;
+  name: string;
+  provider: string | null;
+  date: string;
+  days: number;
+  amount: number | null;
+  eligible: { id: string; name: string; status: string }[];
+}
+
+/** Upcoming funding deadlines across the whole portfolio, with the ventures that match each call. */
+export async function getDeadlines(lens: string, horizonDays = 120): Promise<DeadlineRow[]> {
+  const db = supabaseAdmin();
+  const today = new Date();
+  const until = new Date(today.getTime() + horizonDays * 86_400_000).toISOString().slice(0, 10);
+  const { data: calls } = await db
+    .from("funding").select("id,name,provider,deadline_date,amount_max_eur")
+    .gte("deadline_date", today.toISOString().slice(0, 10)).lte("deadline_date", until).order("deadline_date");
+  if (!calls?.length) return [];
+  const [{ data: m }, { data: s }] = await Promise.all([
+    db.from("matches").select("startup_id,target_id,status,fit").eq("thesis_id", lens).eq("target_type", "funding").in("target_id", calls.map((c) => c.id)),
+    db.from("startups").select("id,name"),
+  ]);
+  return calls.map((c) => ({
+    id: c.id,
+    name: c.name,
+    provider: c.provider,
+    date: c.deadline_date,
+    days: Math.round((new Date(c.deadline_date).getTime() - today.getTime()) / 86_400_000),
+    amount: c.amount_max_eur,
+    eligible: (m ?? [])
+      .filter((x) => x.target_id === c.id)
+      .sort((a, b) => b.fit - a.fit)
+      .map((x) => ({ id: x.startup_id, name: s?.find((y) => y.id === x.startup_id)?.name ?? x.startup_id, status: x.status })),
+  }));
 }
 
 export async function getStartupNames(): Promise<{ id: string; name: string }[]> {
