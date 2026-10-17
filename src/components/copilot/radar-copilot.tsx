@@ -19,7 +19,7 @@ import { LENSES, resolveLens } from "@/lib/lens";
 import { cn } from "@/lib/utils";
 import { useLensTransition } from "@/components/dashboard/lens-transition";
 import { Plus, X } from "lucide-react";
-import { SmoothMarkdown, ThinkingSlot } from "./chat-parts";
+import { ThinkingSlot } from "./chat-parts";
 import {
   CompareCard,
   ConnectionsCard,
@@ -80,8 +80,11 @@ export function RadarCopilot({ children }: { children: React.ReactNode }) {
           width={440}
           toggleButton={{ className: "hidden" }}
           header={DrawerHeaderSlot}
-          // "Thinking…" shimmer instead of "Thought for N seconds"; answers type out at a reading pace.
-          messageView={{ reasoningMessage: ThinkingSlot, assistantMessage: { markdownRenderer: SmoothMarkdown } }}
+          // "Thinking…" shimmer instead of "Thought for N seconds".
+          messageView={{ reasoningMessage: ThinkingSlot }}
+          // Scroll once to the sent question, then let the answer stream below it without the view chasing every
+          // chunk (the default pin-to-bottom re-scrolls on each token, which blurs the text).
+          autoScroll="pin-to-send"
           labels={{
             modalHeaderTitle: "Ask Atlas",
             chatInputPlaceholder: "Ask Atlas anything…",
