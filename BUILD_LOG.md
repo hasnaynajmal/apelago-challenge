@@ -469,3 +469,9 @@ Done (all on `ui-v2`; main/dev untouched):
   - Assess form no longer waits for searchParams (reads the lens from the URL at submit), so it is part of the
     static shell; Recent assessments has a list-shaped skeleton.
 - Ask Atlas scrolling reverted to CopilotKit's default (user preferred following the answer down).
+
+## UI v2 live (2026-10-18)
+- Old live version kept on branch **`ui-v1`** (= previous main, cad6ed2, incl. the user's PR #1 merge).
+- `ui-v2` merged into `main` (merge commit cbaf043, tree identical to ui-v2) → Vercel production deployed.
+- Live check: all pages 200 with the new UI; warm full-page loads 0.19–0.41 s (before: 0.65–2.1 s).
+- `dev` was not touched (still at the pre-redesign state); new work can continue on main/ui-v2.
