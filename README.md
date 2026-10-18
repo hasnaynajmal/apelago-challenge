@@ -42,6 +42,10 @@ The challenge asked for a prototype that answers five questions. Each one has a 
   the portfolio, upcoming funding deadlines with eligible ventures, and the investors worth activating first.
 - Works on desktop and phone.
 
+## Architecture
+
+![A'Pelago Atlas architecture: users reach one Next.js app on Vercel (dashboard, Ask Atlas, two API routes); the Deep Panel agent team (Mastra, Claude Haiku) runs Scout, readiness review, Matchmaker, Connector, Narrator and Strategist; Anthropic Claude and a Second Opinion model are external AI services; Supabase Postgres stores everything and streams the live run feed](docs/architecture.png)
+
 ## How an assessment works
 
 ```
@@ -174,4 +178,4 @@ relationships are curated for the prototype and would be connected to live sourc
 
 ## Team
 
-Built by Hasnain Ajmal at JunctionX Turku 2026.
+**Team Outliers** — Hasnain, Behroz, Abubakar and Rehan — at JunctionX Turku 2026.

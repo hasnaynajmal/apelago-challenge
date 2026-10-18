@@ -475,3 +475,9 @@ Done (all on `ui-v2`; main/dev untouched):
 - `ui-v2` merged into `main` (merge commit cbaf043, tree identical to ui-v2) → Vercel production deployed.
 - Live check: all pages 200 with the new UI; warm full-page loads 0.19–0.41 s (before: 0.65–2.1 s).
 - `dev` was not touched (still at the pre-redesign state); new work can continue on main/ui-v2.
+
+## Submission wrap-up (2026-10-18)
+- Architecture diagram added as `docs/architecture.png` and shown in the README ("Architecture" section); README
+  team line now names Team Outliers (Hasnain, Behroz, Abubakar, Rehan).
+- Pitch deck (12 slides) and demo video assets live outside git in `pitch-assets/` (excluded via .git/info/exclude).
+- Origin by Ocean was assessed live during the demo recording → 26 ventures in the database.
