@@ -43,7 +43,7 @@ yarn-error.log*
 # mastra local state
 .mastra/
 *.db
-
+pitch-assets/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
